@@ -1,26 +1,32 @@
-<template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
-</template>
+<script setup>
 
-<script>
-import HelloWorld from './components/HelloWorld.vue'
+import { RouterView } from 'vue-router';
 
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+
+<template>
+  <div class="wrapper">
+    <suspense>
+      <RouterView />
+    </suspense>
+  </div>
+</template>
+
+
+<style scoped>
+
+.wrapper {
+  margin: 0;
+  width: 100%;
+  height: 100vh;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  background-color: bisque;
 }
+
+.wrapper h1{
+  font-size: 25px;
+  /* color: black; */
+}
+
 </style>
