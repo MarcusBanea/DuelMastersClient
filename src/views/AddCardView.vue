@@ -19,9 +19,9 @@ const cardRealms = ["Light", "Darkness", "Nature", "Fire", "Aqua"];
 
 const cardLightClasses = ["Angel Command", "Guardian", "Light Bringer"];
 const cardDarknessClasses = ["Demon Command", "Dark Lord", "Brain Jacker"];
-const cardNatureClasses = ["soon"];
-const cardFireClasses = ["soon"];
-const cardAquaClasses = ["soon"];
+const cardNatureClasses = ["Horned Beast"];
+const cardFireClasses = ["Armored Dragon"];
+const cardAquaClasses = ["Cyber Virus"];
 
 const imageSet = ref(false);
 
@@ -149,6 +149,7 @@ const getCardImage = computed(() => {
     return "";
   }
 });
+
 </script>
     
 <template>
@@ -229,10 +230,6 @@ const getCardImage = computed(() => {
             </div>
           </form>
         </div>
-
-        <!-- <div v-if="imageSet">
-          <ImageContainer :image-url="getCardImage" />
-        </div> -->
       </div>
     </div>
   </div>
