@@ -14,7 +14,9 @@ const props = defineProps({
   defaultValue: String,
 });
 
-const selectedOption = ref(props.defaultValue === undefined ? props.noValueSelected : props.defaultValue);
+const selectedOption = ref(
+  props.defaultValue === undefined ? props.noValueSelected : props.defaultValue
+);
 </script>
     
     
@@ -44,7 +46,9 @@ const selectedOption = ref(props.defaultValue === undefined ? props.noValueSelec
       :disabled="disabled"
       @change="$emit('update:modelValue', $event.target.value)"
     >
-      <option :selected="noValueSelected" disabled>{{ noValueSelected }}</option>
+      <option :selected="noValueSelected" disabled>
+        {{ noValueSelected }}
+      </option>
       <option v-for="option in options" :value="option" :key="option">
         {{ option }}
       </option>
@@ -53,5 +57,5 @@ const selectedOption = ref(props.defaultValue === undefined ? props.noValueSelec
 </template>
     
     
-    <style scoped>
+<style scoped>
 </style>

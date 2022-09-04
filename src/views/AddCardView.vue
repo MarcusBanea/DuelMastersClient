@@ -3,6 +3,8 @@ import FormInputString from "../components/FormInputString.vue";
 import FormInputSelect from "../components/FormInputSelect.vue";
 import FormInputCheckbox from "../components/FormInputCheckbox.vue";
 import { computed, ref } from "@vue/runtime-core";
+import FormInputFile from "../components/FormInputFile.vue";
+import ImageContainer from "../components/ImageContainer.vue";
 
 const cardNameField = ref("");
 const cardRealmField = ref("");
@@ -10,6 +12,7 @@ const cardClassField = ref("");
 const cardManaField = ref("");
 const cardPowerField = ref("");
 const cardNumberOfShieldsBreakerField = ref("");
+const cardImageField = ref();
 const cardEvolutionStatusField = ref(false);
 
 const cardRealms = ["Light", "Darkness", "Nature", "Fire", "Aqua"];
@@ -20,17 +23,21 @@ const cardNatureClasses = ["soon"];
 const cardFireClasses = ["soon"];
 const cardAquaClasses = ["soon"];
 
+const imageSet = ref(false);
+
 const isRealmSelected = computed(() => {
   return cardRealmField.value ? true : false;
 });
 
 const areFieldsValid = computed(() => {
-  return cardNameField.value !== "" && 
+  return (
+    cardNameField.value !== "" &&
     cardRealmField.value !== "" &&
     cardClassField.value !== "" &&
     cardManaField.value !== "" &&
     cardPowerField.value !== "" &&
-    cardNumberOfShieldsBreakerField.value !== "";
+    cardNumberOfShieldsBreakerField.value !== ""
+  );
 });
 
 const getClassesForSelectedRealm = computed(() => {
@@ -53,21 +60,95 @@ const getClassesForSelectedRealm = computed(() => {
   }
 });
 
-function addNewCardToDB() {
+async function addNewCardToDB() {
+  const blob = await testImageRenderFromBlob();
+  console.log(blob);
+
+  // cardImageField.value = await toBase64(cardImageField.value);
+  // cardImageField.value = cardImageField.value.replace('data:image/jpeg;base64,','');
+  // cardImageField.value = _base64ToArrayBuffer(cardImageField.value);
+  // console.log(cardImageField.value);
+
+  //imageSet.value = true;
+
+  var formData = new FormData();
+
+  formData.append("file", cardImageField.value);
+  formData.append(
+    "card",
+    new Blob(
+      [
+        JSON.stringify({
+          name: cardNameField.value,
+          cardRealm: cardRealmField.value,
+          cardClass: cardClassField.value,
+          mana: cardManaField.value,
+          power: cardPowerField.value,
+          breakerNumber: cardNumberOfShieldsBreakerField.value,
+          isEvolution: cardEvolutionStatusField.value,
+        }),
+      ],
+      {
+        type: "application/json",
+      }
+    )
+  );
+
+  var boundary = Math.random().toString().substr(2);
+
   fetch("/api/cards/add", {
     method: "POST",
-    headers: { "Content-Type": "application/json;charset=UTF-8" },
-    body: JSON.stringify({
-      name: cardNameField.value,
-      cardRealm: cardRealmField.value,
-      cardClass: cardClassField.value,
-      mana: cardManaField.value,
-      power: cardPowerField.value,
-      breakerNumber: cardNumberOfShieldsBreakerField.value,
-      isEvolution: cardEvolutionStatusField.value,
-    }),
+    body: formData,
+  })
+    .then(function (response) {
+      if (response.status !== 200) {
+        alert("There was an error!");
+      } else {
+        alert("Request successful");
+      }
+    })
+    .catch(function (err) {
+      alert("There was an error!");
+    });
+}
+
+const toBase64 = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
+
+function _base64ToArrayBuffer(base64) {
+  var binary_string = window.atob(base64);
+  var len = binary_string.length;
+  var bytes = new Uint8Array(len);
+  for (var i = 0; i < len; i++) {
+    bytes[i] = binary_string.charCodeAt(i);
+  }
+  return bytes.buffer;
+}
+
+async function blobFromImage() {
+  return new Blob([await new Response(cardImageField.value).arrayBuffer()], {
+    type: cardImageField.value.name,
   });
 }
+
+async function testImageRenderFromBlob() {
+  var blob = await blobFromImage();
+  const array = new Uint8Array(await blob.arrayBuffer());
+  return array;
+}
+
+const getCardImage = computed(() => {
+  if (cardImageField.value !== undefined) {
+    return cardImageField.value;
+  } else {
+    return "";
+  }
+});
 </script>
     
 <template>
@@ -75,7 +156,7 @@ function addNewCardToDB() {
     <div class="grid place-items-center h-screen">
       <div class="bg-myDarkGreen rounded-2xl">
         <div>
-            <h1 class="font-bold text-myBlack text-xl mt-2 mb-2">Create card</h1>
+          <h1 class="font-bold text-myBlack text-xl mt-2 mb-2">Create card</h1>
         </div>
         <div>
           <form
@@ -119,10 +200,12 @@ function addNewCardToDB() {
 
               <FormInputSelect
                 label="How many shields can break?"
-                :options="['None', 1, 2, 3, 4, 5]"
+                :options="[0, 1, 2, 3, 4, 5]"
                 no-value-selected="Choose a number"
                 v-model="cardNumberOfShieldsBreakerField"
               />
+
+              <FormInputFile label="Image" v-model="cardImageField" />
 
               <FormInputCheckbox
                 label="Evolution?"
@@ -130,14 +213,26 @@ function addNewCardToDB() {
               />
 
               <button
-                class="rounded-md bg-myDarkGreen disabled:opacity-50 text-myBlack font-bold px-3 "
-                type="submit" :disabled="!areFieldsValid"
+                class="
+                  rounded-md
+                  bg-myDarkGreen
+                  disabled:opacity-50
+                  text-myBlack
+                  font-bold
+                  px-3
+                "
+                type="submit"
+                :disabled="!areFieldsValid"
               >
                 Add
               </button>
             </div>
           </form>
         </div>
+
+        <!-- <div v-if="imageSet">
+          <ImageContainer :image-url="getCardImage" />
+        </div> -->
       </div>
     </div>
   </div>

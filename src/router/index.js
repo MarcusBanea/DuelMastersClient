@@ -1,5 +1,6 @@
 import AddCardView from "../views/AddCardView.vue";
 import { createRouter, createWebHashHistory, createWebHistory } from "vue-router";
+import CardCollection from "../views/CardCollection.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -8,6 +9,11 @@ const router = createRouter({
             path: "/addCard",
             name: "addCard",
             component: AddCardView
+        },
+        {
+            path: "/cardCollection",
+            name: "cardCollection",
+            component: CardCollection
         }
     ]
 });
