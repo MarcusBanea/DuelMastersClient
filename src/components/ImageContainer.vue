@@ -18,7 +18,6 @@ const cssProps = computed(() => {
 });
 
 function _base64ToArrayBuffer(base64) {
-    console.log(base64);
     var binary_string = atob(base64);
     var len = binary_string.length;
     var bytes = new Uint8Array(len);

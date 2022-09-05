@@ -12,16 +12,18 @@ const cardClassField = ref("");
 const cardManaField = ref("");
 const cardPowerField = ref("");
 const cardNumberOfShieldsBreakerField = ref("");
+const cardTypefield = ref("");
+const cardAbilityField = ref("");
+const cardRarityField = ref("");
 const cardImageField = ref();
-const cardEvolutionStatusField = ref(false);
 
 const cardRealms = ["Light", "Darkness", "Nature", "Fire", "Aqua"];
 
 const cardLightClasses = ["Angel Command", "Guardian", "Light Bringer"];
 const cardDarknessClasses = ["Demon Command", "Dark Lord", "Brain Jacker"];
-const cardNatureClasses = ["Horned Beast"];
-const cardFireClasses = ["Armored Dragon"];
-const cardAquaClasses = ["Cyber Virus"];
+const cardNatureClasses = ["Horned Beast", "Giant Insect"];
+const cardFireClasses = ["Armored Dragon", "Armored Wyvern"];
+const cardAquaClasses = ["Cyber Virus", "Liquid People", "Leviathan"];
 
 const imageSet = ref(false);
 
@@ -36,7 +38,10 @@ const areFieldsValid = computed(() => {
     cardClassField.value !== "" &&
     cardManaField.value !== "" &&
     cardPowerField.value !== "" &&
-    cardNumberOfShieldsBreakerField.value !== ""
+    cardNumberOfShieldsBreakerField.value !== "" &&
+    cardTypefield.value !== "" &&
+    cardAbilityField.value !== "" &&
+    cardRarityField.value !== ""
   );
 });
 
@@ -62,7 +67,7 @@ const getClassesForSelectedRealm = computed(() => {
 
 async function addNewCardToDB() {
   const blob = await testImageRenderFromBlob();
-  console.log(blob);
+  //console.log(blob);
 
   // cardImageField.value = await toBase64(cardImageField.value);
   // cardImageField.value = cardImageField.value.replace('data:image/jpeg;base64,','');
@@ -73,6 +78,9 @@ async function addNewCardToDB() {
 
   var formData = new FormData();
 
+  // console.log(cardRarityField.value.substring(0, cardRarityField.value.indexOf(" ")));
+
+  
   formData.append("file", cardImageField.value);
   formData.append(
     "card",
@@ -85,7 +93,9 @@ async function addNewCardToDB() {
           mana: cardManaField.value,
           power: cardPowerField.value,
           breakerNumber: cardNumberOfShieldsBreakerField.value,
-          isEvolution: cardEvolutionStatusField.value,
+          type: cardTypefield.value,
+          ability: cardAbilityField.value,
+          rarity: cardRarityField.value.substring(0, cardRarityField.value.indexOf(" "))
         }),
       ],
       {
@@ -199,6 +209,12 @@ const getCardImage = computed(() => {
                 v-model="cardPowerField"
               />
 
+              <FormInputString 
+                label="Ability"
+                placeholder="Ability"
+                v-model="cardAbilityField"
+              />
+
               <FormInputSelect
                 label="How many shields can break?"
                 :options="[0, 1, 2, 3, 4, 5]"
@@ -206,12 +222,21 @@ const getCardImage = computed(() => {
                 v-model="cardNumberOfShieldsBreakerField"
               />
 
-              <FormInputFile label="Image" v-model="cardImageField" />
-
-              <FormInputCheckbox
-                label="Evolution?"
-                v-model="cardEvolutionStatusField"
+              <FormInputSelect
+                label="Type"
+                :options="['Creature', 'Spell', 'Evolution']"
+                no-value-selected="Choose a card type"
+                v-model="cardTypefield"
               />
+
+              <FormInputSelect 
+                label="Rarity"
+                :options='["0 - Common", "30 - Uncommon", "50 - Rare", "70 - Very Rare", "90 - Super Rare", "100 - Legendary"]'
+                no-value-selected="Choose a rarity"
+                v-model="cardRarityField"
+              />
+
+              <FormInputFile label="Image" v-model="cardImageField" />
 
               <button
                 class="
