@@ -69,6 +69,7 @@ async function getCardsWithRarity(rarity) {
       <ul id="Rarity-navbar" class="grid grid-cols-6 h-auto mt-5 mb-4 border-b-4">
         <li
           class="
+            text-myDarkGreen
             cursor-pointer
             mb-7
             transition

@@ -19,11 +19,11 @@ const cardImageField = ref();
 
 const cardRealms = ["Light", "Darkness", "Nature", "Fire", "Aqua"];
 
-const cardLightClasses = ["Angel Command", "Guardian", "Light Bringer"];
-const cardDarknessClasses = ["Demon Command", "Dark Lord", "Brain Jacker"];
-const cardNatureClasses = ["Horned Beast", "Giant Insect"];
-const cardFireClasses = ["Armored Dragon", "Armored Wyvern"];
-const cardAquaClasses = ["Cyber Virus", "Liquid People", "Leviathan"];
+const cardLightClasses = ["None","Angel Command", "Guardian", "Light Bringer"];
+const cardDarknessClasses = ["None","Demon Command", "Dark Lord", "Brain Jacker"];
+const cardNatureClasses = ["None","Horned Beast", "Giant Insect"];
+const cardFireClasses = ["None","Armored Dragon", "Armored Wyvern"];
+const cardAquaClasses = ["None","Cyber Virus", "Liquid People", "Leviathan", "Survivor"];
 
 const imageSet = ref(false);
 
