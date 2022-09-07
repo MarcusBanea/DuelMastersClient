@@ -57,6 +57,8 @@ async function openSelectedPack() {
               v-for="card in contentOfPack"
               :key="card"
               :image-url="card.image"
+              :flip-animation-on="true"
+              :card-rarity="card.rarity"
               
             />
           </div>

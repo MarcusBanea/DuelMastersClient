@@ -1,12 +1,15 @@
 <script setup>
-import { computed } from '@vue/reactivity';
+import { computed, ref } from '@vue/reactivity';
 
 
 const props = defineProps({
     imageUrl: String,
     containerWidth: String,
     containerHeight: String,
-    imageBorderRadius: String
+    imageBorderRadius: String,
+
+    flipAnimationOn: Boolean,
+    cardRarity: String
 });
 
 const cssProps = computed(() => {
@@ -34,13 +37,26 @@ const imageSrc = computed(() => {
     return imgUrl;
 });
 
+
+const clicked = ref(false);
+
 </script>
 
 
 <template>
     <div :style="cssProps" class="image-container">
-        <img v-if="imageUrl" :src="imageSrc" />
-        <img v-else src="@/assets/defaultUser.jpg" />
+        <div v-if="props.flipAnimationOn || props.cardRarity">
+            <img v-if="clicked" :src="imageSrc" />
+            <img v-if="props.cardRarity === 0 && clicked === false" src="../assets/common-card.png" @click="clicked = true"/>
+            <img v-else-if="props.cardRarity === 30 && clicked === false" src="../assets/uncommon-card.png" @click="clicked = true"/>
+            <img v-else-if="props.cardRarity === 50 && clicked === false" src="../assets/rare-card.png" @click="clicked = true"/>
+            <img v-else-if="props.cardRarity === 70 && clicked === false" src="../assets/very-rare-card.png" @click="clicked = true"/>
+            <img v-else-if="props.cardRarity === 90 && clicked === false" src="../assets/super-rare-card.png" @click="clicked = true"/>
+            <img v-else-if="props.cardRarity === 100 && clicked === false" src="../assets/legendary-card.png" @click="clicked = true"/>
+        </div>
+        <div v-else>
+            <img :src="imageSrc" />
+        </div>
     </div>
 </template>
 
@@ -60,4 +76,5 @@ const imageSrc = computed(() => {
     object-fit: cover;
     border-radius: var(--border-radius);
 }
+
 </style>
