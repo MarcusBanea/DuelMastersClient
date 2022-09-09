@@ -47,12 +47,12 @@ const clicked = ref(false);
     <div :style="cssProps" class="image-container">
         <div v-if="props.flipAnimationOn || props.cardRarity">
             <img v-if="clicked" :src="imageSrc" />
-            <img v-if="props.cardRarity === 0 && clicked === false" src="../assets/common-card.png" @click="clicked = true"/>
-            <img v-else-if="props.cardRarity === 30 && clicked === false" src="../assets/uncommon-card.png" @click="clicked = true"/>
-            <img v-else-if="props.cardRarity === 50 && clicked === false" src="../assets/rare-card.png" @click="clicked = true"/>
-            <img v-else-if="props.cardRarity === 70 && clicked === false" src="../assets/very-rare-card.png" @click="clicked = true"/>
-            <img v-else-if="props.cardRarity === 90 && clicked === false" src="../assets/super-rare-card.png" @click="clicked = true"/>
-            <img v-else-if="props.cardRarity === 100 && clicked === false" src="../assets/legendary-card.png" @click="clicked = true"/>
+            <img v-if="props.cardRarity === 'Common' && clicked === false" src="../assets/common-card.png" @click="clicked = true"/>
+            <img v-else-if="props.cardRarity === 'Uncommon' && clicked === false" src="../assets/uncommon-card.png" @click="clicked = true"/>
+            <img v-else-if="props.cardRarity === 'Rare' && clicked === false" src="../assets/rare-card.png" @click="clicked = true"/>
+            <img v-else-if="props.cardRarity === 'VeryRare' && clicked === false" src="../assets/very-rare-card.png" @click="clicked = true"/>
+            <img v-else-if="props.cardRarity === 'SuperRare' && clicked === false" src="../assets/super-rare-card.png" @click="clicked = true"/>
+            <img v-else-if="props.cardRarity === 'Legendary' && clicked === false" src="../assets/legendary-card.png" @click="clicked = true"/>
         </div>
         <div v-else>
             <img :src="imageSrc" />

@@ -5,18 +5,29 @@ import ImageContainer from "../components/ImageContainer.vue";
 const response = await fetch("/api/packs");
 const packs = ref(await response.json());
 
+const responseUser = await fetch("/api/users/631b10bc5f56771e8167ee17");
+const user = ref(await responseUser.json());
+
 const selectedPack = ref();
+const openedPack = ref(false);
 
 const contentOfPack = ref();
 
 function selectPack(index) {
+  openedPack.value = false;
   selectedPack.value = packs.value[index];
+  contentOfPack.value = null;
 }
 
 async function openSelectedPack() {
-  let packType = selectedPack.value.name.replace(/\s/g, "");
-  const response = await fetch("/api/packs/open/" + packType);
+  let packType = selectedPack.value.name;
+  const response = await fetch("/api/users/openPack/631b10bc5f56771e8167ee17?packType=" + packType);
   contentOfPack.value = [...(await response.json())];
+  const responseUser = await fetch("/api/users/631b10bc5f56771e8167ee17");
+  user.value = await responseUser.json();
+  selectedPack.value = null;
+  openedPack.value = true;
+  
 }
 </script>
 
@@ -25,6 +36,37 @@ async function openSelectedPack() {
 
 
 <template>
+  <div
+    class="
+      absolute
+      w-screen
+      h-[7%]
+      bg-myBlack
+      grid
+      grid-cols-[45%_10%_45%]
+      place-items-center
+      text-myLightGray
+      border-b-4
+    "
+  >
+    <div class="w-[100%]">
+      <p class="float-right min-w-min">
+        {{ user.nickname }}
+      </p>
+    </div>
+    <div class="grid place-items-center">
+      <img src="../assets/avatar.jpg" class="absolute w-[5%] rounded-full border-4" :title="user.nickname"/>
+    </div>
+    <div class="w-[100%]">
+      <p class="float-left min-w-min">
+        {{ user.money }}
+      </p>
+      <div class="w-48">
+        <img src="../assets/money.png" class="w-[15%] h-[15%]" />
+      </div>
+    </div>
+  </div>
+
   <div
     id="page"
     class="bg-myDarkGreen w-screen h-screen grid place-items-center"
@@ -59,7 +101,6 @@ async function openSelectedPack() {
               :image-url="card.image"
               :flip-animation-on="true"
               :card-rarity="card.rarity"
-              
             />
           </div>
         </div>
@@ -139,6 +180,23 @@ async function openSelectedPack() {
                 type="submit"
               >
                 OPEN
+              </button>
+              <button
+                v-if="openedPack"
+                @click="openSelectedPack"
+                class="
+                  rounded-md
+                  bg-myDarkGreen
+                  disabled:opacity-50
+                  text-myBlack
+                  font-bold
+                  px-5
+                  py-2
+                  text-xl
+                "
+                type="submit"
+              >
+                STORE
               </button>
             </div>
           </div>
