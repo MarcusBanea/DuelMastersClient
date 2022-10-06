@@ -37,6 +37,14 @@ const imageSrc = computed(() => {
     return imgUrl;
 });
 
+function getImage() {
+    const imgBlob = new Blob([_base64ToArrayBuffer(props.imageUrl)]);
+    let urlCreator = URL;
+    let imgUrl = urlCreator.createObjectURL(imgBlob);
+    return imgUrl;
+}
+
+
 
 const clicked = ref(false);
 
@@ -55,7 +63,7 @@ const clicked = ref(false);
             <img v-else-if="props.cardRarity === 'Legendary' && clicked === false" src="../assets/legendary-card.png" @click="clicked = true"/>
         </div>
         <div v-else>
-            <img :src="imageSrc" />
+            <img :src="getImage()" />
         </div>
     </div>
 </template>

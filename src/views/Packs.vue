@@ -2,15 +2,17 @@
 import { ref } from "@vue/reactivity";
 import ImageContainer from "../components/ImageContainer.vue";
 
+//list of packs
 const response = await fetch("/api/packs");
 const packs = ref(await response.json());
 
+//current user
 const responseUser = await fetch("/api/users/631b10bc5f56771e8167ee17");
 const user = ref(await responseUser.json());
 
+//selected pack
 const selectedPack = ref();
 const openedPack = ref(false);
-
 const contentOfPack = ref();
 
 function selectPack(index) {
@@ -21,14 +23,23 @@ function selectPack(index) {
 
 async function openSelectedPack() {
   let packType = selectedPack.value.name;
+  //currently using a hardcoded user id, will be replaced with connected user id in the future version
   const response = await fetch("/api/users/openPack/631b10bc5f56771e8167ee17?packType=" + packType);
   contentOfPack.value = [...(await response.json())];
+
+  for(const element of contentOfPack.value) {
+    const response2 = await fetch("/api/file/download/bytes/" + element.imageId);
+    let tempImageData = await response2.json();
+    element.imageUrl = tempImageData.content;
+  }
+
   const responseUser = await fetch("/api/users/631b10bc5f56771e8167ee17");
   user.value = await responseUser.json();
   selectedPack.value = null;
-  openedPack.value = true;
-  
+  openedPack.value = true;  
 }
+
+
 </script>
 
 
@@ -89,16 +100,15 @@ async function openSelectedPack() {
         id="pack-content"
         class="border-4 myLightGray grid grid-rows-[65%_35%]"
       >
-        <div id="pack-details" class="grid place-items-center">
+        <div id="pack-details" class="grid place-items-center" >
           <div
             id="pack-content-"
             class="border-4 w-[95%] h-[90%] border-myLightGray flex flex-row"
           >
-            <ImageContainer
-              v-if="contentOfPack"
+            <ImageContainer 
               v-for="card in contentOfPack"
               :key="card"
-              :image-url="card.image"
+              :image-url="card.imageUrl"
               :flip-animation-on="true"
               :card-rarity="card.rarity"
             />
@@ -176,11 +186,18 @@ async function openSelectedPack() {
                   px-5
                   py-2
                   text-xl
+                  -mb-16
                 "
+                :disabled="user.money < selectedPack.price"
                 type="submit"
               >
                 OPEN
               </button>
+              <div v-if="selectedPack">
+                <p class="text-myLightGray">
+                  PRICE: {{selectedPack.price}}
+                </p>
+              </div>
               <button
                 v-if="openedPack"
                 @click="openSelectedPack"

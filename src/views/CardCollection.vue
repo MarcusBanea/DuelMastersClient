@@ -2,10 +2,14 @@
 import { computed, ref } from "@vue/runtime-core";
 import ImageContainer from "../components/ImageContainer.vue";
 
+//list of cards
 const response = await fetch("/api/cards");
 const cards = ref(await response.json());
 
-const currentCardIndex = ref(0);
+//selected card
+const selectedCard = ref();
+const selectedCardIndex = ref(0);
+const cardClicked = ref(false);
 
 const cardRarities = [
   "Common",
@@ -16,8 +20,19 @@ const cardRarities = [
   "Legendary",
 ];
 
-const getCardImage = computed(() => {
-  return cards.value[currentCardIndex.value].image;
+async function setSelectedCard(cardIndex) {
+
+  selectedCardIndex.value = cardIndex;
+  let cardImageId = cards.value[selectedCardIndex.value].imageId;
+
+  const response = await fetch("/api/file/download/bytes/" + cardImageId);
+  selectedCard.value = await response.json();
+
+  cardClicked.value = true;
+}
+
+const getSelectedCardImage = computed(() => {
+  return selectedCard.value.content;
 });
 
 async function getCardsWithRarity(rarity) {
@@ -100,16 +115,16 @@ async function getCardsWithRarity(rarity) {
           "
           v-for="(card, index) in cards"
           :key="card"
-          @click="currentCardIndex = index"
+          @click="setSelectedCard(index)"
         >
           {{ card.name }}
         </li>
       </ul>
     </div>
 
-    <div class="grid place-items-center h-screen">
+    <div v-if="cardClicked" class="grid place-items-center h-screen">
       <div class="grid place-items-center shadow-md rounded px-8 pt-6 pb-8 m-4">
-        <ImageContainer container-width="50%" :image-url="getCardImage" />
+        <ImageContainer container-width="50%" :image-url="getSelectedCardImage" />
       </div>
     </div>
   </div>
