@@ -19,11 +19,11 @@ const cardImageField = ref();
 
 const cardRealms = ["Light", "Darkness", "Nature", "Fire", "Aqua"];
 
-const cardLightClasses = ["None","Angel Command", "Guardian", "Light Bringer"];
-const cardDarknessClasses = ["None","Demon Command", "Dark Lord", "Brain Jacker"];
-const cardNatureClasses = ["None","Horned Beast", "Giant Insect"];
-const cardFireClasses = ["None","Armored Dragon", "Armored Wyvern"];
-const cardAquaClasses = ["None","Cyber Virus", "Liquid People", "Leviathan", "Survivor"];
+const cardLightClasses = ["None", "Angel Command", "Guardian", "Light Bringer"];
+const cardDarknessClasses = ["None", "Demon Command", "Dark Lord", "Brain Jacker"];
+const cardNatureClasses = ["None", "Horned Beast", "Giant Insect"];
+const cardFireClasses = ["None", "Armored Dragon", "Armored Wyvern"];
+const cardAquaClasses = ["None", "Cyber Virus", "Liquid People", "Leviathan", "Survivor"];
 
 const imageSet = ref(false);
 
@@ -80,7 +80,7 @@ async function addNewCardToDB() {
 
   // console.log(cardRarityField.value.substring(0, cardRarityField.value.indexOf(" ")));
 
-  
+
   formData.append("file", cardImageField.value);
   formData.append(
     "card",
@@ -170,86 +170,42 @@ const getCardImage = computed(() => {
           <h1 class="font-bold text-myBlack text-xl mt-2 mb-2">Create card</h1>
         </div>
         <div>
-          <form
-            @submit.prevent="addNewCardToDB"
-            class="bg-myLightGray shadow-md rounded px-8 pt-6 pb-8 m-4"
-          >
+          <form @submit.prevent="addNewCardToDB" class="bg-myLightGray shadow-md rounded px-8 pt-6 pb-8 m-4">
             <div class="mb-4">
-              <FormInputString
-                label="Card name"
-                placeholder="Card name"
-                v-model="cardNameField"
-              />
+              <FormInputString label="Card name" placeholder="Card name" v-model="cardNameField" />
 
-              <FormInputSelect
-                label="Realm"
-                :options="cardRealms"
-                no-value-selected="Choose a realm"
-                v-model="cardRealmField"
-              />
+              <FormInputSelect label="Realm" :options="cardRealms" no-value-selected="Choose a realm"
+                v-model="cardRealmField" />
 
-              <FormInputSelect
-                label="Class"
-                :options="getClassesForSelectedRealm"
-                :key="cardRealmField"
-                :disabled="!isRealmSelected"
-                no-value-selected="Choose a class"
-                v-model="cardClassField"
-              />
+              <FormInputSelect label="Class" :options="getClassesForSelectedRealm" :key="cardRealmField"
+                :disabled="!isRealmSelected" no-value-selected="Choose a class" v-model="cardClassField" />
 
-              <FormInputString
-                label="Mana"
-                placeholder="Mana"
-                v-model="cardManaField"
-              />
+              <FormInputString label="Mana" placeholder="Mana" v-model="cardManaField" />
 
-              <FormInputString
-                label="Power"
-                placeholder="Power"
-                v-model="cardPowerField"
-              />
+              <FormInputString label="Power" placeholder="Power" v-model="cardPowerField" />
 
-              <FormInputString 
-                label="Ability"
-                placeholder="Ability"
-                v-model="cardAbilityField"
-              />
+              <FormInputString label="Ability" placeholder="Ability" v-model="cardAbilityField" />
 
-              <FormInputSelect
-                label="How many shields can break?"
-                :options="[0, 1, 2, 3, 4, 5]"
-                no-value-selected="Choose a number"
-                v-model="cardNumberOfShieldsBreakerField"
-              />
+              <FormInputSelect label="How many shields can break?" :options="[0, 1, 2, 3, 4, 5]"
+                no-value-selected="Choose a number" v-model="cardNumberOfShieldsBreakerField" />
 
-              <FormInputSelect
-                label="Type"
-                :options="['Creature', 'Spell', 'Evolution']"
-                no-value-selected="Choose a card type"
-                v-model="cardTypefield"
-              />
+              <FormInputSelect label="Type" :options="['Creature', 'Spell', 'Evolution']"
+                no-value-selected="Choose a card type" v-model="cardTypefield" />
 
-              <FormInputSelect 
-                label="Rarity"
+              <FormInputSelect label="Rarity"
                 :options='["0 - Common", "30 - Uncommon", "50 - Rare", "70 - Very Rare", "90 - Super Rare", "100 - Legendary"]'
-                no-value-selected="Choose a rarity"
-                v-model="cardRarityField"
-              />
+                no-value-selected="Choose a rarity" v-model="cardRarityField" />
 
               <FormInputFile label="Image" v-model="cardImageField" />
 
-              <button
-                class="
+              <button class="
                   rounded-md
                   bg-myDarkGreen
                   disabled:opacity-50
                   text-myBlack
                   font-bold
                   px-3
-                "
-                type="submit"
-                :disabled="!areFieldsValid"
-              >
+                " type="submit" :disabled="!areFieldsValid">
                 Add
               </button>
             </div>
@@ -261,4 +217,5 @@ const getCardImage = computed(() => {
 </template>
     
 <style scoped>
+
 </style>

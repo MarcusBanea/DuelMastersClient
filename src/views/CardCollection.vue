@@ -71,19 +71,16 @@ async function getCardsWithRarity(rarity) {
 
 <template>
   <div class="bg-myDarkGreen h-full grid grid-cols-2 col-gap-2">
-    <div
-      class="
+    <div class="
         bg-myBlack
         text-white
         font-bold
         grid
         grid-rows-[min-content_min-content]
         h-screen
-      "
-    >
+      ">
       <ul id="Rarity-navbar" class="grid grid-cols-6 h-auto mt-5 mb-4 border-b-4">
-        <li
-          class="
+        <li class="
             text-myDarkGreen
             cursor-pointer
             mb-7
@@ -92,18 +89,13 @@ async function getCardsWithRarity(rarity) {
             ease-in-out
             hover:scale-110 hover:bg-gray-100 hover:text-myBlack
             text-2xl
-          "
-          v-for="rarity in cardRarities"
-          :key="rarity"
-          @click="getCardsWithRarity(rarity)"
-        >
+          " v-for="rarity in cardRarities" :key="rarity" @click="getCardsWithRarity(rarity)">
           {{ rarity }}
         </li>
       </ul>
 
       <ul id="Cards-names" class="grid place-items-center" :key="cards">
-        <li
-          class="
+        <li class="
             cursor-pointer
             mb-2
             transition
@@ -112,11 +104,7 @@ async function getCardsWithRarity(rarity) {
             hover:scale-110 hover:bg-gray-100 hover:text-myBlack
             text-xl
             min-w-min
-          "
-          v-for="(card, index) in cards"
-          :key="card"
-          @click="setSelectedCard(index)"
-        >
+          " v-for="(card, index) in cards" :key="card" @click="setSelectedCard(index)">
           {{ card.name }}
         </li>
       </ul>
@@ -134,4 +122,5 @@ async function getCardsWithRarity(rarity) {
 
 
 <style scoped>
+
 </style>

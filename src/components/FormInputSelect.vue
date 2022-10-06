@@ -20,16 +20,12 @@ const selectedOption = ref(
 </script>
     
     
-    <template>
+<template>
   <div class="mb-5">
-    <label
-      class="block text-gray-700 text-sm font-bold float-left"
-      for="options"
-    >
+    <label class="block text-gray-700 text-sm font-bold float-left" for="options">
       {{ label }}
     </label>
-    <select
-      class="
+    <select class="
         text-gray-700
         shadow
         border
@@ -40,12 +36,8 @@ const selectedOption = ref(
         text-gray-700
         leading-tight
         focus:outline-none focus:shadow-outline
-      "
-      name="options"
-      v-model="selectedOption"
-      :disabled="disabled"
-      @change="$emit('update:modelValue', $event.target.value)"
-    >
+      " name="options" v-model="selectedOption" :disabled="disabled"
+      @change="$emit('update:modelValue', $event.target.value)">
       <option :selected="noValueSelected" disabled>
         {{ noValueSelected }}
       </option>
@@ -58,4 +50,5 @@ const selectedOption = ref(
     
     
 <style scoped>
+
 </style>

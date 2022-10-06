@@ -55,19 +55,19 @@ function getNumberOfCardsRemaining(currentValue) {
   if (currentValue !== undefined) {
     return remainingNumberOfCards !== undefined
       ? Array.from(
-          {
-            length:
-              Number(remainingNumberOfCards.value) + Number(currentValue) + 1,
-          },
-          (_, i) => i
-        )
+        {
+          length:
+            Number(remainingNumberOfCards.value) + Number(currentValue) + 1,
+        },
+        (_, i) => i
+      )
       : [0];
   } else {
     return remainingNumberOfCards !== undefined
       ? Array.from(
-          { length: Number(remainingNumberOfCards.value) + 1 },
-          (_, i) => i
-        )
+        { length: Number(remainingNumberOfCards.value) + 1 },
+        (_, i) => i
+      )
       : [0];
   }
 }
@@ -151,98 +151,47 @@ async function addNewPackToDB() {
           <h1 class="font-bold text-myBlack text-xl mt-2 mb-2">Create Pack</h1>
         </div>
         <div>
-          <form
-            @submit.prevent="addNewPackToDB"
-            class="bg-myLightGray shadow-md rounded px-8 pt-6 pb-8 m-4"
-          >
+          <form @submit.prevent="addNewPackToDB" class="bg-myLightGray shadow-md rounded px-8 pt-6 pb-8 m-4">
             <div class="mb-4">
-              <FormInputString
-                label="Pack name"
-                placeholder="Pack name"
-                v-model="packNameField"
-              />
+              <FormInputString label="Pack name" placeholder="Pack name" v-model="packNameField" />
 
-              <FormInputSelect
-                label="Cards in Pack"
-                :options="[6, 7]"
-                no-value-selected="Number of Cards"
-                v-model="packTotalNumberOfCardsField"
-              />
+              <FormInputSelect label="Cards in Pack" :options="[6, 7]" no-value-selected="Number of Cards"
+                v-model="packTotalNumberOfCardsField" />
 
-              <FormInputSelect
-                label="Common cards"
-                :options="getNumberOfCardsRemaining(packNumberOfCommonCards)"
-                :key="packTotalNumberOfCardsField"
-                no-value-selected="Number of Common Cards"
-                default-value="0"
-                :disabled="!packTotalNumberOfCardsField"
-                v-model="packNumberOfCommonCards"
-              />
+              <FormInputSelect label="Common cards" :options="getNumberOfCardsRemaining(packNumberOfCommonCards)"
+                :key="packTotalNumberOfCardsField" no-value-selected="Number of Common Cards" default-value="0"
+                :disabled="!packTotalNumberOfCardsField" v-model="packNumberOfCommonCards" />
 
-              <FormInputSelect
-                label="Uncommon cards"
-                :options="getNumberOfCardsRemaining(packNumberOfUncommonCards)"
-                :key="packTotalNumberOfCardsField"
-                no-value-selected="Number of Uncommon Cards"
-                default-value="0"
-                :disabled="!packTotalNumberOfCardsField"
-                v-model="packNumberOfUncommonCards"
-              />
+              <FormInputSelect label="Uncommon cards" :options="getNumberOfCardsRemaining(packNumberOfUncommonCards)"
+                :key="packTotalNumberOfCardsField" no-value-selected="Number of Uncommon Cards" default-value="0"
+                :disabled="!packTotalNumberOfCardsField" v-model="packNumberOfUncommonCards" />
 
-              <FormInputSelect
-                label="Rare cards"
-                :options="getNumberOfCardsRemaining(packNumberOfRareCards)"
-                :key="packTotalNumberOfCardsField"
-                no-value-selected="Number of Rare Cards"
-                default-value="0"
-                :disabled="!packTotalNumberOfCardsField"
-                v-model="packNumberOfRareCards"
-              />
+              <FormInputSelect label="Rare cards" :options="getNumberOfCardsRemaining(packNumberOfRareCards)"
+                :key="packTotalNumberOfCardsField" no-value-selected="Number of Rare Cards" default-value="0"
+                :disabled="!packTotalNumberOfCardsField" v-model="packNumberOfRareCards" />
 
-              <FormInputSelect
-                label="Very Rare cards"
-                :options="getNumberOfCardsRemaining(packNumberOfVeryRareCards)"
-                :key="packTotalNumberOfCardsField"
-                no-value-selected="Number of Very Rare Cards"
-                default-value="0"
-                :disabled="!packTotalNumberOfCardsField"
-                v-model="packNumberOfVeryRareCards"
-              />
+              <FormInputSelect label="Very Rare cards" :options="getNumberOfCardsRemaining(packNumberOfVeryRareCards)"
+                :key="packTotalNumberOfCardsField" no-value-selected="Number of Very Rare Cards" default-value="0"
+                :disabled="!packTotalNumberOfCardsField" v-model="packNumberOfVeryRareCards" />
 
-              <FormInputSelect
-                label="Super Rare cards"
-                :options="getNumberOfCardsRemaining(packNumberOfSuperRareCards)"
-                :key="packTotalNumberOfCardsField"
-                no-value-selected="Number of Super Rare Cards"
-                default-value="0"
-                :disabled="!packTotalNumberOfCardsField"
-                v-model="packNumberOfSuperRareCards"
-              />
+              <FormInputSelect label="Super Rare cards" :options="getNumberOfCardsRemaining(packNumberOfSuperRareCards)"
+                :key="packTotalNumberOfCardsField" no-value-selected="Number of Super Rare Cards" default-value="0"
+                :disabled="!packTotalNumberOfCardsField" v-model="packNumberOfSuperRareCards" />
 
-              <FormInputSelect
-                label="Legendary cards"
-                :options="getNumberOfCardsRemaining(packNumberOfLegendaryCards)"
-                :key="packTotalNumberOfCardsField"
-                no-value-selected="Number of Legendary Cards"
-                default-value="0"
-                :disabled="!packTotalNumberOfCardsField"
-                v-model="packNumberOfLegendaryCards"
-              />
+              <FormInputSelect label="Legendary cards" :options="getNumberOfCardsRemaining(packNumberOfLegendaryCards)"
+                :key="packTotalNumberOfCardsField" no-value-selected="Number of Legendary Cards" default-value="0"
+                :disabled="!packTotalNumberOfCardsField" v-model="packNumberOfLegendaryCards" />
 
               <FormInputFile label="Image" v-model="packImageField" />
 
-              <button
-                class="
+              <button class="
                   rounded-md
                   bg-myDarkGreen
                   disabled:opacity-50
                   text-myBlack
                   font-bold
                   px-3
-                "
-                type="submit"
-                :disabled="!areFieldsValid"
-              >
+                " type="submit" :disabled="!areFieldsValid">
                 Add
               </button>
             </div>
@@ -257,4 +206,5 @@ async function addNewPackToDB() {
 
 
 <style scoped>
+
 </style>

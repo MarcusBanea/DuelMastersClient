@@ -1,23 +1,22 @@
 <script setup>
 
-    defineEmits(["update:modelValue"]);
+defineEmits(["update:modelValue"]);
+
+const props = defineProps({
+  label: String,
+  placeholder: String,
+
+  defaultValue: String,
+});
+</script>
     
-    const props = defineProps({
-      label: String,
-      placeholder: String,
     
-      defaultValue: String,
-    });
-    </script>
-    
-    
-    <template>
-      <div class="mb-5">
-        <label class="block text-gray-700 text-sm font-bold mb-1 float-left" for="name">
-          {{ props.label }}
-        </label>
-        <input
-          class="
+<template>
+  <div class="mb-5">
+    <label class="block text-gray-700 text-sm font-bold mb-1 float-left" for="name">
+      {{ props.label }}
+    </label>
+    <input class="
             shadow
             appearance-none
             border
@@ -28,16 +27,12 @@
             text-gray-700
             leading-tight
             focus:outline-none focus:shadow-outline
-          "
-          id="name"
-          type="file"
-          :placeholder="props.placeholder"
-          autocomplete="off"
-          @input="$emit('update:modelValue', $event.target.files[0])"
-        />
-      </div>
-    </template>
+          " id="name" type="file" :placeholder="props.placeholder" autocomplete="off"
+      @input="$emit('update:modelValue', $event.target.files[0])" />
+  </div>
+</template>
     
     
-    <style scoped>
-    </style>
+<style scoped>
+
+</style>

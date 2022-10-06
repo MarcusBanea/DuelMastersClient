@@ -24,11 +24,15 @@ function selectPack(index) {
 async function openSelectedPack() {
   let packType = selectedPack.value.name;
   //currently using a hardcoded user id, will be replaced with connected user id in the future version
-  const response = await fetch("/api/users/openPack/631b10bc5f56771e8167ee17?packType=" + packType);
+  const response = await fetch(
+    "/api/users/openPack/631b10bc5f56771e8167ee17?packType=" + packType
+  );
   contentOfPack.value = [...(await response.json())];
 
-  for(const element of contentOfPack.value) {
-    const response2 = await fetch("/api/file/download/bytes/" + element.imageId);
+  for (const element of contentOfPack.value) {
+    const response2 = await fetch(
+      "/api/file/download/bytes/" + element.imageId
+    );
     let tempImageData = await response2.json();
     element.imageUrl = tempImageData.content;
   }
@@ -36,10 +40,8 @@ async function openSelectedPack() {
   const responseUser = await fetch("/api/users/631b10bc5f56771e8167ee17");
   user.value = await responseUser.json();
   selectedPack.value = null;
-  openedPack.value = true;  
+  openedPack.value = true;
 }
-
-
 </script>
 
 
@@ -47,8 +49,7 @@ async function openSelectedPack() {
 
 
 <template>
-  <div
-    class="
+  <div class="
       absolute
       w-screen
       h-[7%]
@@ -58,15 +59,14 @@ async function openSelectedPack() {
       place-items-center
       text-myLightGray
       border-b-4
-    "
-  >
+    ">
     <div class="w-[100%]">
       <p class="float-right min-w-min">
         {{ user.nickname }}
       </p>
     </div>
     <div class="grid place-items-center">
-      <img src="../assets/avatar.jpg" class="absolute w-[5%] rounded-full border-4" :title="user.nickname"/>
+      <img src="../assets/avatar.jpg" class="absolute w-[5%] rounded-full border-4" :title="user.nickname" />
     </div>
     <div class="w-[100%]">
       <p class="float-left min-w-min">
@@ -78,62 +78,34 @@ async function openSelectedPack() {
     </div>
   </div>
 
-  <div
-    id="page"
-    class="bg-myDarkGreen w-screen h-screen grid place-items-center"
-  >
-    <div
-      id="content"
-      class="bg-myDarkGray w-[75%] h-[640px] grid grid-cols-[15%_85%]"
-    >
+  <div id="page" class="bg-myDarkGreen w-screen h-screen grid place-items-center">
+    <div id="content" class="bg-myDarkGray w-[75%] h-[640px] grid grid-cols-[15%_85%]">
       <div id="pack-list" class="border-4 myLightGray overflow-scroll h-full">
-        <ImageContainer
-          v-for="(pack, index) in packs"
-          :key="pack"
-          :image-url="pack.image"
-          class="cursor-pointer"
-          @click="selectPack(index)"
-        />
+        <ImageContainer v-for="(pack, index) in packs" :key="pack" :image-url="pack.image" class="cursor-pointer"
+          @click="selectPack(index)" />
       </div>
 
-      <div
-        id="pack-content"
-        class="border-4 myLightGray grid grid-rows-[65%_35%]"
-      >
-        <div id="pack-details" class="grid place-items-center" >
-          <div
-            id="pack-content-"
-            class="border-4 w-[95%] h-[90%] border-myLightGray flex flex-row"
-          >
-            <ImageContainer 
-              v-for="card in contentOfPack"
-              :key="card"
-              :image-url="card.imageUrl"
-              :flip-animation-on="true"
-              :card-rarity="card.rarity"
-            />
+      <div id="pack-content" class="border-4 myLightGray grid grid-rows-[65%_35%]">
+        <div id="pack-details" class="grid place-items-center">
+          <div id="pack-content-" class="border-4 w-[95%] h-[90%] border-myLightGray flex flex-row">
+            <ImageContainer v-for="card in contentOfPack" :key="card" :image-url="card.imageUrl"
+              :flip-animation-on="true" :card-rarity="card.rarity" />
           </div>
         </div>
 
         <div id="pack-options" class="grid grid-cols-[65%_35%]">
           <div id="pack-data-container" class="grid place-items-center">
-            <div
-              id="pack-data"
-              class="mb-4 border-4 border-myLightGray w-[90%] h-[90%]"
-            >
+            <div id="pack-data" class="mb-4 border-4 border-myLightGray w-[90%] h-[90%]">
               <p v-if="selectedPack" class="text-myLightGray font-bold text-xl">
                 {{ selectedPack.name }} includes:
               </p>
-              <ul
-                v-if="selectedPack"
-                class="
+              <ul v-if="selectedPack" class="
                   text-myLightGray
                   font-bold
                   text-md
                   grid
                   place-items-center
-                "
-              >
+                ">
                 <li v-if="selectedPack.numberOfCommonCards" class="list-disc">
                   {{ selectedPack.numberOfCommonCards }} Common cards
                 </li>
@@ -146,16 +118,10 @@ async function openSelectedPack() {
                 <li v-if="selectedPack.numberOfVeryRareCards" class="list-disc">
                   {{ selectedPack.numberOfVeryRareCards }} Very Rare cards
                 </li>
-                <li
-                  v-if="selectedPack.numberOfSuperRareCards"
-                  class="list-disc"
-                >
+                <li v-if="selectedPack.numberOfSuperRareCards" class="list-disc">
                   {{ selectedPack.numberOfSuperRareCards }} Super Rare cards
                 </li>
-                <li
-                  v-if="selectedPack.numberOfLegendaryCards"
-                  class="list-disc"
-                >
+                <li v-if="selectedPack.numberOfLegendaryCards" class="list-disc">
                   {{ selectedPack.numberOfLegendaryCards }} Legendary cards
                 </li>
               </ul>
@@ -163,8 +129,7 @@ async function openSelectedPack() {
           </div>
 
           <div class="grid place-items-center">
-            <div
-              class="
+            <div class="
                 mb-4
                 -ml-4
                 border-4 border-myLightGray
@@ -172,12 +137,8 @@ async function openSelectedPack() {
                 h-[70%]
                 grid
                 place-items-center
-              "
-            >
-              <button
-                v-if="selectedPack"
-                @click="openSelectedPack"
-                class="
+              ">
+              <button v-if="selectedPack" @click="openSelectedPack" class="
                   rounded-md
                   bg-myDarkGreen
                   disabled:opacity-50
@@ -185,23 +146,14 @@ async function openSelectedPack() {
                   font-bold
                   px-5
                   py-2
-                  text-xl
-                  -mb-16
-                "
-                :disabled="user.money < selectedPack.price"
-                type="submit"
-              >
+                  text-xl-mb-16
+                " :disabled="user.money < selectedPack.price" type="submit">
                 OPEN
               </button>
               <div v-if="selectedPack">
-                <p class="text-myLightGray">
-                  PRICE: {{selectedPack.price}}
-                </p>
+                <p class="text-myLightGray">PRICE: {{ selectedPack.price }}</p>
               </div>
-              <button
-                v-if="openedPack"
-                @click="openSelectedPack"
-                class="
+              <button v-if="openedPack" @click="openSelectedPack" class="
                   rounded-md
                   bg-myDarkGreen
                   disabled:opacity-50
@@ -210,9 +162,7 @@ async function openSelectedPack() {
                   px-5
                   py-2
                   text-xl
-                "
-                type="submit"
-              >
+                " type="submit">
                 STORE
               </button>
             </div>
@@ -227,4 +177,5 @@ async function openSelectedPack() {
 
 
 <style scoped>
+
 </style>
