@@ -5,6 +5,12 @@ import FormInputCheckbox from "../components/FormInputCheckbox.vue";
 import { computed, ref } from "@vue/runtime-core";
 import FormInputFile from "../components/FormInputFile.vue";
 import ImageContainer from "../components/ImageContainer.vue";
+import Header from "../components/Header.vue";
+
+//current user
+const userId = "633f18459af2fa78268b91d4";
+const responseUser = await fetch("/api/users/" + userId);
+const user = ref(await responseUser.json());
 
 const cardNameField = ref("");
 const cardRealmField = ref("");
@@ -163,6 +169,9 @@ const getCardImage = computed(() => {
 </script>
     
 <template>
+
+  <Header :money="user.money" :nickname="user.nickname" ></Header>
+
   <div class="bg-myBlack h-full">
     <div class="grid place-items-center h-screen">
       <div class="bg-myDarkGreen rounded-2xl">

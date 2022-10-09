@@ -1,6 +1,12 @@
 <script setup>
 import { computed, ref } from "@vue/runtime-core";
 import ImageContainer from "../components/ImageContainer.vue";
+import Header from "../components/Header.vue";
+
+//current user
+const userId = "633f18459af2fa78268b91d4";
+const responseUser = await fetch("/api/users/" + userId);
+const user = ref(await responseUser.json());
 
 //list of cards
 const response = await fetch("/api/cards");
@@ -70,6 +76,9 @@ async function getCardsWithRarity(rarity) {
 
 
 <template>
+
+  <Header :money="user.money" :nickname="user.nickname" ></Header>
+
   <div class="bg-myDarkGreen h-full grid grid-cols-2 col-gap-2">
     <div class="
         bg-myBlack

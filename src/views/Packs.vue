@@ -2,6 +2,7 @@
 import { ref } from "@vue/reactivity";
 import ImageContainer from "../components/ImageContainer.vue";
 import ImageRevealOnClick from "../components/ImageRevealOnClick.vue";
+import Header from "../components/Header.vue";
 
 //list of packs
 const response = await fetch("/api/packs");
@@ -52,34 +53,7 @@ async function openSelectedPack() {
 
 
 <template>
-  <div class="
-      absolute
-      w-screen
-      h-[7%]
-      bg-myBlack
-      grid
-      grid-cols-[45%_10%_45%]
-      place-items-center
-      text-myLightGray
-      border-b-4
-    ">
-    <div class="w-[100%]">
-      <p class="float-right min-w-min">
-        {{ user.nickname }}
-      </p>
-    </div>
-    <div class="grid place-items-center">
-      <img src="../assets/avatar.jpg" class="absolute w-[5%] rounded-full border-4" :title="user.nickname" />
-    </div>
-    <div class="w-[100%]">
-      <p class="float-left min-w-min">
-        {{ user.money }}
-      </p>
-      <div class="w-48">
-        <img src="../assets/money.png" class="w-[15%] h-[15%]" />
-      </div>
-    </div>
-  </div>
+  <Header :money="user.money" :nickname="user.nickname" ></Header>
 
   <div id="page" class="bg-myDarkGreen w-screen h-screen grid place-items-center">
     <div id="content" class="bg-myDarkGray w-[75%] h-[640px] grid grid-cols-[15%_85%]">

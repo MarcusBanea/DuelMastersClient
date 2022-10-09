@@ -3,6 +3,7 @@ import { createRouter, createWebHashHistory, createWebHistory } from "vue-router
 import CardCollection from "../views/CardCollection.vue";
 import Packs from "../views/Packs.vue";
 import AddPackView from "../views/AddPackView.vue";
+import MyCollection from "../views/MyCollection.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,6 +27,11 @@ const router = createRouter({
             path: "/addPack",
             name: "addPack",
             component: AddPackView
+        },
+        {
+            path: "/myCollection",
+            name: "myCollection",
+            component: MyCollection
         }
     ]
 });
