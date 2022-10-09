@@ -1,13 +1,14 @@
 <script setup>
 import { ref } from "@vue/reactivity";
 import ImageContainer from "../components/ImageContainer.vue";
+import ImageRevealOnClick from "../components/ImageRevealOnClick.vue";
 
 //list of packs
 const response = await fetch("/api/packs");
 const packs = ref(await response.json());
 
 //current user
-const responseUser = await fetch("/api/users/631b10bc5f56771e8167ee17");
+const responseUser = await fetch("/api/users/633f18459af2fa78268b91d4");
 const user = ref(await responseUser.json());
 
 //selected pack
@@ -24,20 +25,22 @@ function selectPack(index) {
 async function openSelectedPack() {
   let packType = selectedPack.value.name;
   //currently using a hardcoded user id, will be replaced with connected user id in the future version
-  const response = await fetch(
-    "/api/users/openPack/631b10bc5f56771e8167ee17?packType=" + packType
-  );
+  const response = await fetch("/api/users/openPack/633f18459af2fa78268b91d4?packType=" + packType);
   contentOfPack.value = [...(await response.json())];
 
-  for (const element of contentOfPack.value) {
-    const response2 = await fetch(
-      "/api/file/download/bytes/" + element.imageId
-    );
-    let tempImageData = await response2.json();
-    element.imageUrl = tempImageData.content;
-  }
 
-  const responseUser = await fetch("/api/users/631b10bc5f56771e8167ee17");
+  // for (const element of contentOfPackIds.value) {
+  //   const responseCard = await fetch("/api/cards/getOne/" + element);
+  //   let tempCardData = await responseCard.json();
+  //   //console.log(tempCardData.imageId);
+  //   const responseImage = await fetch("/api/file/download/bytes/" + tempCardData.imageId);
+  //   let tempImageData = await responseImage.json();
+  //   //console.log(tempImageData.content);
+  //   contentOfPackImages.value.push(tempImageData.content);
+  //   //element.imageUrl = tempImageData.content;
+  // }
+
+  const responseUser = await fetch("/api/users/633f18459af2fa78268b91d4");
   user.value = await responseUser.json();
   selectedPack.value = null;
   openedPack.value = true;
@@ -88,8 +91,8 @@ async function openSelectedPack() {
       <div id="pack-content" class="border-4 myLightGray grid grid-rows-[65%_35%]">
         <div id="pack-details" class="grid place-items-center">
           <div id="pack-content-" class="border-4 w-[95%] h-[90%] border-myLightGray flex flex-row">
-            <ImageContainer v-for="card in contentOfPack" :key="card" :image-url="card.imageUrl"
-              :flip-animation-on="true" :card-rarity="card.rarity" />
+            <ImageRevealOnClick v-for="card in contentOfPack" :key="card" :image-id="card" container-height="70%" container-width="90%"
+              :flip-animation-on="true"/>
           </div>
         </div>
 
