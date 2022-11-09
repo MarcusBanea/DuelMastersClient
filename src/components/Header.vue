@@ -29,12 +29,13 @@ function goToAllCards() {
           relative
           w-screen
           h-[10%]
-          bg-myBlack
+          bg-myDarkBlue
           grid
           grid-cols-[20%_25%_10%_45%]
           place-items-center
           text-myLightGray
           border-b-4
+          border-myBeige
         ">
         <div class="w-[100%] grid grid-cols-3 gap-4">
             <p class="min-w-min p-2 transition duration-1000 ease-in-out

@@ -52,7 +52,7 @@ const clicked = ref(false);
 
 
 <template>
-    <div :style="cssProps" class="image-container">
+    <div :style="cssProps" class="image-container m-auto">
         <div v-if="props.flipAnimationOn || props.cardRarity">
             <img v-if="clicked" :src="imageSrc" />
             <img v-if="props.cardRarity === 'Common' && clicked === false" src="../assets/common-card.png"
