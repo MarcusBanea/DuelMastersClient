@@ -4,6 +4,8 @@ import CardCollection from "../views/CardCollection.vue";
 import Packs from "../views/Packs.vue";
 import AddPackView from "../views/AddPackView.vue";
 import MyCollection from "../views/MyCollection.vue";
+import CombineCardsView from "../views/CombineCardsView.vue";
+import MatchView from "../views/MatchView.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,6 +34,16 @@ const router = createRouter({
             path: "/myCollection",
             name: "myCollection",
             component: MyCollection
+        },
+        {
+            path: "/combineCards",
+            name: "combineCards",
+            component: CombineCardsView
+        },
+        {
+            path: "/match",
+            name: "match",
+            component: MatchView
         }
     ]
 });

@@ -7,18 +7,20 @@ const props = defineProps({
     containerWidth: String,
     containerHeight: String,
     imageBorderRadius: String,
+    rotate: String,
 
     param1: String
 });
 
-const response = await fetch("/api/cards/getOneWithImage/" + props.imageId);
+const response = await fetch("/api/file/download/bytes/" + props.imageId);
 const image = await response.json();
 
 const cssProps = computed(() => {
     return {
         '--container-width': props.containerWidth,
         '--container-height': props.containerHeight,
-        '--border-radius': props.imageBorderRadius ? props.imageBorderRadius : '0%'
+        '--border-radius': props.imageBorderRadius ? props.imageBorderRadius : '0%',
+        '--rotate': props.rotate ? props.rotate : 0
     }
 });
 
@@ -33,7 +35,7 @@ function _base64ToArrayBuffer(base64) {
 }
 
 const imageSrc = computed(() => {
-    const imgBlob = new Blob([_base64ToArrayBuffer(image.imageBytes)]);
+    const imgBlob = new Blob([_base64ToArrayBuffer(image.content)]);
     let urlCreator = URL;
     let imgUrl = urlCreator.createObjectURL(imgBlob);
     return imgUrl;
@@ -45,7 +47,7 @@ const clicked = ref(false);
     
     
 <template>
-    <div :style="cssProps" class="image-container">
+    <div :style="cssProps" class="image-container m-auto">
         <img :src="imageSrc" />
     </div>
 </template>
@@ -65,5 +67,6 @@ const clicked = ref(false);
     height: 100%;
     object-fit: cover;
     border-radius: var(--border-radius);
+    transform: rotate(var(--rotate));
 }
 </style>

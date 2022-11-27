@@ -1,7 +1,6 @@
 <script setup>
 import router from '../router';
 
-
 const props = defineProps({
     nickname: String,
     money: String
@@ -17,6 +16,18 @@ function goToAddCard() {
 
 function goToAllCards() {
     router.push("/cardCollection");
+}
+
+function goToShop() {
+    router.push("/packs");
+}
+
+function goToCombineCards() {
+    router.push("/combineCards");
+}
+
+function goToMatch() {
+    router.push("/match");
 }
 
 </script>
@@ -37,7 +48,7 @@ function goToAllCards() {
           border-b-4
           border-myBeige
         ">
-        <div class="w-[100%] grid grid-cols-3 gap-4">
+        <div class="w-[100%] grid grid-cols-4 gap-2">
             <p class="min-w-min p-2 transition duration-1000 ease-in-out
                 hover:scale-110 hover:bg-myLightGray hover:text-myBlack text-myLightGray cursor-pointer rounded"
                 @click="goToMyCollection">
@@ -53,6 +64,11 @@ function goToAllCards() {
                 @click="goToAllCards">
                 All Cards
             </p>
+            <p class="min-w-min p-2 transition duration-1000 ease-in-out
+                hover:scale-110 hover:bg-myLightGray hover:text-myBlack text-myLightGray cursor-pointer rounded"
+                @click="goToCombineCards">
+                Combine
+            </p>
         </div>
         <div class="w-[100%]">
             <p class="float-right min-w-min">
@@ -62,13 +78,24 @@ function goToAllCards() {
         <div class="grid place-items-center">
             <img src="../assets/avatar.jpg" class="absolute w-[5%] rounded-full border-4" :title="nickname" />
         </div>
-        <div class="w-[100%]">
-            <p class="float-left min-w-min">
-                {{ money }}
-            </p>
-            <div class="w-48">
-                <img src="../assets/money.png" class="w-[15%] h-[15%]" />
+        <div class="w-[100%] grid grid-cols-[20%_20%_20%]">
+            <div>
+                <p class="float-left min-w-min">
+                    {{ money }}
+                </p>
+                <div class="w-48">
+                    <img src="../assets/money.png" class="w-[15%] h-[50%]" />
+                </div>
             </div>
+            
+
+            <button class="bg-myBeige text-myBlack font-bold rounded w-min px-4" @click="goToShop()">
+                SHOP
+            </button>
+
+            <button class="bg-myBeige text-myBlack font-bold rounded w-min px-4" @click="goToMatch()">
+                MATCH
+            </button>
         </div>
     </div>
 

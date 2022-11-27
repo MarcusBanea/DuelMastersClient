@@ -48,9 +48,9 @@ function openPack() {
 
               <div id="pack_info_details" class="border-2 border-myBeige bg-myBlack w-[90%] h-[90%] m-auto grid grid-cols-[60%_40%]">
 
-                <div id="pack_info_details_text" class="w-full h-full place-items-center">
+                <div id="pack_info_details_text" class="w-full h-24 place-items-center">
 
-                  <p v-for="cardType in content" :key="cardType" class="text-myBeige myScrollbar">
+                  <p v-for="cardType in content" :key="cardType" class="text-myBeige">
                     {{cardType}}
                   </p>
 
