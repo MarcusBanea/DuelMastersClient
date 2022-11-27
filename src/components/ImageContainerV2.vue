@@ -9,11 +9,11 @@ const props = defineProps({
     imageBorderRadius: String,
     rotate: String,
 
-    param1: String
+    image: String
 });
 
-const response = await fetch("/api/file/download/bytes/" + props.imageId);
-const image = await response.json();
+const response = props.imageId != null ? await fetch("/api/file/download/bytes/" + props.imageId) : null;
+const image = props.imageId != null ? await response.json() : props.image;
 
 const cssProps = computed(() => {
     return {
@@ -35,7 +35,13 @@ function _base64ToArrayBuffer(base64) {
 }
 
 const imageSrc = computed(() => {
-    const imgBlob = new Blob([_base64ToArrayBuffer(image.content)]);
+    let imgBlob;
+    if(props.imageId != null) {
+        imgBlob = new Blob([_base64ToArrayBuffer(image.content)]);
+    }
+    else {
+        imgBlob = new Blob([_base64ToArrayBuffer(props.image)]);
+    }
     let urlCreator = URL;
     let imgUrl = urlCreator.createObjectURL(imgBlob);
     return imgUrl;

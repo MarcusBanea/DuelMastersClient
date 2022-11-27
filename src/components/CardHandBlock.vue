@@ -5,15 +5,13 @@ import ImageContainerV2 from './ImageContainerV2.vue';
 import ImageRevealOnClick from './ImageRevealOnClick.vue';
 
 const props = defineProps({
-    imageId: String, 
+    image: String, 
     index: Number,
     rotate: Boolean
 });
 
 const emits = defineEmits(['sendToBattleZone', 'sendToMana']);
 
-const response = await fetch("/api/file/download/bytes/" + props.imageId);
-const image = await response.json();
 
 const cssProps = computed(() => {
     return {
@@ -22,6 +20,7 @@ const cssProps = computed(() => {
         '--border-radius': props.imageBorderRadius ? props.imageBorderRadius : '0%'
     }
 });
+
 
 function _base64ToArrayBuffer(base64) {
     var binary_string = atob(base64);
@@ -34,11 +33,12 @@ function _base64ToArrayBuffer(base64) {
 }
 
 const imageSrc = computed(() => {
-    const imgBlob = new Blob([_base64ToArrayBuffer(image.content)]);
+    const imgBlob = new Blob([_base64ToArrayBuffer(props.image)]);
     let urlCreator = URL;
     let imgUrl = urlCreator.createObjectURL(imgBlob);
     return imgUrl;
 });
+
 
 
 const cardClicked = ref(false);

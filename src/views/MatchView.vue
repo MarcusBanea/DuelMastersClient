@@ -20,7 +20,8 @@ const userId = "633f18459af2fa78268b91d4";
 const responseCollection = await fetch("/api/users/getCollectionV2/" + userId);
 const collection = ref(await responseCollection.json());
 
-const deck = ref(collection.value.slice(0, 10));
+const responseDeck = await fetch("/api/users/getRandomDeckWithGameCards/" + userId);
+const deck = ref(await responseDeck.json());
 
 const cardsInBattleZone = ref([]);
 const cardsInMana = ref([]);
@@ -86,7 +87,7 @@ function sendCardFromHandToBattleZone(index) {
                 <div id="my_battleZone_container" class="w-[100%] h-[100%] flex flex-row justify-evenly">
 
                     <div v-for="card in cardsInBattleZone" :key="card" class="w-[100px] h-[100px]">
-                        <ImageContainerV2 :image-id="card.imageId" container-width="110%"/>
+                        <ImageContainerV2 :image="card.image" container-width="110%"/>
                     </div>
 
                 </div>
@@ -116,7 +117,7 @@ function sendCardFromHandToBattleZone(index) {
                 <div id="my_manaZone_container" class="w-[55%] h-[100%] flex flex-row flex-nowrap m-auto">
 
                     <div v-for="card in cardsInMana" :key="card" class="w-[100px] h-[100px]">
-                        <ImageContainerV2 :image-id="card.imageId" container-width="70%" rotate="-0.25turn"/>
+                        <ImageContainerV2 :image="card.image" container-width="70%" rotate="-0.25turn"/>
                     </div>
 
                 </div>
@@ -131,7 +132,7 @@ function sendCardFromHandToBattleZone(index) {
 
                 <div class="w-full h-full flex flex-row flex-nowrap overflow-x-auto">
 
-                    <CardHandBlock v-for="(card, index) in deck" :key="card" :image-id="card.imageId" :index="index"
+                    <CardHandBlock v-for="(card, index) in deck" :key="card" :image="card.image" :index="index"
                     @send-to-mana="sendCardFromHandToMana($event, index)"
                     @send-to-battle-zone="sendCardFromHandToBattleZone($event, index)"
                     />
