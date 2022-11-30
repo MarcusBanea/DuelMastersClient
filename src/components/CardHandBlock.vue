@@ -7,7 +7,11 @@ import ImageRevealOnClick from './ImageRevealOnClick.vue';
 const props = defineProps({
     image: String, 
     index: Number,
-    rotate: Boolean
+    rotate: Boolean,
+
+    canSendToMana: Boolean,
+    mana: Number,
+    manaAvailable: Number
 });
 
 const emits = defineEmits(['sendToBattleZone', 'sendToMana']);
@@ -43,6 +47,12 @@ const imageSrc = computed(() => {
 
 const cardClicked = ref(false);
 
+function clickOnCard() {
+    if(props.mana <= props.manaAvailable || props.canSendToMana == true) {
+        cardClicked.value = true;
+    }
+}
+
 function sendToBattleZone(index) {
     emits('sendToBattleZone', props.index);
 }
@@ -64,17 +74,17 @@ function sendToMana(index) {
 
             <div v-if="!cardClicked" id="card_image" class="m-auto w-[65%] h-[70%]">
               
-                <img :src="imageSrc" container-width="50%" class="hover:scale-150 cursor-pointer" @click="cardClicked = true"/>
+                <img :src="imageSrc" container-width="50%" class="hover:scale-150 cursor-pointer" @click="clickOnCard"/>
 
             </div>
 
-            <div v-else class="m-auto grid grid-rows-2 gap-4">
+            <div v-else-if="mana <= manaAvailable || canSendToMana == true" class="m-auto grid grid-rows-2 gap-4">
 
-                <button class="bg-myBeige text-myBlack font-bold rounded w-[100%] px-4" @click="sendToBattleZone()">
+                <button v-if="mana <= manaAvailable" class="bg-myBeige text-myBlack font-bold rounded w-[100%] px-4" @click="sendToBattleZone()">
                     BATTLE ZONE
                 </button>
 
-                <button class="bg-myBeige text-myBlack font-bold rounded w-[100%] px-4" @click="sendToMana()">
+                <button v-if="canSendToMana == true" class="bg-myBeige text-myBlack font-bold rounded w-[100%] px-4" @click="sendToMana()">
                     MANA
                 </button>
 
