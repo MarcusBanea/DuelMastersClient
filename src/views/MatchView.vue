@@ -16,11 +16,10 @@ const responseUser = await fetch("/api/users/633f18459af2fa78268b91d4");
 const user = ref(await responseUser.json());
 
 //your deck
-//TODO
-//using collection as of now
+//25 random cards from collection
 const userId = "633f18459af2fa78268b91d4";
-const responseCollection = await fetch("/api/users/getCollectionV2/" + userId);
-const collection = ref(await responseCollection.json());
+const responseMatchDeck = await fetch("/api/users/getMatchDeck/" + userId);
+const matchDeck = ref(await responseMatchDeck.json());
 
 const turn = ref("BOTTOM");
 const canBottomSendToMana = ref(true);
@@ -66,7 +65,7 @@ const isTopSelectable = computed(() => {
 
         <div id="my_container" class="w-full">
 
-            <GameTableBottom :selectable="isBottomSelectable" :can-send-to-mana-prop="canBottomSendToMana"
+            <GameTableBottom :selectable="isBottomSelectable" :can-send-to-mana-prop="canBottomSendToMana" :deck="matchDeck"
                 @end-of-turn="changeTurn()"
             />
 

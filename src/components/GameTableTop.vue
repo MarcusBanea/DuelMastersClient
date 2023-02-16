@@ -6,7 +6,8 @@ import ImageContainerV2 from './ImageContainerV2.vue';
 
 const props = defineProps({
     selectable: Boolean,
-    canSendToManaProp: Boolean
+    canSendToManaProp: Boolean,
+    deck: Array
 });
 
 const emits = defineEmits(['endOfTurn']);
