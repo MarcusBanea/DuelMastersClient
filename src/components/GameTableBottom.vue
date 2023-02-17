@@ -10,7 +10,7 @@ const props = defineProps({
     deck: Array
 });
 
-const emits = defineEmits(['endOfTurn']);
+const emits = defineEmits(['endOfTurn', 'drawCardEvent']);
 
 const userId = "633f18459af2fa78268b91d4";
 //const responseDeck = await fetch("/api/users/getRandomDeckWithGameCards/" + userId);
@@ -70,7 +70,7 @@ function sendCardFromHandToBattleZone(index) {
 function drawCard() {
     hand.value.push(deck[0]);
     deck.splice(0, 1);
-
+    emits("drawCardEvent");
 }
 
 function endTurn() {

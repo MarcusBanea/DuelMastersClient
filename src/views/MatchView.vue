@@ -25,6 +25,10 @@ const turn = ref("BOTTOM");
 const canBottomSendToMana = ref(true);
 const canTopSendToMana = ref(false);
 
+const isGameLogOpen = ref(false)
+//game log contains array of strings, representing the game timeline
+const gameLog = ref([]);
+
 function changeTurn() {
     turn.value = turn.value == "BOTTOM" ? "TOP" : "BOTTOM";
     canBottomSendToMana.value = !canBottomSendToMana.value;
@@ -38,6 +42,27 @@ const isBottomSelectable = computed(() => {
 const isTopSelectable = computed(() => {
     return turn.value == "TOP" ? true : false;
 });
+
+function toggleGameLog() {
+    isGameLogOpen.value = !isGameLogOpen.value;
+}
+
+function getCurrentTime() {
+    var currentdate = new Date(); 
+    var currentDateTime = currentdate.getDate() + "/"
+                + (currentdate.getMonth() + 1)  + "/" 
+                + currentdate.getFullYear() + " @ "  
+                + currentdate.getHours() + ":"  
+                + currentdate.getMinutes() + ":" 
+                + currentdate.getSeconds();
+    return currentDateTime;
+}
+
+function addMomentToGameLog(moment) {
+    console.log(moment);
+    let newMoment = getCurrentTime() + " : " + moment;
+    gameLog.value.push(newMoment);
+}
 
 </script>
 
@@ -66,9 +91,27 @@ const isTopSelectable = computed(() => {
         <div id="my_container" class="w-full">
 
             <GameTableBottom :selectable="isBottomSelectable" :can-send-to-mana-prop="canBottomSendToMana" :deck="matchDeck"
-                @end-of-turn="changeTurn()"
+                @end-of-turn="changeTurn()" @draw-card-event="addMomentToGameLog('Draw card')"
             />
 
+        </div>
+
+        <div class="w-[5%] h-max bg-myBlack border-myBeige border-2 absolute right-0 cursor-pointer z-10">
+            <p class="text-myBeige" @click="toggleGameLog()">
+                GAMELOG
+            </p>
+        </div>
+
+        <div v-if="isGameLogOpen" class="w-[25%] h-[90%] bg-myBlack border-myBeige border-2 absolute right-0 grid grid-rows-[10%_90%]">
+            <div id="gameLogTitle">
+                <p class="text-myBeige">TIMELINE</p>
+            </div>
+
+            <div id="timeline">
+                <p v-for="moment in gameLog" :key="moment" class="text-myBeige">
+                    {{ moment }}
+                </p>
+            </div>
         </div>
 
 
