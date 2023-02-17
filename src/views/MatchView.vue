@@ -15,11 +15,10 @@ import GameTableTop from "../components/GameTableTop.vue";
 const responseUser = await fetch("/api/users/633f18459af2fa78268b91d4");
 const user = ref(await responseUser.json());
 
-//your deck
-//25 random cards from collection
 const userId = "633f18459af2fa78268b91d4";
-const responseMatchDeck = await fetch("/api/users/getMatchDeck/" + userId);
-const matchDeck = ref(await responseMatchDeck.json());
+//get players details
+const responsePlayers = await fetch("/api/game/initialize/" + userId + "/" + userId);
+const players = ref(await responsePlayers.json());
 
 const turn = ref("BOTTOM");
 const canBottomSendToMana = ref(true);
@@ -29,10 +28,11 @@ const isGameLogOpen = ref(false)
 //game log contains array of strings, representing the game timeline
 const gameLog = ref([]);
 
-function changeTurn() {
+async function changeTurn() {
     turn.value = turn.value == "BOTTOM" ? "TOP" : "BOTTOM";
     canBottomSendToMana.value = !canBottomSendToMana.value;
     canTopSendToMana.value = !canTopSendToMana.value;
+    const test = await fetch("/api/game/test");
 }
 
 const isBottomSelectable = computed(() => {
@@ -58,10 +58,13 @@ function getCurrentTime() {
     return currentDateTime;
 }
 
-function addMomentToGameLog(moment) {
+async function addMomentToGameLog(moment) {
     console.log(moment);
     let newMoment = getCurrentTime() + " : " + moment;
     gameLog.value.push(newMoment);
+
+    let currentPlayer = turn.value == "BOTTOM" ? "player1" : "player2";
+    await fetch("/api/game/action/" + moment + "/" + currentPlayer);
 }
 
 </script>
@@ -90,7 +93,7 @@ function addMomentToGameLog(moment) {
 
         <div id="my_container" class="w-full">
 
-            <GameTableBottom :selectable="isBottomSelectable" :can-send-to-mana-prop="canBottomSendToMana" :deck="matchDeck"
+            <GameTableBottom :selectable="isBottomSelectable" :can-send-to-mana-prop="canBottomSendToMana" :player="players[0]"
                 @end-of-turn="changeTurn()" @draw-card-event="addMomentToGameLog('Draw card')"
             />
 

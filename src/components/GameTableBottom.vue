@@ -7,21 +7,19 @@ import ImageContainerV2 from './ImageContainerV2.vue';
 const props = defineProps({
     selectable: Boolean,
     canSendToManaProp: Boolean,
-    deck: Array
+    player: Array
 });
 
 const emits = defineEmits(['endOfTurn', 'drawCardEvent']);
 
 const userId = "633f18459af2fa78268b91d4";
-//const responseDeck = await fetch("/api/users/getRandomDeckWithGameCards/" + userId);
-//const deck = ref(await responseDeck.json());
-const deck = reactive(props.deck);
-const hand = ref(getInitialHandCards());
+const cardsInHand = ref(props.player["hand"]);
 
-const cardsInBattleZone = ref([]);
-const cardsInMana = ref([]);
-const cardsInGraveyard = ref([]);
-const cardsInDeck = ref([]);
+const cardsInBattleZone = ref(props.player["battleZone"]);
+const cardsInMana = ref(props.player["manaZone"]);
+const cardsInGraveyard = ref(props.player["graveyard"]);
+const cardsInDeck = ref(props.player["deck"]);
+const cardsInShields = ref(props.player["shields"])
 const numberOfShields = ref(5);
 
 const currentTurnManaAvailable = ref(cardsInMana.value.length);
@@ -35,15 +33,6 @@ watch(() => props.canSendToManaProp, (newValue, oldValue) => {
     currentTurnManaAvailable.value = cardsInMana.value.length;
 });
 
-function getInitialHandCards() {
-    const initialHand = [];
-    for (let i = 0; i < 5; i++) {
-        let randomCardIndex = Math.floor(Math.random() * deck.length);
-        initialHand.push(props.deck[randomCardIndex]);
-    }
-    return initialHand;
-}
-
 function showHand() {
     isHandSelected.value = !isHandSelected.value;
 }
@@ -51,8 +40,8 @@ function showHand() {
 function sendCardFromHandToMana(index) {
     showHand();
     currentTurnManaAvailable.value++;
-    cardsInMana.value.push(hand.value[index]);
-    hand.value.splice(index, 1);
+    cardsInMana.value.push(cardsInHand.value[index]);
+    cardsInHand.value.splice(index, 1);
 
     canSendToMana.value = false;
 
@@ -61,15 +50,15 @@ function sendCardFromHandToMana(index) {
 
 function sendCardFromHandToBattleZone(index) {
     showHand();
-    currentTurnManaAvailable.value -= hand.value[index].mana;
-    cardsInBattleZone.value.push(hand.value[index]);
+    currentTurnManaAvailable.value -= cardsInHand.value[index].mana;
+    cardsInBattleZone.value.push(cardsInHand.value[index]);
     myNumberOfCardsInBattleZone.value++;
-    hand.value.splice(index, 1);
+    cardsInHand.value.splice(index, 1);
 }
 
 function drawCard() {
-    hand.value.push(deck[0]);
-    deck.splice(0, 1);
+    cardsInHand.value.push(cardsInDeck.value[0]);
+    cardsInDeck.value.splice(0, 1);
     emits("drawCardEvent");
 }
 
@@ -148,7 +137,7 @@ function endTurn() {
 
         <div class="w-full h-full flex flex-row flex-nowrap overflow-x-auto">
 
-            <CardHandBlock v-for="(card, index) in hand" :key="card" :image="card.image" :index="index" 
+            <CardHandBlock v-for="(card, index) in cardsInHand" :key="card" :image="card.image" :index="index" 
                 :mana-available="currentTurnManaAvailable" :mana="card.mana" :can-send-to-mana="canSendToMana"
                 @send-to-mana="sendCardFromHandToMana($event, index)"
                 @send-to-battle-zone="sendCardFromHandToBattleZone($event, index)"
