@@ -1,6 +1,6 @@
 <script setup>
 import { reactive, ref } from '@vue/reactivity';
-import { computed, watch } from '@vue/runtime-core';
+import { computed, onMounted, watch } from '@vue/runtime-core';
 import CardHandBlock from './CardHandBlock.vue';
 import ImageContainerV2 from './ImageContainerV2.vue';
 
@@ -10,7 +10,7 @@ const props = defineProps({
     player: Array
 });
 
-const emits = defineEmits(['endOfTurn', 'drawCardEvent']);
+const emits = defineEmits(['endOfTurn', 'drawCardEvent', 'selectCard']);
 
 const userId = "633f18459af2fa78268b91d4";
 const cardsInHand = ref(props.player["hand"]);
@@ -51,7 +51,10 @@ function sendCardFromHandToMana(index) {
 function sendCardFromHandToBattleZone(index) {
     showHand();
     currentTurnManaAvailable.value -= cardsInHand.value[index].mana;
-    cardsInBattleZone.value.push(cardsInHand.value[index]);
+    let cardToAdd = cardsInHand.value[index];
+    //attribute used when selecting card for attack
+    cardToAdd.selected = false;
+    cardsInBattleZone.value.push(cardToAdd);
     myNumberOfCardsInBattleZone.value++;
     cardsInHand.value.splice(index, 1);
 }
@@ -66,6 +69,12 @@ function endTurn() {
     emits("endOfTurn");
 }
 
+function selectCard(index) {
+    cardsInBattleZone.value[index].selected = !cardsInBattleZone.value[index].selected;
+    emits("selectCard", index);
+}
+
+
 </script>
 
 
@@ -75,10 +84,16 @@ function endTurn() {
     
     <div v-if="!isHandSelected" id="table_container" class="border-2 border-myBeige bg-myBlack w-[95%] h-[100%] m-auto grid grid-rows-[40%_35%_25%]">
       
-        <div id="battleZone_container" class="w-[100%] h-[100%] flex flex-row justify-evenly">
+        <div id="battleZone_container" class="w-[100%] h-[100%] flex flex-row justify-evenly mb-2 mt-2">
 
-            <div v-for="card in cardsInBattleZone" :key="card" class="w-[100px] h-[100px]">
-                <ImageContainerV2 :image="card.image" container-width="110%"/>
+            <div v-for="(card, index) in cardsInBattleZone" :key="card" class="w-[6%] h-[100px]">
+                <div v-if="card.selected == true" class="border-4">
+                    <ImageContainerV2 :image="card.image" container-width="100%" @click="selectCard(index)"/>
+                </div>
+                <div v-else>
+                    <ImageContainerV2 :image="card.image" container-width="100%" @click="selectCard(index)"/>
+                </div>
+                
             </div>
 
         </div>

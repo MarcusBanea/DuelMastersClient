@@ -67,6 +67,14 @@ async function addMomentToGameLog(moment) {
     await fetch("/api/game/action/" + moment + "/" + currentPlayer);
 }
 
+const player1SelectedCard = ref(false);
+
+function showAttackingOptions() {
+    //for now, every card/shield can be attacked by any card (be it blocker or not)
+    //so, every card in the battle zone and shield will be highlighted
+    player1SelectedCard.value = !player1SelectedCard.value;
+}
+
 </script>
 
 
@@ -77,8 +85,12 @@ async function addMomentToGameLog(moment) {
 
         <div id="opponent_container" class="w-full">
 
-            <GameTableTop :selectable="isTopSelectable" :can-send-to-mana-prop="canTopSendToMana"
-                @end-of-turn="changeTurn()"
+            <GameTableTop :selectable="isTopSelectable" :can-send-to-mana-prop="canTopSendToMana" :player="players[1]"
+                :opponent-is-attacking="player1SelectedCard"
+                @end-of-turn="changeTurn()" 
+                @draw-card-event="addMomentToGameLog('Draw card')"
+                @select-card="showAttackingOptions(index)"
+
             />
 
         </div>
@@ -94,7 +106,9 @@ async function addMomentToGameLog(moment) {
         <div id="my_container" class="w-full">
 
             <GameTableBottom :selectable="isBottomSelectable" :can-send-to-mana-prop="canBottomSendToMana" :player="players[0]"
-                @end-of-turn="changeTurn()" @draw-card-event="addMomentToGameLog('Draw card')"
+                @end-of-turn="changeTurn()" 
+                @draw-card-event="addMomentToGameLog('Draw card')"
+                @select-card="showAttackingOptions(index)"
             />
 
         </div>
