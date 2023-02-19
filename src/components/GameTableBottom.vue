@@ -7,10 +7,13 @@ import ImageContainerV2 from './ImageContainerV2.vue';
 const props = defineProps({
     selectable: Boolean,
     canSendToManaProp: Boolean,
-    player: Array
+    player: Array,
+
+    opponentIsAttacking: Boolean,
+    turn: String
 });
 
-const emits = defineEmits(['endOfTurn', 'drawCardEvent', 'selectCard']);
+const emits = defineEmits(['endOfTurn', 'drawCardEvent', 'selectCard', 'opponentSelectCard']);
 
 const userId = "633f18459af2fa78268b91d4";
 const cardsInHand = ref(props.player["hand"]);
@@ -31,6 +34,25 @@ const canSendToMana = ref(props.canSendToManaProp);
 watch(() => props.canSendToManaProp, (newValue, oldValue) => {
     canSendToMana.value = newValue;
     currentTurnManaAvailable.value = cardsInMana.value.length;
+});
+
+watch(() => props.opponentIsAttacking, (newValue, oldValue) => {
+    cardsInShields.value.forEach((card) => {
+        if(card.selected === undefined) {
+            card.selected = true;
+        }
+        else {
+            card.selected = !card.selected;
+        }
+    })
+    cardsInBattleZone.value.forEach((card) => {
+        if(card.selected === undefined) {
+            card.selected = true;
+        }
+        else {
+            card.selected = !card.selected;
+        }
+    })    
 });
 
 function showHand() {
@@ -55,7 +77,6 @@ function sendCardFromHandToBattleZone(index) {
     //attribute used when selecting card for attack
     cardToAdd.selected = false;
     cardsInBattleZone.value.push(cardToAdd);
-    myNumberOfCardsInBattleZone.value++;
     cardsInHand.value.splice(index, 1);
 }
 
@@ -69,9 +90,30 @@ function endTurn() {
     emits("endOfTurn");
 }
 
+const lastCardSelectedIndex = ref(-1);
 function selectCard(index) {
+    if(lastCardSelectedIndex.value != -1 && lastCardSelectedIndex.value != index) {
+        cardsInBattleZone.value[lastCardSelectedIndex.value].selected = false;
+    }
     cardsInBattleZone.value[index].selected = !cardsInBattleZone.value[index].selected;
-    emits("selectCard", index);
+    lastCardSelectedIndex.value = index;
+    emits("selectCard", lastCardSelectedIndex.value);
+}
+
+const opponentSelectedShield = ref(false);
+const opponentSelectedBattleZoneCard = ref(false);
+const opponentSelectedCardIndex = ref(-1);
+
+function opponentSelectCard(index, zone) {
+    if(zone == "BZ") {
+        opponentSelectedBattleZoneCard.value = true;
+    }
+    else {
+        opponentSelectedShield.value = true;
+    }
+    opponentSelectedCardIndex.value = index;
+    
+    emits("opponentSelectCard", opponentSelectedCardIndex.value);
 }
 
 
@@ -87,11 +129,14 @@ function selectCard(index) {
         <div id="battleZone_container" class="w-[100%] h-[100%] flex flex-row justify-evenly mb-2 mt-2">
 
             <div v-for="(card, index) in cardsInBattleZone" :key="card" class="w-[6%] h-[100px]">
-                <div v-if="card.selected == true" class="border-4">
+                <div v-if="card.selected == true && turn == 'BOTTOM'" class="border-4">
                     <ImageContainerV2 :image="card.image" container-width="100%" @click="selectCard(index)"/>
                 </div>
+                <div v-else-if="card.selected == true && turn == 'TOP'" class="border-4 border-myLightGreen">
+                    <ImageContainerV2 :image="card.image" container-width="100%" @click="opponentSelectCard(index, 'BZ')"/>
+                </div>
                 <div v-else>
-                    <ImageContainerV2 :image="card.image" container-width="100%" @click="selectCard(index)"/>
+                    <ImageContainerV2 :image="card.image" container-width="100%" @click="selectable && selectCard(index)"/>
                 </div>
                 
             </div>
@@ -110,9 +155,14 @@ function selectCard(index) {
 
             <div id="shields_container" class="w-[70%] h-[90%] border-2 border-myBeige m-auto flex flex-row justify-between">
               
-                <div v-for="index in numberOfShields" :key="index">
+                <div v-for="card in cardsInShields" :key="card">
 
-                    <img src="../assets/Shield.jpg" class="h-28"/>
+                    <div v-if="card.selected == true" class="border-4 border-myLightGreen">
+                        <img src="../assets/Shield.jpg" class="h-28"/>
+                    </div>
+                    <div v-else >
+                        <img src="../assets/Shield.jpg" class="h-28"/>
+                    </div>
 
                 </div>
 

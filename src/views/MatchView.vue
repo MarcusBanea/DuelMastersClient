@@ -67,13 +67,69 @@ async function addMomentToGameLog(moment) {
     await fetch("/api/game/action/" + moment + "/" + currentPlayer);
 }
 
-const player1SelectedCard = ref(false);
+const player2Component = ref(null);
 
-function showAttackingOptions() {
+const player1SelectedCard = ref(false);
+const player2SelectedCard = ref(false);
+
+const player1SelectedCardIndex = ref(-1);
+const player2SelectedCardIndex = ref(-1);
+
+function showAttackingOptionsForPlayer1(index) {
     //for now, every card/shield can be attacked by any card (be it blocker or not)
     //so, every card in the battle zone and shield will be highlighted
+    player1SelectedCardIndex.value = index;
     player1SelectedCard.value = !player1SelectedCard.value;
 }
+
+function showAttackingOptionsForPlayer2(index) {
+    //for now, every card/shield can be attacked by any card (be it blocker or not)
+    //so, every card in the battle zone and shield will be highlighted
+    player2SelectedCardIndex.value = index;
+    player2SelectedCard.value = !player2SelectedCard.value;
+}
+
+async function attack(index, player) {
+    console.log(index);
+    console.log(player);
+    let action = "Attack ";
+    if(player == "player1") {
+        //set index of the card that is attacked
+        player2SelectedCardIndex.value = index;
+        action += player1SelectedCardIndex.value + " " + player2SelectedCardIndex.value;
+    }
+    else { 
+        //set index of the card that is attacked
+        player1SelectedCardIndex.value = index;
+        action += player2SelectedCardIndex.value + " " + player1SelectedCardIndex.value;
+    }
+    //inform the server of this action
+    const awaitingResponse = await fetch("/api/game/action/" + action + "/" + player);
+    let attackResponse = await awaitingResponse.json();
+
+    //perform action provided by server
+
+    //get player1 response
+    let player1Response = attackResponse.at(0);
+
+
+    //get player2 response
+    let player2Response = attackResponse.at(1);
+    switch(player2Response) {
+        case "" : {
+            break;
+        }
+        //move player2 last selected card to graveyard
+        case "MTG" : {
+            player2Component.value?.executeAction("MTG");
+        }
+        default : {
+            break;
+        }
+    }
+}
+
+
 
 </script>
 
@@ -85,11 +141,12 @@ function showAttackingOptions() {
 
         <div id="opponent_container" class="w-full">
 
-            <GameTableTop :selectable="isTopSelectable" :can-send-to-mana-prop="canTopSendToMana" :player="players[1]"
-                :opponent-is-attacking="player1SelectedCard"
+            <GameTableTop ref="player2Component" :selectable="isTopSelectable" :can-send-to-mana-prop="canTopSendToMana" :player="players[1]"
+                :opponent-is-attacking="player1SelectedCard" :turn="turn"
                 @end-of-turn="changeTurn()" 
-                @draw-card-event="addMomentToGameLog('Draw card')"
-                @select-card="showAttackingOptions(index)"
+                @draw-card-event="addMomentToGameLog($event, 'Draw card')"
+                @select-card="showAttackingOptionsForPlayer2($event, index)"
+                @opponent-select-card="attack($event, (index, 'player1'))"
 
             />
 
@@ -106,9 +163,11 @@ function showAttackingOptions() {
         <div id="my_container" class="w-full">
 
             <GameTableBottom :selectable="isBottomSelectable" :can-send-to-mana-prop="canBottomSendToMana" :player="players[0]"
+                :opponent-is-attacking="player2SelectedCard" :turn="turn"
                 @end-of-turn="changeTurn()" 
-                @draw-card-event="addMomentToGameLog('Draw card')"
-                @select-card="showAttackingOptions(index)"
+                @draw-card-event="addMomentToGameLog($event, 'Draw card')"
+                @select-card="showAttackingOptionsForPlayer1($event, index)"
+                @opponent-select-card="attack($event, (index, 'player2'))"
             />
 
         </div>

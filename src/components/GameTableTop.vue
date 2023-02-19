@@ -9,10 +9,11 @@ const props = defineProps({
     canSendToManaProp: Boolean,
     player: Array,
 
-    opponentIsAttacking: Boolean
+    opponentIsAttacking: Boolean,
+    turn: String
 });
 
-const emits = defineEmits(['endOfTurn', 'drawCardEvent', 'selectCard']);
+const emits = defineEmits(['endOfTurn', 'drawCardEvent', 'selectCard', 'opponentSelectCard']);
 
 const userId = "633f18459af2fa78268b91d4";
 const cardsInHand = ref(props.player["hand"]);
@@ -43,7 +44,15 @@ watch(() => props.opponentIsAttacking, (newValue, oldValue) => {
         else {
             card.selected = !card.selected;
         }
-    })   
+    })
+    cardsInBattleZone.value.forEach((card) => {
+        if(card.selected === undefined) {
+            card.selected = true;
+        }
+        else {
+            card.selected = !card.selected;
+        }
+    })    
 });
 
 function showHand() {
@@ -82,9 +91,50 @@ function endTurn() {
     emits("endOfTurn");
 }
 
+const lastCardSelectedIndex = ref(-1);
+
 function selectCard(index) {
+    if(lastCardSelectedIndex.value != -1 && lastCardSelectedIndex.value != index) {
+        cardsInBattleZone.value[lastCardSelectedIndex.value].selected = false;
+    }
     cardsInBattleZone.value[index].selected = !cardsInBattleZone.value[index].selected;
-    emits("selectCard", index);
+    lastCardSelectedIndex.value = index;
+    emits("selectCard", lastCardSelectedIndex.value);
+}
+
+const opponentSelectedShield = ref(false);
+const opponentSelectedBattleZoneCard = ref(false);
+const opponentSelectedCardIndex = ref(-1);
+
+function opponentSelectCard(index, zone) {
+    opponentSelectedCardIndex.value = index;
+    if(zone == "BZ") {
+        opponentSelectedBattleZoneCard.value = true;
+    }
+    else {
+        opponentSelectedShield.value = true;
+    }
+    
+    emits("opponentSelectCard", opponentSelectedCardIndex.value);
+}
+
+function executeAction(action) {
+    switch(action) {
+        case "MTG" : {
+            cardsInGraveyard.value.push(cardsInBattleZone.value[opponentSelectedCardIndex.value]);
+            cardsInBattleZone.value.splice(opponentSelectedCardIndex.value, 1);
+            break;
+        }
+        default : { 
+            break;
+        }
+    }
+}
+
+defineExpose({executeAction});
+
+function isGraveyardEmpty() {
+    return cardsInGraveyard.value.length == 0 ? true : false;
 }
 
 </script>
@@ -108,7 +158,10 @@ function selectCard(index) {
 
             <div id="graveyard_container" class="w-[40%] h-[90%] border-2 border-myBeige m-auto grid cursor-pointer">
 
-                <p class="text-myBeige m-auto">
+                <div v-if="!isGraveyardEmpty()" :key="isGraveyardEmpty()">
+                    <ImageContainerV2 :image="cardsInGraveyard[0].image" container-width="80%"/>
+                </div>
+                <p v-else class="text-myBeige m-auto">
                     GRAVEYARD
                 </p>
 
@@ -118,7 +171,7 @@ function selectCard(index) {
               
                 <div v-for="card in cardsInShields" :key="card">
 
-                    <div v-if="card.selected == true" class="border-4">
+                    <div v-if="card.selected == true" class="border-4 border-myLightGreen">
                         <img src="../assets/Shield.jpg" class="h-28"/>
                     </div>
                     <div v-else >
@@ -144,11 +197,14 @@ function selectCard(index) {
         <div id="battleZone_container" class="w-[100%] h-[100%] flex flex-row justify-evenly mb-2 mt-2">
 
             <div v-for="(card, index) in cardsInBattleZone" :key="card" class="w-[6%] h-[100px]">
-                <div v-if="card.selected == true" class="border-4">
+                <div v-if="card.selected == true && turn == 'TOP'" class="border-4">
                     <ImageContainerV2 :image="card.image" container-width="100%" @click="selectCard(index)"/>
                 </div>
+                <div v-else-if="card.selected == true && turn == 'BOTTOM'" class="border-4 border-myLightGreen">
+                    <ImageContainerV2 :image="card.image" container-width="100%" @click="opponentSelectCard(index, 'BZ')"/>
+                </div>
                 <div v-else>
-                    <ImageContainerV2 :image="card.image" container-width="100%" @click="selectCard(index)"/>
+                    <ImageContainerV2 :image="card.image" container-width="100%" @click="selectable && selectCard(index)"/>
                 </div>
                 
             </div>
