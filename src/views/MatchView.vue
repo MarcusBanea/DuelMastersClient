@@ -10,6 +10,7 @@ import ImageContainerV2 from "../components/ImageContainerV2.vue";
 import CardHandBlock from "../components/CardHandBlock.vue";
 import GameTableBottom from "../components/GameTableBottom.vue";
 import GameTableTop from "../components/GameTableTop.vue";
+import utils from "@/Utils";
 
 //current user
 const responseUser = await fetch("/api/users/633f18459af2fa78268b91d4");
@@ -21,79 +22,58 @@ const responsePlayers = await fetch("/api/game/initialize/" + userId + "/" + use
 const players = ref(await responsePlayers.json());
 
 const turn = ref("BOTTOM");
-const canBottomSendToMana = ref(true);
-const canTopSendToMana = ref(false);
 
 const isGameLogOpen = ref(false)
-//game log contains array of strings, representing the game timeline
+//game log contains array of strings, representing the match timeline
 const gameLog = ref([]);
+
+const player1Component = ref(null);
+const player2Component = ref(null);
+
+const hasPlayer1SelectedCard = ref(false);
+const hasPlayer2SelectedCard = ref(false);
+
+const player1SelectedCardIndex = ref(-1);
+const player2SelectedCardIndex = ref(-1);
 
 async function changeTurn() {
     turn.value = turn.value == "BOTTOM" ? "TOP" : "BOTTOM";
-    canBottomSendToMana.value = !canBottomSendToMana.value;
-    canTopSendToMana.value = !canTopSendToMana.value;
-    const test = await fetch("/api/game/test");
 }
 
-const isBottomSelectable = computed(() => {
+const isBottomTurn = computed(() => {
     return turn.value == "BOTTOM" ? true : false;
 });
 
-const isTopSelectable = computed(() => {
+const isTopTurn = computed(() => {
     return turn.value == "TOP" ? true : false;
 });
 
-function toggleGameLog() {
-    isGameLogOpen.value = !isGameLogOpen.value;
-}
-
-function getCurrentTime() {
-    var currentdate = new Date(); 
-    var currentDateTime = currentdate.getDate() + "/"
-                + (currentdate.getMonth() + 1)  + "/" 
-                + currentdate.getFullYear() + " @ "  
-                + currentdate.getHours() + ":"  
-                + currentdate.getMinutes() + ":" 
-                + currentdate.getSeconds();
-    return currentDateTime;
-}
-
-async function addMomentToGameLog(moment) {
-    console.log(moment);
-    let newMoment = getCurrentTime() + " : " + moment;
+async function addMomentToGameLog(event, moment) {
+    let newMoment = utils.getCurrentTime() + " : " + moment;
     gameLog.value.push(newMoment);
 
     let currentPlayer = turn.value == "BOTTOM" ? "player1" : "player2";
     await fetch("/api/game/action/" + moment + "/" + currentPlayer);
 }
 
-async function basicMove(index, move, player) {
-    let action = move;
-    action += " " + index;
-    await fetch("/api/game/action/" + action +  "/" + player)
-}
-
-const player1Component = ref(null);
-const player2Component = ref(null);
-
-const player1SelectedCard = ref(false);
-const player2SelectedCard = ref(false);
-
-const player1SelectedCardIndex = ref(-1);
-const player2SelectedCardIndex = ref(-1);
-
 function showAttackingOptionsForPlayer1(index) {
     //for now, every card/shield can be attacked by any card (be it blocker or not)
     //so, every card in the battle zone and shield will be highlighted
     player1SelectedCardIndex.value = index;
-    player1SelectedCard.value = !player1SelectedCard.value;
+    hasPlayer1SelectedCard.value = !hasPlayer1SelectedCard.value;
 }
 
 function showAttackingOptionsForPlayer2(index) {
     //for now, every card/shield can be attacked by any card (be it blocker or not)
     //so, every card in the battle zone and shield will be highlighted
     player2SelectedCardIndex.value = index;
-    player2SelectedCard.value = !player2SelectedCard.value;
+    hasPlayer2SelectedCard.value = !hasPlayer2SelectedCard.value;
+}
+
+async function basicMove(index, move, player) {
+    let action = move;
+    action += " " + index;
+    await fetch("/api/game/action/" + action +  "/" + player)
 }
 
 async function attack(index, player) {
@@ -133,7 +113,6 @@ async function attack(index, player) {
         }
     }
 
-
     //get player2 response
     let player2Response = attackResponse.at(1);
     switch(player2Response) {
@@ -152,8 +131,6 @@ async function attack(index, player) {
     }
 }
 
-
-
 </script>
 
 
@@ -164,18 +141,17 @@ async function attack(index, player) {
 
         <div id="opponent_container" class="w-full">
 
-            <GameTableTop ref="player2Component" :selectable="isTopSelectable" :can-send-to-mana-prop="canTopSendToMana" :player="players[1]"
-                :opponent-is-attacking="player1SelectedCard" :turn="turn"
+            <GameTableTop ref="player2Component" :player="players[1]" :its-your-turn="isTopTurn"
+                :opponent-is-attacking="hasPlayer1SelectedCard"
                 @end-of-turn="changeTurn()" 
                 @draw-card-event="addMomentToGameLog($event, 'Draw card')"
                 @select-card="showAttackingOptionsForPlayer2($event, index)"
-                @opponent-select-card="attack($event, (index, 'player1'))"
+                @opponent-select-card="attack($event, 'player1')"
                 @send-card-to-mana="basicMove($event, 'MoveToMana', 'player2')"
                 @send-card-to-battle-zone="basicMove($event, 'MoveToBattleZone', 'player2')"
             />
 
         </div>
-
 
         <div id="turn_indicator_container">
             <p class="text-myBeige h-[100%] text-2xl">
@@ -183,15 +159,14 @@ async function attack(index, player) {
             </p>
         </div>
 
-
         <div id="my_container" class="w-full">
 
-            <GameTableBottom ref="player1Component" :selectable="isBottomSelectable" :can-send-to-mana-prop="canBottomSendToMana" :player="players[0]"
-                :opponent-is-attacking="player2SelectedCard" :turn="turn"
+            <GameTableBottom ref="player1Component" :player="players[0]" :its-your-turn="isBottomTurn"
+                :opponent-is-attacking="hasPlayer2SelectedCard" 
                 @end-of-turn="changeTurn()" 
                 @draw-card-event="addMomentToGameLog($event, 'Draw card')"
                 @select-card="showAttackingOptionsForPlayer1($event, index)"
-                @opponent-select-card="attack($event, (index, 'player2'))"
+                @opponent-select-card="attack($event, 'player2')"
                 @send-card-to-mana="basicMove($event, 'MoveToMana', 'player1')"
                 @send-card-to-battle-zone="basicMove($event, 'MoveToBattleZone', 'player1')"
             />
@@ -199,7 +174,7 @@ async function attack(index, player) {
         </div>
 
         <div class="w-[5%] h-max bg-myBlack border-myBeige border-2 absolute right-0 cursor-pointer z-10">
-            <p class="text-myBeige" @click="toggleGameLog()">
+            <p class="text-myBeige" @click="isGameLogOpen = !isGameLogOpen">
                 GAMELOG
             </p>
         </div>

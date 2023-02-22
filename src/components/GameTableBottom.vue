@@ -5,18 +5,16 @@ import CardHandBlock from './CardHandBlock.vue';
 import ImageContainerV2 from './ImageContainerV2.vue';
 
 const props = defineProps({
-    selectable: Boolean,
-    canSendToManaProp: Boolean,
     player: Array,
-
     opponentIsAttacking: Boolean,
-    turn: String
+    itsYourTurn: Boolean
 });
 
 const emits = defineEmits(['endOfTurn', 'drawCardEvent', 'selectCard', 'opponentSelectCard', 'sendCardToMana', 'sendCardToBattleZone']);
 
-const cardsInHand = ref(props.player["hand"]);
+defineExpose({executeAction});
 
+const cardsInHand = ref(props.player["hand"]);
 const cardsInBattleZone = ref(props.player["battleZone"]);
 const cardsInMana = ref(props.player["manaZone"]);
 const cardsInGraveyard = ref(props.player["graveyard"]);
@@ -24,17 +22,20 @@ const cardsInDeck = ref(props.player["deck"]);
 const cardsInShields = ref(props.player["shields"])
 
 const currentTurnManaAvailable = ref(cardsInMana.value.length);
+const canSendToMana = ref(props.itsYourTurn);
 
 const isHandSelected = ref(false);
 
-const canSendToMana = ref(props.canSendToManaProp);
+const lastCardSelectedIndex = ref(-1);
 
-//when it's this player's turn, 
-watch(() => props.canSendToManaProp, (newValue, oldValue) => {
+//can send to mana only when turn is true
+watch(() => props.itsYourTurn, (newValue, oldValue) => {
     canSendToMana.value = newValue;
     currentTurnManaAvailable.value = cardsInMana.value.length;
 });
 
+//if the opponent selected a card for attack, all possible cards that can be attacked must be highlighted
+//TODO: look at opponent's selected card and see what card it can/can't attack
 watch(() => props.opponentIsAttacking, (newValue, oldValue) => {
     cardsInShields.value.forEach((card) => {
         if(card.selected === undefined) {
@@ -54,46 +55,44 @@ watch(() => props.opponentIsAttacking, (newValue, oldValue) => {
     })    
 });
 
-function showHand() {
-    isHandSelected.value = !isHandSelected.value;
-}
-
+//move the card at index in hand cards array to mana cards array
 function sendCardFromHandToMana(index) {
-    showHand();
     currentTurnManaAvailable.value++;
     cardsInMana.value.push(cardsInHand.value[index]);
     cardsInHand.value.splice(index, 1);
-
     canSendToMana.value = false;
 
+    isHandSelected.value = !isHandSelected.value;
     emits("sendCardToMana", index);
-
 }
 
+//move the card at index in hand cards array to battle zone cards array
 function sendCardFromHandToBattleZone(index) {
-    showHand();
     currentTurnManaAvailable.value -= cardsInHand.value[index].mana;
     let cardToAdd = cardsInHand.value[index];
-    //attribute used when selecting card for attack
+    //activate card highlighted status
     cardToAdd.selected = false;
     cardsInBattleZone.value.push(cardToAdd);
     cardsInHand.value.splice(index, 1);
 
+    isHandSelected.value = !isHandSelected.value;
     emits("sendCardToBattleZone", index);
 }
 
+//move card at index 0 in deck cards array to hand cards array
 function drawCard() {
     cardsInHand.value.push(cardsInDeck.value[0]);
     cardsInDeck.value.splice(0, 1);
     emits("drawCardEvent");
 }
 
+//notify match interface that this turn has ended
 function endTurn() {
     emits("endOfTurn");
 }
 
-const lastCardSelectedIndex = ref(-1);
-
+//save the index of the (last) selected card from the battle zone and send it to match interface
+//the match interface will notify the opponent player interface to highlight the attack options for this selected card
 function selectCard(index) {
     if(lastCardSelectedIndex.value != -1 && lastCardSelectedIndex.value != index) {
         cardsInBattleZone.value[lastCardSelectedIndex.value].selected = false;
@@ -103,22 +102,13 @@ function selectCard(index) {
     emits("selectCard", lastCardSelectedIndex.value);
 }
 
-const opponentSelectedShield = ref(false);
-const opponentSelectedBattleZoneCard = ref(false);
-const opponentSelectedCardIndex = ref(-1);
-
-function opponentSelectCard(index, zone) {
-    lastCardSelectedIndex.value = index;
-    if(zone == "BZ") {
-        opponentSelectedBattleZoneCard.value = true;
-    }
-    else {
-        opponentSelectedShield.value = true;
-    }
-    
+//when the opponent is attacking, notify the match interface which card he/she selected
+function opponentSelectCard(index) {
+    lastCardSelectedIndex.value = index;    
     emits("opponentSelectCard", lastCardSelectedIndex.value);
 }
 
+//decode the response provided by server (through match interface) and execute the action
 function executeAction(action) {
     switch(action) {
         case "MTG" : {
@@ -133,12 +123,11 @@ function executeAction(action) {
     resetCardHighlightedStatusEffect();
 }
 
-defineExpose({executeAction});
-
 function isGraveyardEmpty() {
     return cardsInGraveyard.value.length == 0 ? true : false;
 }
 
+//after specific actions, card highlighted status effect must be reset
 function resetCardHighlightedStatusEffect() {
     //shields
     cardsInShields.value.forEach((card) => {
@@ -148,9 +137,8 @@ function resetCardHighlightedStatusEffect() {
     cardsInBattleZone.value.forEach((card) => {
         card.selected = false;
     })
-    lastCardSelectedIndex.value = null;
+    lastCardSelectedIndex.value = -1;
 }
-
 
 </script>
 
@@ -164,16 +152,15 @@ function resetCardHighlightedStatusEffect() {
         <div id="battleZone_container" class="w-[100%] h-[100%] flex flex-row justify-evenly mb-2 mt-2">
 
             <div v-for="(card, index) in cardsInBattleZone" :key="card" class="w-[6%] h-[100px]">
-                <div v-if="card.selected == true && turn == 'BOTTOM'" class="border-4">
+                <div v-if="card.selected == true && itsYourTurn" class="border-4">
                     <ImageContainerV2 :image="card.image" container-width="100%" @click="selectCard(index)"/>
                 </div>
-                <div v-else-if="card.selected == true && turn == 'TOP'" class="border-4 border-myLightGreen">
-                    <ImageContainerV2 :image="card.image" container-width="100%" @click="opponentSelectCard(index, 'BZ')"/>
+                <div v-else-if="card.selected == true && !itsYourTurn" class="border-4 border-myLightGreen">
+                    <ImageContainerV2 :image="card.image" container-width="100%" @click="opponentSelectCard(index)"/>
                 </div>
                 <div v-else>
-                    <ImageContainerV2 :image="card.image" container-width="100%" @click="selectable && selectCard(index)"/>
+                    <ImageContainerV2 :image="card.image" container-width="100%" @click="itsYourTurn && selectCard(index)"/>
                 </div>
-                
             </div>
 
         </div>
@@ -226,11 +213,11 @@ function resetCardHighlightedStatusEffect() {
 
         </div>
 
-        <button v-if="selectable == true" class="absolute bg-myBeige text-myBlack font-bold rounded w-min px-4 bottom-8 right-24" @click="showHand()">
+        <button v-if="itsYourTurn" class="absolute bg-myBeige text-myBlack font-bold rounded w-min px-4 bottom-8 right-24" @click="isHandSelected = !isHandSelected">
             HAND
         </button>
 
-        <button v-if="selectable == true" class="absolute bg-myBeige text-myBlack font-bold rounded px-4 bottom-8 left-24" @click="endTurn()">
+        <button v-if="itsYourTurn" class="absolute bg-myBeige text-myBlack font-bold rounded px-4 bottom-8 left-24" @click="endTurn()">
           END TURN
         </button>
 
@@ -248,7 +235,7 @@ function resetCardHighlightedStatusEffect() {
 
         </div>
 
-        <button class="absolute bg-myBeige text-myBlack font-bold rounded w-min px-4 bottom-8 right-24" @click="showHand()">
+        <button class="absolute bg-myBeige text-myBlack font-bold rounded w-min px-4 bottom-8 right-24" @click="isHandSelected = !isHandSelected">
           HAND
         </button>
 
