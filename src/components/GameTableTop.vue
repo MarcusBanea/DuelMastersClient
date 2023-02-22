@@ -163,7 +163,7 @@ function resetCardHighlightedStatusEffect() {
             <div id="graveyard_container" class="w-[40%] h-[90%] border-2 border-myBeige m-auto grid cursor-pointer">
 
                 <div v-if="!isGraveyardEmpty()" :key="isGraveyardEmpty()">
-                    <ImageContainerV2 :image="cardsInGraveyard[0].image" container-width="80%"/>
+                    <ImageContainerV2 :image="cardsInGraveyard[cardsInGraveyard.length - 1].image" container-width="80%"/>
                 </div>
                 <p v-else class="text-myBeige m-auto">
                     GRAVEYARD
