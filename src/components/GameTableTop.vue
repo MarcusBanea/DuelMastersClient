@@ -163,7 +163,7 @@ function resetCardHighlightedStatusEffect() {
             <div id="graveyard_container" class="w-[40%] h-[90%] border-2 border-myBeige m-auto grid cursor-pointer">
 
                 <div v-if="!isGraveyardEmpty()" :key="isGraveyardEmpty()">
-                    <ImageContainerV2 :image="cardsInGraveyard[cardsInGraveyard.length - 1].image" container-width="80%"/>
+                    <ImageContainerV2 :zoom-on-hover-activated="false" :image="cardsInGraveyard[cardsInGraveyard.length - 1].image" container-width="80%"/>
                 </div>
                 <p v-else class="text-myBeige m-auto">
                     GRAVEYARD
@@ -202,13 +202,13 @@ function resetCardHighlightedStatusEffect() {
 
             <div v-for="(card, index) in cardsInBattleZone" :key="card" class="w-[6%] h-[100px]">
                 <div v-if="card.selected == true && itsYourTurn" class="border-4">
-                    <ImageContainerV2 :image="card.image" container-width="100%" @click="selectCard(index)"/>
+                    <ImageContainerV2 :zoom-on-hover-activated="true" :image="card.image" container-width="100%" @click="selectCard(index)"/>
                 </div>
                 <div v-else-if="card.selected == true && !itsYourTurn" class="border-4 border-myLightGreen">
-                    <ImageContainerV2 :image="card.image" container-width="100%" @click="opponentSelectCard(index)"/>
+                    <ImageContainerV2 :zoom-on-hover-activated="true" :image="card.image" container-width="100%" @click="opponentSelectCard(index)"/>
                 </div>
                 <div v-else>
-                    <ImageContainerV2 :image="card.image" container-width="100%" @click="itsYourTurn && selectCard(index)"/>
+                    <ImageContainerV2 :zoom-on-hover-activated="true" :image="card.image" container-width="100%" @click="itsYourTurn && selectCard(index)"/>
                 </div>
             </div>
 

@@ -9,7 +9,9 @@ const props = defineProps({
     imageBorderRadius: String,
     rotate: String,
 
-    image: String
+    image: String,
+
+    zoomOnHoverActivated: Boolean
 });
 
 const response = props.imageId != null ? await fetch("/api/file/download/bytes/" + props.imageId) : null;
@@ -53,7 +55,10 @@ const clicked = ref(false);
     
     
 <template>
-    <div :style="cssProps" class="image-container m-auto">
+    <div v-if="zoomOnHoverActivated" :style="cssProps" class="image-container m-auto hover:scale-[3] hover:delay-500 duration-300 hover:border-2 hover:border-myBeige">
+        <img :src="imageSrc" />
+    </div>
+    <div v-else :style="cssProps" class="image-container m-auto">
         <img :src="imageSrc" />
     </div>
 </template>

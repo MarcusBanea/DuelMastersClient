@@ -153,13 +153,13 @@ function resetCardHighlightedStatusEffect() {
 
             <div v-for="(card, index) in cardsInBattleZone" :key="card" class="w-[6%] h-[100px]">
                 <div v-if="card.selected == true && itsYourTurn" class="border-4">
-                    <ImageContainerV2 :image="card.image" container-width="100%" @click="selectCard(index)"/>
+                    <ImageContainerV2 :zoom-on-hover-activated="true" :image="card.image" container-width="100%" @click="selectCard(index)"/>
                 </div>
                 <div v-else-if="card.selected == true && !itsYourTurn" class="border-4 border-myLightGreen">
-                    <ImageContainerV2 :image="card.image" container-width="100%" @click="opponentSelectCard(index)"/>
+                    <ImageContainerV2 :zoom-on-hover-activated="true" :image="card.image" container-width="100%" @click="opponentSelectCard(index)"/>
                 </div>
                 <div v-else>
-                    <ImageContainerV2 :image="card.image" container-width="100%" @click="itsYourTurn && selectCard(index)"/>
+                    <ImageContainerV2 :zoom-on-hover-activated="true" :image="card.image" container-width="100%" @click="itsYourTurn && selectCard(index)"/>
                 </div>
             </div>
 
@@ -208,7 +208,7 @@ function resetCardHighlightedStatusEffect() {
         <div id="manaZone_container" class="w-[55%] h-[100%] flex flex-row flex-nowrap m-auto">
 
             <div v-for="card in cardsInMana" :key="card" class="w-[100px] h-[100px]">
-                <ImageContainerV2 :image="card.image" container-width="70%" rotate="-0.25turn"/>
+                <ImageContainerV2 :zoom-on-hover-activated="false" :image="card.image" container-width="70%" rotate="-0.25turn"/>
             </div>
 
         </div>
