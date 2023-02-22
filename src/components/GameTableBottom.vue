@@ -13,9 +13,8 @@ const props = defineProps({
     turn: String
 });
 
-const emits = defineEmits(['endOfTurn', 'drawCardEvent', 'selectCard', 'opponentSelectCard']);
+const emits = defineEmits(['endOfTurn', 'drawCardEvent', 'selectCard', 'opponentSelectCard', 'sendCardToMana', 'sendCardToBattleZone']);
 
-const userId = "633f18459af2fa78268b91d4";
 const cardsInHand = ref(props.player["hand"]);
 
 const cardsInBattleZone = ref(props.player["battleZone"]);
@@ -23,7 +22,6 @@ const cardsInMana = ref(props.player["manaZone"]);
 const cardsInGraveyard = ref(props.player["graveyard"]);
 const cardsInDeck = ref(props.player["deck"]);
 const cardsInShields = ref(props.player["shields"])
-const numberOfShields = ref(5);
 
 const currentTurnManaAvailable = ref(cardsInMana.value.length);
 
@@ -31,6 +29,7 @@ const isHandSelected = ref(false);
 
 const canSendToMana = ref(props.canSendToManaProp);
 
+//when it's this player's turn, 
 watch(() => props.canSendToManaProp, (newValue, oldValue) => {
     canSendToMana.value = newValue;
     currentTurnManaAvailable.value = cardsInMana.value.length;
@@ -67,7 +66,8 @@ function sendCardFromHandToMana(index) {
 
     canSendToMana.value = false;
 
-    //emits("endOfTurn");
+    emits("sendCardToMana", index);
+
 }
 
 function sendCardFromHandToBattleZone(index) {
@@ -78,6 +78,8 @@ function sendCardFromHandToBattleZone(index) {
     cardToAdd.selected = false;
     cardsInBattleZone.value.push(cardToAdd);
     cardsInHand.value.splice(index, 1);
+
+    emits("sendCardToBattleZone", index);
 }
 
 function drawCard() {
@@ -91,6 +93,7 @@ function endTurn() {
 }
 
 const lastCardSelectedIndex = ref(-1);
+
 function selectCard(index) {
     if(lastCardSelectedIndex.value != -1 && lastCardSelectedIndex.value != index) {
         cardsInBattleZone.value[lastCardSelectedIndex.value].selected = false;
@@ -105,15 +108,47 @@ const opponentSelectedBattleZoneCard = ref(false);
 const opponentSelectedCardIndex = ref(-1);
 
 function opponentSelectCard(index, zone) {
+    lastCardSelectedIndex.value = index;
     if(zone == "BZ") {
         opponentSelectedBattleZoneCard.value = true;
     }
     else {
         opponentSelectedShield.value = true;
     }
-    opponentSelectedCardIndex.value = index;
     
-    emits("opponentSelectCard", opponentSelectedCardIndex.value);
+    emits("opponentSelectCard", lastCardSelectedIndex.value);
+}
+
+function executeAction(action) {
+    switch(action) {
+        case "MTG" : {
+            cardsInGraveyard.value.push(cardsInBattleZone.value[lastCardSelectedIndex.value]);
+            cardsInBattleZone.value.splice(lastCardSelectedIndex.value, 1);
+            break;
+        }
+        default : { 
+            break;
+        }
+    }
+    resetCardHighlightedStatusEffect();
+}
+
+defineExpose({executeAction});
+
+function isGraveyardEmpty() {
+    return cardsInGraveyard.value.length == 0 ? true : false;
+}
+
+function resetCardHighlightedStatusEffect() {
+    //shields
+    cardsInShields.value.forEach((card) => {
+        card.selected = false;
+    })
+    //battle zone
+    cardsInBattleZone.value.forEach((card) => {
+        card.selected = false;
+    })
+    lastCardSelectedIndex.value = null;
 }
 
 
@@ -147,7 +182,10 @@ function opponentSelectCard(index, zone) {
 
             <div id="graveyard_container" class="w-[40%] h-[90%] border-2 border-myBeige m-auto grid cursor-pointer">
 
-                <p class="text-myBeige m-auto">
+                <div v-if="!isGraveyardEmpty()" :key="isGraveyardEmpty()">
+                    <ImageContainerV2 :image="cardsInGraveyard[0].image" container-width="80%"/>
+                </div>
+                <p v-else class="text-myBeige m-auto">
                     GRAVEYARD
                 </p>
 

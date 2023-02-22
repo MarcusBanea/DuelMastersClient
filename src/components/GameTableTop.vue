@@ -13,9 +13,8 @@ const props = defineProps({
     turn: String
 });
 
-const emits = defineEmits(['endOfTurn', 'drawCardEvent', 'selectCard', 'opponentSelectCard']);
+const emits = defineEmits(['endOfTurn', 'drawCardEvent', 'selectCard', 'opponentSelectCard', 'sendCardToMana', 'sendCardToBattleZone']);
 
-const userId = "633f18459af2fa78268b91d4";
 const cardsInHand = ref(props.player["hand"]);
 
 const cardsInBattleZone = ref(props.player["battleZone"]);
@@ -23,7 +22,6 @@ const cardsInMana = ref(props.player["manaZone"]);
 const cardsInGraveyard = ref(props.player["graveyard"]);
 const cardsInDeck = ref(props.player["deck"]);
 const cardsInShields = ref(props.player["shields"])
-const numberOfShields = ref(5);
 
 const currentTurnManaAvailable = ref(cardsInMana.value.length);
 
@@ -67,7 +65,8 @@ function sendCardFromHandToMana(index) {
 
     canSendToMana.value = false;
 
-    //emits("endOfTurn");
+    emits("sendCardToMana", index);
+
 }
 
 function sendCardFromHandToBattleZone(index) {
@@ -77,8 +76,9 @@ function sendCardFromHandToBattleZone(index) {
     //attribute used when selecting card for attack
     cardToAdd.selected = false;
     cardsInBattleZone.value.push(cardToAdd);
-    myNumberOfCardsInBattleZone.value++;
     cardsInHand.value.splice(index, 1);
+
+    emits("sendCardToBattleZone", index);
 }
 
 function drawCard() {
@@ -107,7 +107,7 @@ const opponentSelectedBattleZoneCard = ref(false);
 const opponentSelectedCardIndex = ref(-1);
 
 function opponentSelectCard(index, zone) {
-    opponentSelectedCardIndex.value = index;
+    lastCardSelectedIndex.value = index;
     if(zone == "BZ") {
         opponentSelectedBattleZoneCard.value = true;
     }
@@ -115,26 +115,39 @@ function opponentSelectCard(index, zone) {
         opponentSelectedShield.value = true;
     }
     
-    emits("opponentSelectCard", opponentSelectedCardIndex.value);
+    emits("opponentSelectCard", lastCardSelectedIndex.value);
 }
 
 function executeAction(action) {
     switch(action) {
         case "MTG" : {
-            cardsInGraveyard.value.push(cardsInBattleZone.value[opponentSelectedCardIndex.value]);
-            cardsInBattleZone.value.splice(opponentSelectedCardIndex.value, 1);
+            cardsInGraveyard.value.push(cardsInBattleZone.value[lastCardSelectedIndex.value]);
+            cardsInBattleZone.value.splice(lastCardSelectedIndex.value, 1);
             break;
         }
         default : { 
             break;
         }
     }
+    resetCardHighlightedStatusEffect();
 }
 
 defineExpose({executeAction});
 
 function isGraveyardEmpty() {
     return cardsInGraveyard.value.length == 0 ? true : false;
+}
+
+function resetCardHighlightedStatusEffect() {
+    //shields
+    cardsInShields.value.forEach((card) => {
+        card.selected = false;
+    })
+    //battle zone
+    cardsInBattleZone.value.forEach((card) => {
+        card.selected = false;
+    })
+    lastCardSelectedIndex.value = null;
 }
 
 </script>

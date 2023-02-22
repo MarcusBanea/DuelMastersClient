@@ -67,6 +67,13 @@ async function addMomentToGameLog(moment) {
     await fetch("/api/game/action/" + moment + "/" + currentPlayer);
 }
 
+async function basicMove(index, move, player) {
+    let action = move;
+    action += " " + index;
+    await fetch("/api/game/action/" + action +  "/" + player)
+}
+
+const player1Component = ref(null);
 const player2Component = ref(null);
 
 const player1SelectedCard = ref(false);
@@ -111,17 +118,33 @@ async function attack(index, player) {
 
     //get player1 response
     let player1Response = attackResponse.at(0);
+    switch(player1Response) {
+        case "" : {
+            player1Component.value?.executeAction("");
+            break;
+        }
+        //move player2 last selected card to graveyard
+        case "MTG" : {
+            player1Component.value?.executeAction("MTG");
+            break;
+        }
+        default : {
+            break;
+        }
+    }
 
 
     //get player2 response
     let player2Response = attackResponse.at(1);
     switch(player2Response) {
         case "" : {
+            player2Component.value?.executeAction("");
             break;
         }
         //move player2 last selected card to graveyard
         case "MTG" : {
             player2Component.value?.executeAction("MTG");
+            break;
         }
         default : {
             break;
@@ -147,7 +170,8 @@ async function attack(index, player) {
                 @draw-card-event="addMomentToGameLog($event, 'Draw card')"
                 @select-card="showAttackingOptionsForPlayer2($event, index)"
                 @opponent-select-card="attack($event, (index, 'player1'))"
-
+                @send-card-to-mana="basicMove($event, 'MoveToMana', 'player2')"
+                @send-card-to-battle-zone="basicMove($event, 'MoveToBattleZone', 'player2')"
             />
 
         </div>
@@ -162,12 +186,14 @@ async function attack(index, player) {
 
         <div id="my_container" class="w-full">
 
-            <GameTableBottom :selectable="isBottomSelectable" :can-send-to-mana-prop="canBottomSendToMana" :player="players[0]"
+            <GameTableBottom ref="player1Component" :selectable="isBottomSelectable" :can-send-to-mana-prop="canBottomSendToMana" :player="players[0]"
                 :opponent-is-attacking="player2SelectedCard" :turn="turn"
                 @end-of-turn="changeTurn()" 
                 @draw-card-event="addMomentToGameLog($event, 'Draw card')"
                 @select-card="showAttackingOptionsForPlayer1($event, index)"
                 @opponent-select-card="attack($event, (index, 'player2'))"
+                @send-card-to-mana="basicMove($event, 'MoveToMana', 'player1')"
+                @send-card-to-battle-zone="basicMove($event, 'MoveToBattleZone', 'player1')"
             />
 
         </div>
