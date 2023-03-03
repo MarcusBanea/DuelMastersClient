@@ -1,10 +1,9 @@
 <script setup>
+import { ref } from 'vue';
 import router from '../router';
+import { useUserStore } from '../stores/userStore';
 
-const props = defineProps({
-    nickname: String,
-    money: String
-});
+const userStore = useUserStore();
 
 function goToMyCollection() {
     router.push("/myCollection");
@@ -72,7 +71,7 @@ function goToMatch() {
         </div>
         <div class="w-[100%]">
             <p class="float-right min-w-min">
-                {{ nickname }}
+                {{ userStore.name }}
             </p>
         </div>
         <div class="grid place-items-center">
@@ -81,7 +80,7 @@ function goToMatch() {
         <div class="w-[100%] grid grid-cols-[20%_20%_20%]">
             <div>
                 <p class="float-left min-w-min">
-                    {{ money }}
+                    {{ userStore.money }}
                 </p>
                 <div class="w-48">
                     <img src="../assets/money.png" class="w-[15%] h-[50%]" />
