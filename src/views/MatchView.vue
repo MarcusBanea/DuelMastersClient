@@ -1,27 +1,14 @@
 <script setup>
 import { ref } from "@vue/reactivity";
-import ImageContainer from "../components/ImageContainer.vue";
-import ImageRevealOnClick from "../components/ImageRevealOnClick.vue";
 import Header from "../components/Header.vue";
-import PackBlock from "../components/PackBlock.vue";
-import { computed } from "@vue/runtime-core";
-import CardBlock from "../components/CardBlock.vue";
-import ImageContainerV2 from "../components/ImageContainerV2.vue";
-import CardHandBlock from "../components/CardHandBlock.vue";
 import GameTableBottom from "../components/GameTableBottom.vue";
 import GameTableTop from "../components/GameTableTop.vue";
 import utils from "@/Utils";
+import { useMatchStore } from "../stores/matchStore";
 
-//current user
-const responseUser = await fetch("/api/users/633f18459af2fa78268b91d4");
-const user = ref(await responseUser.json());
+const matchStore = useMatchStore();
+matchStore.init();
 
-const userId = "633f18459af2fa78268b91d4";
-//get players details
-const responsePlayers = await fetch("/api/game/initialize/" + userId + "/" + userId);
-const players = ref(await responsePlayers.json());
-
-const turn = ref("BOTTOM");
 
 const isGameLogOpen = ref(false)
 //game log contains array of strings, representing the match timeline
@@ -35,18 +22,6 @@ const hasPlayer2SelectedCard = ref(false);
 
 const player1SelectedCardIndex = ref(-1);
 const player2SelectedCardIndex = ref(-1);
-
-async function changeTurn() {
-    turn.value = turn.value == "BOTTOM" ? "TOP" : "BOTTOM";
-}
-
-const isBottomTurn = computed(() => {
-    return turn.value == "BOTTOM" ? true : false;
-});
-
-const isTopTurn = computed(() => {
-    return turn.value == "TOP" ? true : false;
-});
 
 async function addMomentToGameLog(event, moment) {
     let newMoment = utils.getCurrentTime() + " : " + moment;
@@ -68,12 +43,6 @@ function showAttackingOptionsForPlayer2(index) {
     //so, every card in the battle zone and shield will be highlighted
     player2SelectedCardIndex.value = index;
     hasPlayer2SelectedCard.value = !hasPlayer2SelectedCard.value;
-}
-
-async function basicMove(index, move, player) {
-    let action = move;
-    action += " " + index;
-    await fetch("/api/game/action/" + action +  "/" + player)
 }
 
 async function attack(index, player) {
@@ -98,9 +67,10 @@ async function attack(index, player) {
 
     //get player1 response
     let player1Response = attackResponse.at(0);
-    switch(player1Response) {
-        case "" : {
-            player1Component.value?.executeAction("");
+    let moveResponse = player1Response.substring(0, 3);
+    switch(moveResponse) {
+        case "NMV" : {
+            player1Component.value?.executeAction(player1Response.substring(4));
             break;
         }
         //move player2 last selected card to graveyard
@@ -136,39 +106,31 @@ async function attack(index, player) {
 
 
 <template>
-    <Header :money="user.money" :nickname="user.nickname" ></Header>
-    <div id="page" class="bg-myLightBlue w-screen h-[90%] grid grid-rows-[47%_5%_47%]">
+    <Header></Header>
+    <div v-if="matchStore.isDataLoaded" id="page" class="bg-myLightBlue w-screen h-[90%] grid grid-rows-[47%_5%_47%]">
 
         <div id="opponent_container" class="w-full">
 
-            <GameTableTop ref="player2Component" :player="players[1]" :its-your-turn="isTopTurn"
-                :opponent-is-attacking="hasPlayer1SelectedCard"
-                @end-of-turn="changeTurn()" 
-                @draw-card-event="addMomentToGameLog($event, 'Draw card')"
+            <GameTableTop ref="player2Component" 
+                :opponent-is-attacking="hasPlayer1SelectedCard" 
                 @select-card="showAttackingOptionsForPlayer2($event, index)"
                 @opponent-select-card="attack($event, 'player1')"
-                @send-card-to-mana="basicMove($event, 'MoveToMana', 'player2')"
-                @send-card-to-battle-zone="basicMove($event, 'MoveToBattleZone', 'player2')"
             />
 
         </div>
 
         <div id="turn_indicator_container">
             <p class="text-myBeige h-[100%] text-2xl">
-                TURN - {{turn}}
+                TURN - {{matchStore.turn}}
             </p>
         </div>
 
         <div id="my_container" class="w-full">
 
-            <GameTableBottom ref="player1Component" :player="players[0]" :its-your-turn="isBottomTurn"
+            <GameTableBottom ref="player1Component"
                 :opponent-is-attacking="hasPlayer2SelectedCard" 
-                @end-of-turn="changeTurn()" 
-                @draw-card-event="addMomentToGameLog($event, 'Draw card')"
                 @select-card="showAttackingOptionsForPlayer1($event, index)"
                 @opponent-select-card="attack($event, 'player2')"
-                @send-card-to-mana="basicMove($event, 'MoveToMana', 'player1')"
-                @send-card-to-battle-zone="basicMove($event, 'MoveToBattleZone', 'player1')"
             />
 
         </div>
@@ -190,7 +152,6 @@ async function attack(index, player) {
                 </p>
             </div>
         </div>
-
 
   </div>
 </template>

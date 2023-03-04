@@ -53,8 +53,7 @@ const router = createRouter({
 const responseUser = await fetch("/api/users/633f18459af2fa78268b91d4");
 const user = ref(await responseUser.json());
 
-router.beforeEach((to) => {
-
+router.beforeEach(() => {
     const userStore = useUserStore();
     userStore.init(user.value.nickname, user.value.money);
 })
