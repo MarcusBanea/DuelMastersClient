@@ -6,8 +6,6 @@ export const useMatchStore = defineStore({
         player1 : null,
         player2 : null,
 
-        turn : null,
-
         currentTurnManaAvailable : null,
         currentTurnCanSendToMana : null,
 
@@ -22,27 +20,20 @@ export const useMatchStore = defineStore({
 
             this.player1 = players[0];
             this.player2 = players[1];
-            this.changeTurn();
 
             this.isDataLoaded = true;
         },
 
-        changeTurn() {
-            this.turn = this.turn === "BOTTOM" ? "TOP" : "BOTTOM";
-            this.currentTurnCanSendToMana = true;
-            this.currentTurnManaAvailable = this.turn === "BOTTOM" ? this.player1['manaZone'].length : this.player2['manaZone'].length;
-        },
-
-        itsTurnOf(playerIndicator) {
-            return playerIndicator == this.turn ? true : false;
+        getCardsInZoneForPlayer(zone, player) {
+            let currentPlayer = player === "player1" ? this.player1 : this.player2;
+            return currentPlayer[zone];
         },
 
         sendCardFromHandToBattleZone(index, player) {
             let currentPlayer = player === "player1" ? this.player1 : this.player2;
             this.currentTurnManaAvailable -= currentPlayer['hand'][index].mana;
-            let cardToAdd = currentPlayer['hand'][index];
             //deactivate card highlighted status
-            cardToAdd.selected = false;
+            currentPlayer['hand'][index].selected = false;
 
             this.moveCard(index, "hand", "battleZone", player);
                 
@@ -50,24 +41,24 @@ export const useMatchStore = defineStore({
         },
 
         sendCardFromHandToMana(index, player) {
-            this.moveCard(index, "hand", "manaZone", player);
-
             this.currentTurnManaAvailable++;
             this.currentTurnCanSendToMana = false;
 
-            this.basicMove(index, "MoveToMana", player);
-        },
+            this.moveCard(index, "hand", "manaZone", player);
 
-        moveCard(index, zoneFrom, zoneTo, player) {
-            let currentPlayer = player === "player1" ? this.player1 : this.player2;
-            currentPlayer[zoneTo].push(currentPlayer[zoneFrom][index]);
-            currentPlayer[zoneFrom].splice(index, 1);
+            this.basicMove(index, "MoveToMana", player);
         },
 
         drawCard(player) {
             this.moveCard(0, "deck", "hand", player);
 
             this.basicMove(null, "DrawCard", player);
+        },
+
+        moveCard(index, zoneFrom, zoneTo, player) {
+            let currentPlayer = player === "player1" ? this.player1 : this.player2;
+            currentPlayer[zoneTo].push(currentPlayer[zoneFrom][index]);
+            currentPlayer[zoneFrom].splice(index, 1);
         },
 
         //notify server of move/action

@@ -12,9 +12,11 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "@xstate/vue": "^2.0.0",
     "pinia": "^2.0.32",
     "vue": "^3.2.37",
-    "vue-router": "^4.1.2"
+    "vue-router": "^4.1.2",
+    "xstate": "^4.37.1"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.0",

@@ -5,10 +5,15 @@ import GameTableBottom from "../components/GameTableBottom.vue";
 import GameTableTop from "../components/GameTableTop.vue";
 import utils from "@/Utils";
 import { useMatchStore } from "../stores/matchStore";
+import matchMachine from '../machines/matchMachine';
+import { useMachine } from '@xstate/vue';
+import { computed, onMounted, watch } from "vue";
+import { interpret } from "xstate";
 
 const matchStore = useMatchStore();
 matchStore.init();
 
+const {state, send, service} = useMachine(matchMachine);
 
 const isGameLogOpen = ref(false)
 //game log contains array of strings, representing the match timeline
@@ -27,7 +32,7 @@ async function addMomentToGameLog(event, moment) {
     let newMoment = utils.getCurrentTime() + " : " + moment;
     gameLog.value.push(newMoment);
 
-    let currentPlayer = turn.value == "BOTTOM" ? "player1" : "player2";
+    let currentPlayer = state.matches('player1Turn') ? "player1" : "player2";
     await fetch("/api/game/action/" + moment + "/" + currentPlayer);
 }
 
@@ -101,6 +106,7 @@ async function attack(index, player) {
     }
 }
 
+
 </script>
 
 
@@ -112,6 +118,8 @@ async function attack(index, player) {
         <div id="opponent_container" class="w-full">
 
             <GameTableTop ref="player2Component" 
+                :state = state
+                :send = send
                 :opponent-is-attacking="hasPlayer1SelectedCard" 
                 @select-card="showAttackingOptionsForPlayer2($event, index)"
                 @opponent-select-card="attack($event, 'player1')"
@@ -121,13 +129,15 @@ async function attack(index, player) {
 
         <div id="turn_indicator_container">
             <p class="text-myBeige h-[100%] text-2xl">
-                TURN - {{matchStore.turn}}
+                TURN - {{ state.value }}
             </p>
         </div>
 
         <div id="my_container" class="w-full">
 
             <GameTableBottom ref="player1Component"
+                :state = state
+                :send = send
                 :opponent-is-attacking="hasPlayer2SelectedCard" 
                 @select-card="showAttackingOptionsForPlayer1($event, index)"
                 @opponent-select-card="attack($event, 'player2')"
