@@ -17,7 +17,8 @@ import { useMachine } from '@xstate/vue';
 const props = defineProps({
     opponentIsAttacking: Boolean,
     state: Object,
-    send: Object
+    send: Object,
+    service: Object
 });
 
 const emits = defineEmits(['endOfTurn', 'selectCard', 'opponentSelectCard', 'sendCardToMana', 'sendCardToBattleZone']);
@@ -153,7 +154,7 @@ const turnText = 'player1Turn';
 
 <template>
     
-    <div v-if="!isHandSelected" id="table_container" class="border-2 border-myBeige bg-myBlack w-[95%] h-[100%] m-auto grid grid-rows-[40%_35%_25%]">
+    <div v-if="!state.context.isPlayer1HandSelected" id="table_container" class="border-2 border-myBeige bg-myBlack w-[95%] h-[100%] m-auto grid grid-rows-[40%_35%_25%]">
     
         <BattleZone :state = state :send = send player = 'player1' />
 
@@ -173,7 +174,7 @@ const turnText = 'player1Turn';
 
         </div>
 
-        <button v-if="state.matches('player1Turn')" class="absolute bg-myBeige text-myBlack font-bold rounded w-min px-4 bottom-8 right-24" @click="isHandSelected = !isHandSelected">
+        <button v-if="state.matches('player1Turn')" class="absolute bg-myBeige text-myBlack font-bold rounded w-min px-4 bottom-8 right-24" @click="send('TOGGLE_HAND_VISIBILITY');">
             HAND
         </button>
 
@@ -185,7 +186,7 @@ const turnText = 'player1Turn';
 
     <div v-else id="hand_container" class="border-2 border-myBeige bg-myBlack w-[1500px] h-[100%] m-auto">
 
-        <Hand player = "player1" />
+        <Hand player = "player1" :send = send :state = state />
 
     </div>
 

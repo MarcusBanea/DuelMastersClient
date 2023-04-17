@@ -1,18 +1,16 @@
 <script setup>
 import { computed, ref } from '@vue/runtime-core';
-import ImageContainer from './ImageContainer.vue';
-import ImageContainerV2 from './ImageContainerV2.vue';
-import ImageRevealOnClick from './ImageRevealOnClick.vue';
+import { useMatchStore } from '../stores/matchStore';
 
 const props = defineProps({
     image: String, 
     index: Number,
     rotate: Boolean,
 
-    canSendToMana: Boolean,
     mana: Number,
-    manaAvailable: Number
 });
+
+const matchStore = useMatchStore();
 
 const emits = defineEmits(['sendToBattleZone', 'sendToMana']);
 
@@ -48,7 +46,7 @@ const imageSrc = computed(() => {
 const cardClicked = ref(false);
 
 function clickOnCard() {
-    if(props.mana <= props.manaAvailable || props.canSendToMana == true) {
+    if(props.mana <= matchStore.currentTurnManaAvailable || matchStore.currentTurnCanSendToMana == true) {
         cardClicked.value = true;
     }
 }
@@ -78,13 +76,13 @@ function sendToMana(index) {
 
             </div>
 
-            <div v-else-if="mana <= manaAvailable || canSendToMana == true" class="m-auto grid grid-rows-2 gap-4">
+            <div v-else-if="mana <= matchStore.currentTurnManaAvailable || matchStore.currentTurnCanSendToMana == true" class="m-auto grid grid-rows-2 gap-4">
 
-                <button v-if="mana <= manaAvailable" class="bg-myBeige text-myBlack font-bold rounded w-[100%] px-4" @click="sendToBattleZone()">
+                <button v-if="mana <= matchStore.currentTurnManaAvailable" class="bg-myBeige text-myBlack font-bold rounded w-[100%] px-4" @click="sendToBattleZone()">
                     BATTLE ZONE
                 </button>
 
-                <button v-if="canSendToMana == true" class="bg-myBeige text-myBlack font-bold rounded w-[100%] px-4" @click="sendToMana()">
+                <button v-if="matchStore.currentTurnCanSendToMana == true" class="bg-myBeige text-myBlack font-bold rounded w-[100%] px-4" @click="sendToMana()">
                     MANA
                 </button>
 

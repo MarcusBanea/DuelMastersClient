@@ -21,7 +21,14 @@ export const useMatchStore = defineStore({
             this.player1 = players[0];
             this.player2 = players[1];
 
+            this.initNewTurn();
+
             this.isDataLoaded = true;
+        },
+
+        initNewTurn(currentTurn) {
+            this.currentTurnCanSendToMana = true;
+            this.currentTurnManaAvailable = currentTurn === "player1" ? this.player2['manaZone'].length : this.player1['manaZone'].length;
         },
 
         getCardsInZoneForPlayer(zone, player) {
