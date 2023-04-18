@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useMatchStore } from '../stores/matchStore';
 import ImageContainerV2 from './ImageContainerV2.vue';
 
@@ -16,18 +16,18 @@ const lastCardSelectedIndex = ref(-1);
 //save the index of the (last) selected card from the battle zone and send it to match interface
 //the match interface will notify the opponent player interface to highlight the attack options for this selected card
 function selectCard(index) {
-    if(lastCardSelectedIndex.value != -1 && lastCardSelectedIndex.value != index) {
-        matchStore.getCardsInZoneForPlayer('battleZone', player)[lastCardSelectedIndex.value].selected = false;
-    }
-    matchStore.getCardsInZoneForPlayer('battleZone', player)[index].selected = !matchStore.getCardsInZoneForPlayer('battleZone', player)[index].selected;
     lastCardSelectedIndex.value = index;
-    emits("selectCard", lastCardSelectedIndex.value);
+
+    matchStore.selectCard(props.player, 'battleZone', index);
 }
 
-//when the opponent is attacking, notify the match interface which card he/she selected
+function selectCardForAttack(index) {
+    matchStore.selectCardForAttack(props.player, index);
+}
+
+//when the opponent is attacking, notify the match interface which card was selected
 function opponentSelectCard(index) {
-    lastCardSelectedIndex.value = index;    
-    emits("opponentSelectCard", lastCardSelectedIndex.value);
+    matchStore.selectedCardToAttack(props.player === 'player1' ? 'player2' : 'player1', index); 
 }
 
 function selectedCardForCommandExecution(index, zone) {
@@ -39,6 +39,10 @@ function selectedCardForCommandExecution(index, zone) {
     }
 }
 
+const currentTurn = computed(() => {
+    return props.player + "Turn";
+});
+
 
 </script>
 
@@ -47,14 +51,16 @@ function selectedCardForCommandExecution(index, zone) {
     <div id="battleZone_container" class="w-[100%] h-[100%] flex flex-row justify-evenly mb-2 mt-2">
 
         <div v-for="(card, index) in matchStore.getCardsInZoneForPlayer('battleZone', player)" :key="card" class="w-[6%] h-[100px]">
-            <div v-if="card.selected == true && state.matches('player1Turn')" class="border-4">
-                <ImageContainerV2 :zoom-on-hover-activated="true" :image="card.image" container-width="100%" @click="selectCard(index)"/>
-            </div>
-            <div v-else-if="card.selected == true && state.matches('player2Turn')" class="border-4 border-myLightGreen">
-                <ImageContainerV2 :zoom-on-hover-activated="true" :image="card.image" container-width="100%" @click="opponentSelectCard(index)"/>
+            <div v-if="card.selected == true" class="border-4">
+                <div v-if="state.matches(currentTurn)">
+                    <ImageContainerV2 :zoom-on-hover-activated="true" :image="card.image" container-width="100%" @click="matchStore.resetSelectedAttributeOfAllCards()"/>
+                </div>
+                <div v-else class="border-myLightGreen">
+                    <ImageContainerV2 :zoom-on-hover-activated="true" :image="card.image" container-width="100%" @click="opponentSelectCard(index)"/>
+                </div>
             </div>
             <div v-else>
-                <ImageContainerV2 :zoom-on-hover-activated="true" :image="card.image" container-width="100%" @click="state.matches('player1Turn') && selectCard(index)"/>
+                <ImageContainerV2 :zoom-on-hover-activated="true" :image="card.image" container-width="100%" @click="state.matches(currentTurn) && selectCardForAttack(index)"/>
             </div>
         </div>
 

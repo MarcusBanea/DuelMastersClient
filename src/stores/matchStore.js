@@ -9,6 +9,9 @@ export const useMatchStore = defineStore({
         currentTurnManaAvailable : null,
         currentTurnCanSendToMana : null,
 
+        cardForAttack : null,
+        cardToAttack : null,
+
         isDataLoaded : false
     }),
     actions : {
@@ -63,6 +66,7 @@ export const useMatchStore = defineStore({
         },
 
         moveCard(index, zoneFrom, zoneTo, player) {
+            console.log(player + " distruge cartea " + index + " din " + zoneFrom);
             let currentPlayer = player === "player1" ? this.player1 : this.player2;
             currentPlayer[zoneTo].push(currentPlayer[zoneFrom][index]);
             currentPlayer[zoneFrom].splice(index, 1);
@@ -82,6 +86,104 @@ export const useMatchStore = defineStore({
                 return this.player1['graveyard'].length == 0 ? true : false;
             }
             return this.player2['graveyard'].length == 0 ? true : false;
+        },
+
+        selectCard(player, zone, index) {
+            let cardsInZone = this.getCardsInZoneForPlayer(zone, player);
+            cardsInZone[index].selected = !cardsInZone[index].selected;
+        },
+
+        resetSelectedAttributeOfAllCards() {
+            //reset selected attribute from other cards
+            let zones = ["battleZone", "manaZone", "shields"];
+            zones.forEach((zone) => {
+                this.player1[zone].forEach((card) => {card.selected = false;})
+                this.player2[zone].forEach((card) => {card.selected = false;})
+            });
+        },
+
+        async selectCardForAttack(player, index) {
+            this.cardForAttack = index;
+
+            let cardsInZone = this.getCardsInZoneForPlayer('battleZone', player);
+            cardsInZone[index].selected = !cardsInZone[index].selected;
+
+            //get attack options
+            //TODO - remove zone variable, value is always 'battleZone', as you can attack only using battle zone cards
+            let responseAttackOptions = await fetch("/api/game/getAttackOptions/" + player + "/" + 'battleZone' + "/" + index);
+            let attackOptions = await responseAttackOptions.json();
+
+            //server will provide a list
+            //if the list contains only one message, then all cards can be attacked
+            //else, only the cards from that list can be attacked
+            if(attackOptions == "ALL") {
+                let opponent = player === 'player1' ? this.player2 : this.player1;
+                opponent['battleZone'].forEach((card) => {card.selected = true;})
+                opponent['shields'].forEach((card) => {card.selected = true;})
+            }
+            else {
+                //TODO
+            }
+        },
+
+        async selectedCardToAttack(player, index) {
+            this.cardToAttack = index;
+            console.log("ATTACK : " + this.cardForAttack);
+            console.log("DEFEND : " + this.cardToAttack);
+
+            this.attack(player);
+        },
+
+        async attack(player) {
+            let action = "Attack ";
+            action += this.cardForAttack + " " + this.cardToAttack;
+
+            //inform the server of this action
+            const awaitingResponse = await fetch("/api/game/action/" + action + "/" + player);
+            let attackResponse = await awaitingResponse.json();
+
+            //perform action provided by server
+            this.applyAttackChanges(player, attackResponse);
+        },
+
+        applyAttackChanges(player, attackResponse) {
+            //get player1 response
+            let player1Response = attackResponse.at(0);
+            let moveResponse = player1Response.substring(0, 3);
+            switch(moveResponse) {
+                case "NMV" : {
+                    //player1Component.value?.executeAction(player1Response.substring(4));
+                    break;
+                }
+                //move player1 last selected card to graveyard
+                case "MTG" : {
+                    this.moveCard(player === 'player1' ? this.cardForAttack : this.cardToAttack, "battleZone", "graveyard", 'player1');
+                    break;
+                }
+                default : {
+                    break;
+                }
+            }
+        
+            //get player2 response
+            let player2Response = attackResponse.at(1);
+            switch(player2Response) {
+                case "" : {
+                    //player2Component.value?.executeAction("");
+                    break;
+                }
+                //move player2 last selected card to graveyard
+                case "MTG" : {
+                    this.moveCard(player === 'player1' ? this.cardToAttack : this.cardForAttack, "battleZone", "graveyard", 'player2');
+                    break;
+                }
+                default : {
+                    break;
+                }
+            }
+
+            //reset selected attribute
+            this.resetSelectedAttributeOfAllCards();
         }
 
     }
