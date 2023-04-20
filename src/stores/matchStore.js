@@ -12,6 +12,11 @@ export const useMatchStore = defineStore({
         cardForAttack : null,
         cardToAttack : null,
 
+        limitedSelectionCards: [],
+        limitedAction: null,
+
+        gamelog : [],
+
         isDataLoaded : false
     }),
     actions : {
@@ -78,7 +83,9 @@ export const useMatchStore = defineStore({
             if(index !== null) {
                 action += " " + index;
             }
-            await fetch("/api/game/action/" + action +  "/" + player);
+            action += "/" + player;
+            this.gamelog.push(action);
+            await fetch("/api/game/action/" + action);
         },
 
         isGraveyardEmpty(player) {
@@ -184,6 +191,51 @@ export const useMatchStore = defineStore({
 
             //reset selected attribute
             this.resetSelectedAttributeOfAllCards();
+        },
+
+        limitedSelection(player, zone, index) {
+            let card = player + " " + zone + " " + index;
+            if(!this.limitedSelectionCards.includes(card)) {
+                console.log("Card added to limited selection: " + card);
+                this.limitedSelectionCards.push(card);
+            }
+            else {
+                console.log("Card removed from limited selection: " + card);
+                this.limitedSelectionCards.splice(this.limitedSelectionCards.indexOf(card), 1);
+            }
+            this.toggleLimitedHighlightStatusOfCards(player, zone, index);
+        },
+
+        toggleLimitedHighlightStatusOfCards(player, zone, index) {
+            let zoneCards = this.getCardsInZoneForPlayer(zone, player);
+            zoneCards[index].limitedSelected = !zoneCards[index].limitedSelected;
+        },
+
+        executeLimitedAction() {
+            switch(this.limitedAction) {
+                case "MTH": {
+                    console.log("Move cards to hand.");
+                    this.limitedSelectionCards.forEach((card) => {
+                        let cardDetails = card.split(/[ ,]+/);
+
+                        this.moveCard(cardDetails[2], cardDetails[1], "hand", cardDetails[0]);
+                    });
+                    this.limitedSelectionCards = [];
+                    break;
+                }
+                case "MTM": {
+                    console.log("Move cards to mana.");
+                    break;
+                }
+                case "MTB": {
+                    console.log("Move cards to battle zone.");
+                    break;
+                }
+                case "MTG": {
+                    console.log("Move cards to graveyard.");
+                    break;
+                }
+            }
         }
 
     }

@@ -5,8 +5,12 @@ const matchMachine = createMachine({
     id: 'match',
     initial: 'player1Turn',
     context: {
-        isPlayer1HandSelected: false,
-        isPlayer2HandSelected: false
+
+      numberOfCardsToBeSelected: 0,
+
+      //TODO - used when toggle hand visibility, return to last state
+      lastState: null
+
     },
 
     states: {
@@ -20,12 +24,12 @@ const matchMachine = createMachine({
                   target: 'player2TurnLimited'
                 },
                 YOUR_TURN_LIMITED: {
-                  target: 'player1TurnLimited'
+                  target: 'player1TurnLimited',
+                  actions: [assign({ numberOfCardsToBeSelected : () => 2}), () => {let matchStore = useMatchStore(); 
+                    matchStore.limitedAction = "MTH";}]
                 },
-                TOGGLE_HAND_VISIBILITY: {
-                  actions: [
-                    assign({isPlayer1HandSelected: (context) => !(context.isPlayer1HandSelected)})
-                  ]
+                SHOW_HAND: {
+                  target: 'player1Hand'
                 }
             }
         },
@@ -41,10 +45,8 @@ const matchMachine = createMachine({
                 YOUR_TURN_LIMITED: {
                   target: 'player2TurnLimited'
                 },
-                TOGGLE_HAND_VISIBILITY: {
-                  actions: [
-                    assign({isPlayer2HandSelected: (context) => !(context.isPlayer2HandSelected)})
-                  ]
+                SHOW_HAND: {
+                  target: 'player2Hand'
                 }
             }
         },
@@ -59,6 +61,9 @@ const matchMachine = createMachine({
                 OPP_TURN_LIMITED: {
                   target: 'player2TurnLimited'
                 },
+                SHOW_HAND: {
+                  target: 'player1Hand'
+                }
             }
         },
         player2TurnLimited: {
@@ -72,12 +77,28 @@ const matchMachine = createMachine({
                 OPP_TURN_LIMITED: {
                   target: 'player1TurnLimited'
                 },
+                SHOW_HAND: {
+                  target: 'player2Hand'
+                }
             }
+        },
+        player1Hand: {
+          on: {
+            HIDE_HAND: {
+              target: 'player1Turn'
+            }
+          }
+        },
+        player2Hand: {
+          on: {
+            HIDE_HAND: {
+              target: 'player2Turn'
+            }
+          }
         }
     },
 
     actions: {
-      
     }
     
 })

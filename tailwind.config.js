@@ -14,7 +14,10 @@ module.exports = {
         'myDarkGreen': '#45A29E',
         'myDarkBlue': '#011129',
         'myLightBlue': '#333e4b',
-        'myBeige': '#f0dbc4'
+        'myBeige': '#f0dbc4',
+
+        'myLimited': '#0f1d40',
+        'myLimitedGreen' : '#0ac73c'
       }
     },
   },

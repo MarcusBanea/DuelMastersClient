@@ -36,7 +36,9 @@ async function addMomentToGameLog(event, moment) {
     await fetch("/api/game/action/" + moment + "/" + currentPlayer);
 }
 
-
+watch(state, (newValue) => {
+    console.log("Total = " + newValue.context.numberOfCardsToBeSelected);
+});
 
 
 </script>
@@ -89,7 +91,7 @@ async function addMomentToGameLog(event, moment) {
             </div>
 
             <div id="timeline">
-                <p v-for="moment in gameLog" :key="moment" class="text-myBeige">
+                <p v-for="moment in matchStore.gamelog" :key="moment" class="text-myBeige">
                     {{ moment }}
                 </p>
             </div>

@@ -27,7 +27,7 @@ const turnText = 'player2Turn';
 
 <template>
     
-    <div v-if="!state.context.isPlayer2HandSelected" id="table_container" class="border-2 border-myBeige bg-myBlack w-[95%] h-[100%] m-auto grid grid-rows-[25%_35%_40%]">
+    <div v-if="!state.matches('player2Hand')" id="table_container" class="border-2 border-myBeige bg-myBlack w-[95%] h-[100%] m-auto grid grid-rows-[25%_35%_40%]">
       
         <div id="manaZone_container" class="w-[55%] h-[100%] flex flex-row flex-nowrap m-auto">
 
@@ -47,7 +47,7 @@ const turnText = 'player2Turn';
 
         <BattleZone :state = state :send = send player = 'player2' />
 
-        <button v-if="state.matches('player2Turn')" class="absolute bg-myBeige text-myBlack font-bold rounded w-min px-4 top-28 right-24" @click="send('TOGGLE_HAND_VISIBILITY');">
+        <button v-if="state.matches('player2Turn')" class="absolute bg-myBeige text-myBlack font-bold rounded w-min px-4 top-28 right-24" @click="send('SHOW_HAND');">
             HAND
         </button>
 
@@ -57,7 +57,7 @@ const turnText = 'player2Turn';
 
     </div>
 
-    <div v-else id="hand_container" class="border-2 border-myBeige bg-myBlack w-[1500px] h-[100%] m-auto">
+    <div v-if="state.matches('player2Hand')" id="hand_container" class="border-2 border-myBeige bg-myBlack w-[1500px] h-[100%] m-auto">
 
         <Hand player = "player2" :send = send :state = state />
 
