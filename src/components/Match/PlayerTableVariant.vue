@@ -70,7 +70,7 @@ const limited_turn_button_style = computed(() => {
 
         <Shields :player = player :limited = limited />
 
-        <Deck :clickable = state.matches(turnText) :player = player />
+        <Deck :player = player :state = state />
 
     </div>
 

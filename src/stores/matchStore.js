@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import utils from "@/Utils";
 
 export const useMatchStore = defineStore({
     id: 'match',
@@ -47,6 +48,8 @@ export const useMatchStore = defineStore({
             //deactivate card highlighted status
             currentPlayer['hand'][index].selected = false;
 
+            this.addMomentToGamelog(player + " moved card \'" + this.getCardFromZone(player, 'hand', index).name + "\' to battle zone.");
+
             this.moveCard(index, "hand", "battleZone", player);
                 
             this.basicMove(index, "MoveToBattleZone", player);
@@ -56,6 +59,8 @@ export const useMatchStore = defineStore({
             this.currentTurnManaAvailable++;
             this.currentTurnCanSendToMana = false;
 
+            this.addMomentToGamelog(player + " added card \'" + this.getCardFromZone(player, 'hand', index).name + "\' to mana.");
+
             this.moveCard(index, "hand", "manaZone", player);
 
             this.basicMove(index, "MoveToMana", player);
@@ -63,12 +68,12 @@ export const useMatchStore = defineStore({
 
         drawCard(player) {
             this.moveCard(0, "deck", "hand", player);
-
             this.basicMove(null, "DrawCard", player);
+
+            this.addMomentToGamelog(player + " draws a card.");
         },
 
         moveCard(index, zoneFrom, zoneTo, player) {
-            console.log(player + " distruge cartea " + index + " din " + zoneFrom);
             let currentPlayer = player === "player1" ? this.player1 : this.player2;
             currentPlayer[zoneTo].push(currentPlayer[zoneFrom][index]);
             currentPlayer[zoneFrom].splice(index, 1);
@@ -81,7 +86,6 @@ export const useMatchStore = defineStore({
                 action += " " + index;
             }
             action += "/" + player;
-            this.gamelog.push(action);
             await fetch("/api/game/action/" + action);
         },
 
@@ -142,6 +146,9 @@ export const useMatchStore = defineStore({
             let action = "Attack ";
             action += this.cardForAttack + " " + this.cardToAttack;
 
+            this.addMomentToGamelog(player + " used card \'" + this.getCardFromZone(player, 'battleZone', this.cardForAttack).name
+                + "\' to attack!");
+
             //inform the server of this action
             const awaitingResponse = await fetch("/api/game/action/" + action + "/" + player);
             let attackResponse = await awaitingResponse.json();
@@ -161,7 +168,9 @@ export const useMatchStore = defineStore({
                 }
                 //move player1 last selected card to graveyard
                 case "MTG" : {
-                    this.moveCard(player === 'player1' ? this.cardForAttack : this.cardToAttack, "battleZone", "graveyard", 'player1');
+                    let cardIndex = player === 'player1' ? this.cardForAttack : this.cardToAttack;
+                    this.addMomentToGamelog("Card \'" + this.getCardFromZone('player1', 'battleZone', cardIndex).name + "\' of player1 was destroyed!");
+                    this.moveCard(cardIndex, "battleZone", "graveyard", 'player1');
                     break;
                 }
                 default : {
@@ -178,6 +187,8 @@ export const useMatchStore = defineStore({
                 }
                 //move player2 last selected card to graveyard
                 case "MTG" : {
+                    let cardIndex = player === 'player1' ? this.cardToAttack : this.cardForAttack;
+                    this.addMomentToGamelog("Card \'" + this.getCardFromZone('player2', 'battleZone', cardIndex).name + "\' of player2 was destroyed!");
                     this.moveCard(player === 'player1' ? this.cardToAttack : this.cardForAttack, "battleZone", "graveyard", 'player2');
                     break;
                 }
@@ -197,6 +208,10 @@ export const useMatchStore = defineStore({
 
         getCardFromZone(player, zone, index) {
             return this.getCardsInZoneForPlayer(zone, player)[index];
+        },
+
+        addMomentToGamelog(moment) {
+            this.gamelog.push(utils.getCurrentTime() + "  -  " + moment);
         }
     }
 })

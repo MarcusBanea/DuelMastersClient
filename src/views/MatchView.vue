@@ -18,7 +18,6 @@ watch(state, (newValue) => {
     console.log("Total = " + newValue.context.numberOfCardsToBeSelected);
 });
 
-
 </script>
 
 
@@ -27,13 +26,7 @@ watch(state, (newValue) => {
     <div v-if="matchStore.isDataLoaded" id="page" class="bg-myLightBlue w-screen h-[90%] grid grid-rows-[47%_5%_47%]">
 
         <div id="opponent_container" class="w-full">
-
-            <PlayerTable ref="player2Component" 
-                player = "player2"
-                :state = state
-                :send = send
-            />
-
+            <PlayerTable player = "player2" :state = state :send = send />
         </div>
 
         <div id="turn_indicator_container">
@@ -43,13 +36,7 @@ watch(state, (newValue) => {
         </div>
 
         <div id="my_container" class="w-full">
-
-            <PlayerTable ref="player1Component"
-                player = "player1"
-                :state = state
-                :send = send
-            />
-
+            <PlayerTable player = "player1" :state = state :send = send />
         </div>
 
         <div class="w-[5%] h-max bg-myBlack border-myBeige border-2 absolute right-0 cursor-pointer z-10">

@@ -16,6 +16,7 @@ const matchMachine = createMachine({
 
     states: {
         player1Turn: {
+            entry: [() => {let matchStore = useMatchStore(); matchStore.addMomentToGamelog("It's player1 turn now!")}],
             on: {
                 END_TURN: {
                     target: 'player2Turn',
@@ -34,6 +35,7 @@ const matchMachine = createMachine({
             }
         },
         player2Turn: {
+            entry: [() => {let matchStore = useMatchStore(); matchStore.addMomentToGamelog("It's player2 turn now!")}],
             on : {
                 END_TURN: {
                     target: 'player1Turn',
@@ -51,6 +53,7 @@ const matchMachine = createMachine({
             }
         },
         player1TurnLimited : {
+            entry: [() => {let matchStore = useMatchStore(); matchStore.addMomentToGamelog("Player1 is in limited state...")}],
             on : {
                 END_TURN: {
                   target: 'player2Turn'
@@ -67,6 +70,7 @@ const matchMachine = createMachine({
             }
         },
         player2TurnLimited: {
+            entry: [() => {let matchStore = useMatchStore(); matchStore.addMomentToGamelog("Player2 is in limited state...")}],
             on : {
                 END_TURN: {
                   target: 'player1Turn'
