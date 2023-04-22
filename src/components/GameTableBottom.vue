@@ -27,10 +27,13 @@ const full_control_table_variant_style = "border-2 border-myBeige bg-myBlack w-[
         <Hand player = "player1" :send = send :state = state />
     </div>
 
-    <div v-else-if="state.matches('player1TurnLimited')" :class = limited_table_variant_style>
+    <div v-else-if="state.matches('player1TurnLimited') || state.matches('player2TurnLimited')" :class = limited_table_variant_style>
         <TableVariant player="player1" :state = state :send = send :limited = true />
     </div>
 
+    <div v-else-if="state.matches('player1Turn')" :class = full_control_table_variant_style>
+        <TableVariant player="player1" :state = state :send = send />
+    </div>
     <div v-else :class = full_control_table_variant_style>
         <TableVariant player="player1" :state = state :send = send />
     </div>

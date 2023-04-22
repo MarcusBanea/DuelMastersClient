@@ -2,8 +2,10 @@
 import { computed, ref } from 'vue';
 import { useMatchStore } from '../stores/matchStore';
 import ImageContainerV2 from './ImageContainerV2.vue';
+import { useLimitedStore } from '../stores/limitedStore';
 
 const matchStore = useMatchStore();
+const limitedStore = useLimitedStore();
 
 const props = defineProps({
     state: Object,
@@ -46,7 +48,7 @@ const currentTurn = computed(() => {
 });
 
 function limitedSelection(index) {
-    matchStore.limitedSelection(props.player, 'battleZone', index);
+    limitedStore.limitedSelection(props.player, 'battleZone', index);
 }
 
 

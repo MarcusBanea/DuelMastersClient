@@ -6,6 +6,7 @@ import Shields from './Shields.vue';
 import Deck from './Deck.vue';
 import BattleZone from './BattleZone.vue';
 import Hand from './Hand.vue';
+import TableVariant from './TableVariant.vue';
 
 const props = defineProps({
     opponentIsAttacking: Boolean,
@@ -14,11 +15,10 @@ const props = defineProps({
     service: Object
 });
 
-const emits = defineEmits(['endOfTurn', 'selectCard', 'opponentSelectCard', 'sendCardToMana', 'sendCardToBattleZone']);
+const hand_container_style = "border-2 border-myBeige bg-myBlack w-[1500px] h-[100%] m-auto";
+const limited_table_variant_style = "border-2 border-myBeige bg-myLimited w-[95%] h-[100%] m-auto grid grid-rows-[25%_35%_40%]";
+const full_control_table_variant_style = "border-2 border-myBeige bg-myBlack w-[95%] h-[100%] m-auto grid grid-rows-[25%_35%_40%]";
 
-const matchStore = useMatchStore();
-
-const turnText = 'player2Turn';
 
 </script>
 
@@ -26,41 +26,20 @@ const turnText = 'player2Turn';
 
 
 <template>
-    
-    <div v-if="!state.matches('player2Hand')" id="table_container" class="border-2 border-myBeige bg-myBlack w-[95%] h-[100%] m-auto grid grid-rows-[25%_35%_40%]">
-      
-        <div id="manaZone_container" class="w-[55%] h-[100%] flex flex-row flex-nowrap m-auto">
 
-            <Mana player = "player2" />
-
-        </div>
-
-        <div id="middleZone_container" class="grid grid-cols-[15%_70%_15%]">
-
-            <Graveyard player = 'player2' />
-
-            <Shields player = 'player2' />
-
-            <Deck :clickable = state.matches(turnText) player = 'player2' />
-
-        </div>
-
-        <BattleZone :state = state :send = send player = 'player2' />
-
-        <button v-if="state.matches('player2Turn')" class="absolute bg-myBeige text-myBlack font-bold rounded w-min px-4 top-28 right-24" @click="send('SHOW_HAND');">
-            HAND
-        </button>
-
-        <button v-if="state.matches('player2Turn')" class="absolute bg-myBeige text-myBlack font-bold rounded px-4 top-28 left-24" @click="send('END_TURN')">
-          END TURN
-        </button>
-
+    <div v-if="state.matches('player2Hand')" id="hand_container" :class = hand_container_style>
+        <Hand player = "player2" :send = send :state = state />
     </div>
 
-    <div v-if="state.matches('player2Hand')" id="hand_container" class="border-2 border-myBeige bg-myBlack w-[1500px] h-[100%] m-auto">
+    <div v-else-if="state.matches('player1TurnLimited') || state.matches('player2TurnLimited')" :class = limited_table_variant_style>
+        <TableVariant player="player2" :state = state :send = send :limited = true />
+    </div>
 
-        <Hand player = "player2" :send = send :state = state />
-
+    <div v-else-if="state.matches('player2Turn')" :class = full_control_table_variant_style>
+        <TableVariant player="player2" :state = state :send = send />
+    </div>
+    <div v-else :class = full_control_table_variant_style>
+        <TableVariant player="player2" :state = state :send = send />
     </div>
 
 </template>

@@ -1,5 +1,6 @@
 import {createMachine, assign, interpret} from 'xstate';
 import { useMatchStore } from '../stores/matchStore';
+import { useLimitedStore } from '../stores/limitedStore';
 
 const matchMachine = createMachine({
     id: 'match',
@@ -25,8 +26,7 @@ const matchMachine = createMachine({
                 },
                 YOUR_TURN_LIMITED: {
                   target: 'player1TurnLimited',
-                  actions: [assign({ numberOfCardsToBeSelected : () => 2}), () => {let matchStore = useMatchStore(); 
-                    matchStore.limitedAction = "MTH";}]
+                  actions: () => {let limitedStore = useLimitedStore(); limitedStore.limit = 2; limitedStore.action = "MTH"; limitedStore.admissibleZone.push("battleZone");}
                 },
                 SHOW_HAND: {
                   target: 'player1Hand'

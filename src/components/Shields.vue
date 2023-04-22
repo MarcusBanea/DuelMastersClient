@@ -1,7 +1,9 @@
 <script setup>
+import { useLimitedStore } from '../stores/limitedStore';
 import { useMatchStore } from '../stores/matchStore';
 
 const matchStore = useMatchStore();
+const limitedStore = useLimitedStore();
 
 const props = defineProps({
     player: String,
@@ -10,7 +12,7 @@ const props = defineProps({
 });
 
 function limitedSelection(index) {
-    matchStore.limitedSelection(props.player, 'shields', index);
+    limitedStore.limitedSelection(props.player, 'shields', index);
 }
 
 </script>
