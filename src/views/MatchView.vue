@@ -1,12 +1,10 @@
 <script setup>
 import { ref } from "@vue/reactivity";
 import Header from "../components/Header.vue";
-import utils from "@/Utils";
 import { useMatchStore } from "../stores/matchStore";
 import matchMachine from '../machines/matchMachine';
 import { useMachine } from '@xstate/vue';
-import { computed, onMounted, watch } from "vue";
-import { interpret } from "xstate";
+import { watch } from "vue";
 import PlayerTable from "../components/Match/PlayerTable.vue";
 
 const matchStore = useMatchStore();
@@ -15,25 +13,6 @@ matchStore.init();
 const {state, send, service} = useMachine(matchMachine);
 
 const isGameLogOpen = ref(false)
-//game log contains array of strings, representing the match timeline
-const gameLog = ref([]);
-
-const player1Component = ref(null);
-const player2Component = ref(null);
-
-const hasPlayer1SelectedCard = ref(false);
-const hasPlayer2SelectedCard = ref(false);
-
-const player1SelectedCardIndex = ref(-1);
-const player2SelectedCardIndex = ref(-1);
-
-async function addMomentToGameLog(event, moment) {
-    let newMoment = utils.getCurrentTime() + " : " + moment;
-    gameLog.value.push(newMoment);
-
-    let currentPlayer = state.matches('player1Turn') ? "player1" : "player2";
-    await fetch("/api/game/action/" + moment + "/" + currentPlayer);
-}
 
 watch(state, (newValue) => {
     console.log("Total = " + newValue.context.numberOfCardsToBeSelected);
@@ -41,7 +20,6 @@ watch(state, (newValue) => {
 
 
 </script>
-
 
 
 <template>
