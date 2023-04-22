@@ -1,18 +1,12 @@
 <script setup>
 import Hand from './Hand.vue';
-import { useMatchStore } from '../stores/matchStore';
 import TableVariant from './TableVariant.vue';
 
 const props = defineProps({
-    opponentIsAttacking: Boolean,
     state: Object,
     send: Object,
     service: Object
 });
-
-const matchStore = useMatchStore();
-
-const turnText = 'player1Turn';
 
 const hand_container_style = "border-2 border-myBeige bg-myBlack w-[1500px] h-[100%] m-auto";
 const limited_table_variant_style = "border-2 border-myBeige bg-myLimited w-[95%] h-[100%] m-auto grid grid-rows-[40%_35%_25%]";

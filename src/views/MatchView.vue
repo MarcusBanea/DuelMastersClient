@@ -54,9 +54,6 @@ watch(state, (newValue) => {
             <GameTableTop ref="player2Component" 
                 :state = state
                 :send = send
-                :opponent-is-attacking="hasPlayer1SelectedCard" 
-                @select-card="showAttackingOptionsForPlayer2($event, index)"
-                @opponent-select-card="attack($event, 'player1')"
             />
 
         </div>
@@ -72,9 +69,6 @@ watch(state, (newValue) => {
             <GameTableBottom ref="player1Component"
                 :state = state
                 :send = send
-                :opponent-is-attacking="hasPlayer2SelectedCard" 
-                @select-card="showAttackingOptionsForPlayer1($event, index)"
-                @opponent-select-card="attack($event, 'player2')"
             />
 
         </div>

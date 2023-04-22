@@ -1,15 +1,8 @@
 <script setup>
-import { useMatchStore } from '../stores/matchStore';
-import Mana from './Mana.vue';
-import Graveyard from './Graveyard.vue';
-import Shields from './Shields.vue';
-import Deck from './Deck.vue';
-import BattleZone from './BattleZone.vue';
 import Hand from './Hand.vue';
 import TableVariant from './TableVariant.vue';
 
 const props = defineProps({
-    opponentIsAttacking: Boolean,
     state: Object,
     send: Object,
     service: Object
@@ -19,10 +12,7 @@ const hand_container_style = "border-2 border-myBeige bg-myBlack w-[1500px] h-[1
 const limited_table_variant_style = "border-2 border-myBeige bg-myLimited w-[95%] h-[100%] m-auto grid grid-rows-[25%_35%_40%]";
 const full_control_table_variant_style = "border-2 border-myBeige bg-myBlack w-[95%] h-[100%] m-auto grid grid-rows-[25%_35%_40%]";
 
-
 </script>
-
-
 
 
 <template>
