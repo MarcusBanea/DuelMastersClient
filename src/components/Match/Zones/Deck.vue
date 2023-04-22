@@ -1,5 +1,5 @@
 <script setup>
-import { useMatchStore } from '../stores/matchStore';
+import { useMatchStore } from '../../../stores/matchStore';
 
 const matchStore = useMatchStore();
 

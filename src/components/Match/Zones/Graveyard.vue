@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue';
-import { useMatchStore } from '../stores/matchStore';
-import ImageContainerV2 from './ImageContainerV2.vue';
+import { useMatchStore } from '../../../stores/matchStore';
+import ImageContainerV2 from '../../ImageContainerV2.vue';
 
 const matchStore = useMatchStore();
 

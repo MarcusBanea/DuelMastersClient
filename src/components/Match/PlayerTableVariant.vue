@@ -1,11 +1,11 @@
 <script setup>
 import { computed } from 'vue';
-import { useLimitedStore } from '../stores/limitedStore';
-import BattleZone from './BattleZone.vue';
-import Deck from './Deck.vue';
-import Graveyard from './Graveyard.vue';
-import Mana from './Mana.vue';
-import Shields from './Shields.vue';
+import { useLimitedStore } from '../../stores/limitedStore';
+import BattleZone from './Zones/BattleZone.vue';
+import Mana from './Zones/Mana.vue';
+import Shields from './Zones/Shields.vue';
+import Deck from './Zones/Deck.vue';
+import Graveyard from './Zones/Graveyard.vue';
 
 
 const props = defineProps({

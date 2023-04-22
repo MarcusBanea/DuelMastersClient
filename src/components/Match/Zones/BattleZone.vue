@@ -1,8 +1,8 @@
 <script setup>
 import { computed, ref } from 'vue';
-import { useMatchStore } from '../stores/matchStore';
-import ImageContainerV2 from './ImageContainerV2.vue';
-import { useLimitedStore } from '../stores/limitedStore';
+import { useMatchStore } from '../../../stores/matchStore';
+import { useLimitedStore } from '../../../stores/limitedStore';
+import ImageContainerV2 from '../../ImageContainerV2.vue';
 
 const matchStore = useMatchStore();
 const limitedStore = useLimitedStore();

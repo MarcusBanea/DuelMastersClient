@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue';
-import Hand from './Hand.vue';
-import TableVariant from './TableVariant.vue';
+import PlayerTableVariant from './PlayerTableVariant.vue';
+import Hand from './Zones/Hand.vue';
 
 const props = defineProps({
     player: String,
@@ -43,14 +43,14 @@ const full_control_table_variant_style = computed(() => {
     </div>
 
     <div v-else-if="state.matches('player1TurnLimited') || state.matches('player2TurnLimited')" :class = limited_table_variant_style>
-        <TableVariant :player = player :state = state :send = send :limited = true />
+        <PlayerTableVariant :player = player :state = state :send = send :limited = true />
     </div>
 
     <div v-else-if="state.matches(player + 'Turn')" :class = full_control_table_variant_style>
-        <TableVariant :player = player :state = state :send = send />
+        <PlayerTableVariant :player = player :state = state :send = send />
     </div>
     <div v-else :class = full_control_table_variant_style>
-        <TableVariant :player = player :state = state :send = send />
+        <PlayerTableVariant :player = player :state = state :send = send />
     </div>
 
 </template>

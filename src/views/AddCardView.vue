@@ -1,9 +1,9 @@
 <script setup>
-import FormInputString from "../components/FormInputString.vue";
-import FormInputSelect from "../components/FormInputSelect.vue";
-import FormInputCheckbox from "../components/FormInputCheckbox.vue";
+import FormInputString from "../components/Admin/FormInputString.vue";
+import FormInputSelect from "../components/Admin/FormInputSelect.vue";
+import FormInputCheckbox from "../components/Admin/FormInputCheckbox.vue";
 import { computed, ref } from "@vue/runtime-core";
-import FormInputFile from "../components/FormInputFile.vue";
+import FormInputFile from "../components/Admin/FormInputFile.vue";
 import ImageContainer from "../components/ImageContainer.vue";
 import Header from "../components/Header.vue";
 

@@ -1,6 +1,7 @@
 <script setup>
-import { useMatchStore } from '../stores/matchStore';
-import CardHandBlock from './CardHandBlock.vue';
+import { useMatchStore } from '../../../stores/matchStore';
+import CardHandBlock from '../../CardHandBlock.vue';
+
 
 const matchStore = useMatchStore();
 

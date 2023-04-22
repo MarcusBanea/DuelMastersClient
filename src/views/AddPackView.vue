@@ -1,8 +1,8 @@
 <script setup>
 import { computed, ref, watch } from "@vue/runtime-core";
-import FormInputString from "../components/FormInputString.vue";
-import FormInputFile from "../components/FormInputFile.vue";
-import FormInputSelect from "../components/FormInputSelect.vue";
+import FormInputString from "../components/Admin/FormInputString.vue";
+import FormInputFile from "../components/Admin/FormInputFile.vue";
+import FormInputSelect from "../components/Admin/FormInputSelect.vue";
 
 const packNameField = ref("");
 const packTotalNumberOfCardsField = ref();

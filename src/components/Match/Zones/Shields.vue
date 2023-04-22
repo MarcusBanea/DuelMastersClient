@@ -1,6 +1,7 @@
 <script setup>
-import { useLimitedStore } from '../stores/limitedStore';
-import { useMatchStore } from '../stores/matchStore';
+import { useLimitedStore } from '../../../stores/limitedStore';
+import { useMatchStore } from '../../../stores/matchStore';
+
 
 const matchStore = useMatchStore();
 const limitedStore = useLimitedStore();
@@ -25,20 +26,20 @@ function limitedSelection(index) {
 
             <div v-if="!limited">
                 <div v-if="card.selected == true" class="border-4 border-myLightGreen">
-                    <img src="../assets/Shield.jpg" class="h-28"/>
+                    <img src="../../../assets/Shield.jpg" class="h-28"/>
                 </div>
                 <div v-else >
-                    <img src="../assets/Shield.jpg" class="h-28"/>
+                    <img src="../../../assets/Shield.jpg" class="h-28"/>
                 </div>
             </div>
 
             <div v-else>
                 <div v-if="card.limitedSelected" class="border-4 border-myLimitedGreen">
-                    <img src="../assets/Shield.jpg" class="h-28"
+                    <img src="../../../assets/Shield.jpg" class="h-28"
                         @click="limitedSelection(index)"/>
                 </div>
                 <div v-else >
-                    <img src="../assets/Shield.jpg" class="h-28"
+                    <img src="../../../assets/Shield.jpg" class="h-28"
                         @click="limitedSelection(index)"/>
                 </div>
             </div>

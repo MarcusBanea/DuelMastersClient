@@ -1,15 +1,13 @@
 <script setup>
 import { ref } from "@vue/reactivity";
 import Header from "../components/Header.vue";
-import GameTableBottom from "../components/GameTableBottom.vue";
-import GameTableTop from "../components/PlayerTable.vue";
 import utils from "@/Utils";
 import { useMatchStore } from "../stores/matchStore";
 import matchMachine from '../machines/matchMachine';
 import { useMachine } from '@xstate/vue';
 import { computed, onMounted, watch } from "vue";
 import { interpret } from "xstate";
-import PlayerTable from "../components/PlayerTable.vue";
+import PlayerTable from "../components/Match/PlayerTable.vue";
 
 const matchStore = useMatchStore();
 matchStore.init();
@@ -72,7 +70,6 @@ watch(state, (newValue) => {
                 player = "player1"
                 :state = state
                 :send = send
-
             />
 
         </div>
