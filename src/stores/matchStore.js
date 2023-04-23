@@ -1,5 +1,8 @@
 import { defineStore } from "pinia";
 import utils from "@/Utils";
+import decoder from "../Decoder";
+import { interpret } from "xstate";
+import matchMachine from "../machines/matchMachine";
 
 export const useMatchStore = defineStore({
     id: 'match',
@@ -134,15 +137,18 @@ export const useMatchStore = defineStore({
             }
         },
 
-        async selectedCardToAttack(player, index) {
+        async selectedCardToAttack(player, index, service) {
+
+            console.log("Service = " + service);
+
             this.cardToAttack = index;
             console.log("ATTACK : " + this.cardForAttack);
             console.log("DEFEND : " + this.cardToAttack);
 
-            this.attack(player);
+            this.attack(player, service);
         },
 
-        async attack(player) {
+        async attack(player, service) {
             let action = "Attack ";
             action += this.cardForAttack + " " + this.cardToAttack;
 
@@ -154,10 +160,13 @@ export const useMatchStore = defineStore({
             let attackResponse = await awaitingResponse.json();
 
             //perform action provided by server
-            this.applyAttackChanges(player, attackResponse);
+            this.applyAttackChanges(player, attackResponse, service);
         },
 
-        applyAttackChanges(player, attackResponse) {
+        applyAttackChanges(player, attackResponse, service) {
+
+
+
             //get player1 response
             let player1Response = attackResponse.at(0);
             let moveResponse = player1Response.substring(0, 3);
@@ -197,6 +206,13 @@ export const useMatchStore = defineStore({
                 }
             }
 
+            //get possible ability activation
+            let ability = attackResponse.at(2);
+            if(ability !== undefined) {
+                service.send('YOUR_TURN_LIMITED');
+                //service.stop();
+                decoder.decodeAbility(ability);
+            }
             //reset selected attribute
             this.resetSelectedAttributeOfAllCards();
         },

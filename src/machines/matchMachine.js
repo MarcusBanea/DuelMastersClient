@@ -27,7 +27,13 @@ const matchMachine = createMachine({
                 },
                 YOUR_TURN_LIMITED: {
                   target: 'player1TurnLimited',
-                  actions: () => {let limitedStore = useLimitedStore(); limitedStore.limit = 2; limitedStore.action = "MTH"; limitedStore.admissibleZone.push("battleZone");}
+                  actions: () => {
+                    //let limitedStore = useLimitedStore(); 
+                    //limitedStore.limit = 2; 
+                    //limitedStore.action = "MTH"; 
+                    //limitedStore.admissibleZone.push("battleZone"); 
+                    //limitedStore.admissibleZone.push("manaZone")
+                  }
                 },
                 SHOW_HAND: {
                   target: 'player1Hand'

@@ -12,6 +12,7 @@ const props = defineProps({
     player: String,
     state: Object,
     send: Object,
+    service: Object,
 
     limited: Boolean
 });
@@ -58,7 +59,7 @@ const limited_turn_button_style = computed(() => {
 
 <template>
         
-    <BattleZone v-if="player === 'player1'" :state = state :send = send :player = player :limited = limited />
+    <BattleZone v-if="player === 'player1'" :state = state :send = send :player = player :limited = limited :service = service />
 
     <div v-else :class = manaZone_container_style>
         <Mana :player = player :limited = limited />
@@ -74,7 +75,7 @@ const limited_turn_button_style = computed(() => {
 
     </div>
 
-    <BattleZone v-if="player === 'player2'" :state = state :send = send :player = player :limited = limited />
+    <BattleZone v-if="player === 'player2'" :state = state :send = send :player = player :limited = limited :service = service />
 
     <div v-else :class = manaZone_container_style>
         <Mana :player = player :limited = limited />

@@ -7,7 +7,7 @@ const props = defineProps({
     player: String,
     state: Object,
     send: Object,
-    service: Object
+    service: Object,
 });
 
 const hand_container_style = "border-2 border-myBeige bg-myBlack w-[1500px] h-[100%] m-auto";
@@ -43,14 +43,14 @@ const full_control_table_variant_style = computed(() => {
     </div>
 
     <div v-else-if="state.matches('player1TurnLimited') || state.matches('player2TurnLimited')" :class = limited_table_variant_style>
-        <PlayerTableVariant :player = player :state = state :send = send :limited = true />
+        <PlayerTableVariant :player = player :state = state :send = send :limited = true :service = service />
     </div>
 
     <div v-else-if="state.matches(player + 'Turn')" :class = full_control_table_variant_style>
-        <PlayerTableVariant :player = player :state = state :send = send />
+        <PlayerTableVariant :player = player :state = state :send = send :service = service />
     </div>
     <div v-else :class = full_control_table_variant_style>
-        <PlayerTableVariant :player = player :state = state :send = send />
+        <PlayerTableVariant :player = player :state = state :send = send :service = service />
     </div>
 
 </template>

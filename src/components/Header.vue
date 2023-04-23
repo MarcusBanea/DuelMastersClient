@@ -41,7 +41,7 @@ function goToMatch() {
           h-[10%]
           bg-myDarkBlue
           grid
-          grid-cols-[20%_25%_10%_45%]
+          grid-cols-[30%_15%_10%_45%]
           place-items-center
           text-myLightGray
           border-b-4

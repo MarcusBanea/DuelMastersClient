@@ -10,6 +10,7 @@ const limitedStore = useLimitedStore();
 const props = defineProps({
     state: Object,
     send: Object,
+    service: Object,
     player: String,
 
     limited: Boolean
@@ -31,7 +32,8 @@ function selectCardForAttack(index) {
 
 //when the opponent is attacking, notify the match interface which card was selected
 function opponentSelectCard(index) {
-    matchStore.selectedCardToAttack(props.player === 'player1' ? 'player2' : 'player1', index); 
+    console.log("Service = " + props.service);
+    matchStore.selectedCardToAttack(props.player === 'player1' ? 'player2' : 'player1', index, props.service); 
 }
 
 function selectedCardForCommandExecution(index, zone) {

@@ -12,6 +12,12 @@ export const useLimitedStore = defineStore({
         admissibleZone: [],
         admissibleRealm: [],
         admissibleClass: [],
+        admissibleMaxPower: [],
+        admissibleMinPower: [],
+        admissiblePower: [],
+        admissibleType: [],
+
+        admissiblePlayer: [],
 
         isDataLoaded : false
     }),
