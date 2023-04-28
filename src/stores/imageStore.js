@@ -9,9 +9,9 @@ export const useImageStore = defineStore({
     }),
     actions : {
         addCardImage(key, image) {
-            console.log(key);
-            console.log(image);
-            this.cardImages[key] = this.createBlobFromImage(image);
+            if(this.cardImages[key] === undefined) {
+                this.cardImages[key] = this.createBlobFromImage(image);
+            }
         },
         
         createBlobFromImage(image) {
