@@ -12,9 +12,9 @@ export const useLimitedStore = defineStore({
         admissibleZone: [],
         admissibleRealm: [],
         admissibleClass: [],
-        admissibleMaxPower: [],
-        admissibleMinPower: [],
-        admissiblePower: [],
+        admissibleMaxPower: null,
+        admissibleMinPower: null,
+        admissiblePower: null,
         admissibleType: [],
 
         admissiblePlayer: [],
@@ -73,6 +73,10 @@ export const useLimitedStore = defineStore({
 
         //check if card is admissible for selection
         checkAdmissibleCard(player, zone, index) {
+            //check player
+            if(!this.admissiblePlayer.includes(player)){
+                return false;
+            }
             //check card zone
             if(this.admissibleZone.length > 0 && !this.admissibleZone.includes(zone)){
                 return false;
@@ -86,6 +90,18 @@ export const useLimitedStore = defineStore({
                 }
                 //check card class
                 if(this.admissibleClass.length > 0 && !this.admissibleClass.includes(card.class)) {
+                    return false;
+                }
+                //check card max power
+                if(this.admissibleMaxPower !== null && this.admissibleMaxPower < card.power) {
+                    return false;
+                }
+                //check card min power
+                if(this.admissibleMiPower !== null && this.admissibleMinPower > card.power) {
+                    return false;
+                }
+                //check card exact power
+                if(this.admissiblePower !== null && this.admissiblePower !== card.power) {
                     return false;
                 }
             }

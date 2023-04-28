@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import { useMatchStore } from '../../../stores/matchStore';
 import { useLimitedStore } from '../../../stores/limitedStore';
 import ImageContainerV2 from '../../ImageContainerV2.vue';
+import CardImage from '../../CardImage.vue';
 
 const matchStore = useMatchStore();
 const limitedStore = useLimitedStore();
@@ -63,28 +64,28 @@ function limitedSelection(index) {
         <div v-for="(card, index) in matchStore.getCardsInZoneForPlayer('battleZone', player)" :key="card" class="w-[6%] h-[100px]">
             <div v-if="card.selected == true" class="border-4">
                 <div v-if="state.matches(currentTurn)">
-                    <ImageContainerV2 :zoom-on-hover-activated="true" :image="card.image" container-width="100%" 
+                    <CardImage :zoom-on-hover-activated="true" :name="card.name" container-width="100%" :rotated=card.tapped
                         @click="matchStore.resetSelectedAttributeOfAllCards()"/>
                 </div>
 
                 <div v-else class="border-myLightGreen">
-                    <ImageContainerV2 :zoom-on-hover-activated="true" :image="card.image" container-width="100%" 
+                    <CardImage :zoom-on-hover-activated="true" :name="card.name" container-width="100%" :rotated=card.tapped
                         @click="opponentSelectCard(index)"/>
                 </div>
             </div>
             <div v-else>
                 <div v-if="limited">
                     <div v-if="card.limitedSelected == true" class="border-4 border-myLimitedGreen">
-                        <ImageContainerV2 :zoom-on-hover-activated="true" :image="card.image" container-width="100%" 
+                        <CardImage :zoom-on-hover-activated="true" :name="card.name" container-width="100%" :rotated=card.tapped
                             @click="limitedSelection(index)"/>
                     </div>
                     <div v-else>
-                        <ImageContainerV2 :zoom-on-hover-activated="true" :image="card.image" container-width="100%" 
+                        <CardImage :zoom-on-hover-activated="true" :name="card.name" container-width="100%" :rotated=card.tapped
                             @click="limitedSelection(index)"/>
                     </div>
                 </div>
                 <div v-else >
-                    <ImageContainerV2 :zoom-on-hover-activated="true" :image="card.image" container-width="100%" 
+                    <CardImage :zoom-on-hover-activated="true" :name="card.name" container-width="100%" :rotated=card.tapped
                         @click="state.matches(currentTurn) && selectCardForAttack(index)"/>
                 </div>
             </div>

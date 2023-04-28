@@ -3,6 +3,7 @@ import utils from "@/Utils";
 import decoder from "../Decoder";
 import { interpret } from "xstate";
 import matchMachine from "../machines/matchMachine";
+import { useImageStore } from "./imageStore";
 
 export const useMatchStore = defineStore({
     id: 'match',
@@ -30,9 +31,24 @@ export const useMatchStore = defineStore({
             this.player1 = players[0];
             this.player2 = players[1];
 
+            this.initCardStoreWithDisplayedCards();
+
             this.initNewTurn();
 
             this.isDataLoaded = true;
+        },
+
+        initCardStoreWithDisplayedCards() {
+            const imageStore = useImageStore();
+            let zones = ["battleZone", "manaZone", "hand", "graveyard"];
+            zones.forEach((zone) => {
+                this.player1[zone].forEach((card) => {
+                    imageStore.addCardImage(card.name, card.image);
+                })
+                this.player2[zone].forEach((card) => {
+                    imageStore.addCardImage(card.name, card.image);
+                })
+            });
         },
 
         initNewTurn(currentTurn) {
@@ -53,9 +69,9 @@ export const useMatchStore = defineStore({
 
             this.addMomentToGamelog(player + " moved card \'" + this.getCardFromZone(player, 'hand', index).name + "\' to battle zone.");
 
-            this.moveCard(index, "hand", "battleZone", player);
+            this.moveCard(index, "hand", "battleZone", player, true);
                 
-            this.basicMove(index, "MoveToBattleZone", player);
+            //this.basicMove(index, "MoveToBattleZone", player);
         },
 
         sendCardFromHandToMana(index, player) {
@@ -64,22 +80,26 @@ export const useMatchStore = defineStore({
 
             this.addMomentToGamelog(player + " added card \'" + this.getCardFromZone(player, 'hand', index).name + "\' to mana.");
 
-            this.moveCard(index, "hand", "manaZone", player);
+            this.moveCard(index, "hand", "manaZone", player, true);
 
-            this.basicMove(index, "MoveToMana", player);
+            //this.basicMove(index, "MoveToMana", player);
         },
 
         drawCard(player) {
-            this.moveCard(0, "deck", "hand", player);
-            this.basicMove(null, "DrawCard", player);
+            this.moveCard(0, "deck", "hand", player, true);
+            //this.basicMove(null, "DrawCard", player);
 
             this.addMomentToGamelog(player + " draws a card.");
         },
 
-        moveCard(index, zoneFrom, zoneTo, player) {
+        async moveCard(index, zoneFrom, zoneTo, player, informServer) {
             let currentPlayer = player === "player1" ? this.player1 : this.player2;
             currentPlayer[zoneTo].push(currentPlayer[zoneFrom][index]);
             currentPlayer[zoneFrom].splice(index, 1);
+
+            if(informServer) {
+                await fetch("/api/game/moveCard/" + player + "/" + zoneFrom + "/" + zoneTo + "/" + index);
+            }
         },
 
         //notify server of move/action
@@ -164,9 +184,6 @@ export const useMatchStore = defineStore({
         },
 
         applyAttackChanges(player, attackResponse, service) {
-
-
-
             //get player1 response
             let player1Response = attackResponse.at(0);
             let moveResponse = player1Response.substring(0, 3);
@@ -179,7 +196,7 @@ export const useMatchStore = defineStore({
                 case "MTG" : {
                     let cardIndex = player === 'player1' ? this.cardForAttack : this.cardToAttack;
                     this.addMomentToGamelog("Card \'" + this.getCardFromZone('player1', 'battleZone', cardIndex).name + "\' of player1 was destroyed!");
-                    this.moveCard(cardIndex, "battleZone", "graveyard", 'player1');
+                    this.moveCard(cardIndex, "battleZone", "graveyard", 'player1', false);
                     break;
                 }
                 default : {
@@ -198,12 +215,18 @@ export const useMatchStore = defineStore({
                 case "MTG" : {
                     let cardIndex = player === 'player1' ? this.cardToAttack : this.cardForAttack;
                     this.addMomentToGamelog("Card \'" + this.getCardFromZone('player2', 'battleZone', cardIndex).name + "\' of player2 was destroyed!");
-                    this.moveCard(player === 'player1' ? this.cardToAttack : this.cardForAttack, "battleZone", "graveyard", 'player2');
+                    this.moveCard(player === 'player1' ? this.cardToAttack : this.cardForAttack, "battleZone", "graveyard", 'player2', false);
                     break;
                 }
                 default : {
                     break;
                 }
+            }
+            
+            //tap attacking card
+            let attackingCard = this.getCardFromZone(player, 'battleZone', this.cardForAttack);
+            if(attackingCard !== undefined) {
+                attackingCard.tapped = true;
             }
 
             //get possible ability activation

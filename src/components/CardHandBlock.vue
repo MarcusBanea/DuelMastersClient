@@ -1,9 +1,10 @@
 <script setup>
 import { computed, ref } from '@vue/runtime-core';
+import { useImageStore } from '../stores/imageStore';
 import { useMatchStore } from '../stores/matchStore';
 
 const props = defineProps({
-    image: String, 
+    name: String, 
     index: Number,
     rotate: Boolean,
 
@@ -23,26 +24,6 @@ const cssProps = computed(() => {
     }
 });
 
-
-function _base64ToArrayBuffer(base64) {
-    var binary_string = atob(base64);
-    var len = binary_string.length;
-    var bytes = new Uint8Array(len);
-    for (var i = 0; i < len; i++) {
-        bytes[i] = binary_string.charCodeAt(i);
-    }
-    return bytes.buffer;
-}
-
-const imageSrc = computed(() => {
-    const imgBlob = new Blob([_base64ToArrayBuffer(props.image)]);
-    let urlCreator = URL;
-    let imgUrl = urlCreator.createObjectURL(imgBlob);
-    return imgUrl;
-});
-
-
-
 const cardClicked = ref(false);
 
 function clickOnCard() {
@@ -59,6 +40,11 @@ function sendToMana(index) {
     emits('sendToMana', props.index);
 }
 
+const imageStore = useImageStore();
+
+const image = computed(() => {
+    return imageStore.cardImages[props.name];
+});
 
 </script>
 
@@ -72,7 +58,7 @@ function sendToMana(index) {
 
             <div v-if="!cardClicked" id="card_image" class="m-auto w-[65%] h-[70%]">
               
-                <img :src="imageSrc" container-width="50%" class="hover:scale-150 cursor-pointer" @click="clickOnCard"/>
+                <img :src="image" container-width="50%" class="hover:scale-150 cursor-pointer" @click="clickOnCard"/>
 
             </div>
 

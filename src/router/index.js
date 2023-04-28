@@ -8,6 +8,7 @@ import CombineCardsView from "../views/CombineCardsView.vue";
 import MatchView from "../views/MatchView.vue";
 import { useUserStore } from "../stores/userStore";
 import { ref } from "vue";
+import { useImageStore } from "../stores/imageStore";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -56,6 +57,8 @@ const user = ref(await responseUser.json());
 router.beforeEach(() => {
     const userStore = useUserStore();
     userStore.init(user.value.nickname, user.value.money);
+
+    const imageStore = useImageStore();
 })
 
 export default router;
