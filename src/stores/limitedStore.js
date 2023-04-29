@@ -68,6 +68,18 @@ export const useLimitedStore = defineStore({
                     console.log("Move cards to graveyard.");
                     break;
                 }
+                case "TAP": {
+                    this.cards.forEach((card) => {
+                        let cardDetails = card.split(/[ ,]+/);
+                        console.log("Card player = " + cardDetails[0]);
+                        console.log("Card zone = " + cardDetails[2]);
+                        console.log("Card index = " + cardDetails[1]);
+                        matchStore.getCardFromZone(cardDetails[0], cardDetails[1], cardDetails[2]).tapped = true;
+                    });
+                    this.cards = [];
+                    console.log("Card was tapped.");
+                    break;
+                }
             }
         },
 
@@ -85,11 +97,13 @@ export const useLimitedStore = defineStore({
                 const matchStore = useMatchStore();
                 let card = matchStore.getCardFromZone(player, zone, index);
                 //check card realm
-                if(!this.admissibleRealm.length > 0 && this.admissibleRealm.includes(card.realm)) {
+                console.log("Admissible realms = " + this.admissibleRealm);
+                console.log("Current realm = " + card.cardRealm.toUpperCase());
+                if(this.admissibleRealm.length > 0 && !this.admissibleRealm.includes(card.cardRealm.toUpperCase())) {
                     return false;
                 }
                 //check card class
-                if(this.admissibleClass.length > 0 && !this.admissibleClass.includes(card.class)) {
+                if(this.admissibleClass.length > 0 && !this.admissibleClass.includes(card.cardClass.toUpperCase())) {
                     return false;
                 }
                 //check card max power

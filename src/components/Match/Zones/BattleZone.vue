@@ -86,7 +86,7 @@ function limitedSelection(index) {
                 </div>
                 <div v-else >
                     <CardImage :zoom-on-hover-activated="true" :name="card.name" container-width="100%" :rotated=card.tapped
-                        @click="state.matches(currentTurn) && selectCardForAttack(index)"/>
+                        @click="!card.tapped && state.matches(currentTurn) && selectCardForAttack(index)"/>
                 </div>
             </div>
         </div>

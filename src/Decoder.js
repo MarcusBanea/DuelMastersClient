@@ -17,7 +17,7 @@ var decoder = {
         const abilityPartsSeparator = " ";
         const abilityStepsSeparator = "*";
 
-        console.log(ability);
+        console.log("Ability = " + ability);
 
         //separate encoded ability into steps
         //a step represent what a player may do
@@ -37,51 +37,52 @@ var decoder = {
             let mainPart = parts[0].split(/[_]+/);
             console.log("Main part = " + parts[0]);
 
+            console.log("Type of selection = " + mainPart[1]);
             //set admissible filter
             switch(mainPart[1]) {
                 //no filter
-                case 0 : {
+                case "0" : {
                     break;
                 }
                 //realm filter
-                case 1 : {
-                    let realms = mainPart[3].split(/[-]+/);
-                    realms.forEach((realm) => {limitedStore.admissibleRealm.push(realm)});
+                case "1" : {
+                    let realms = mainPart[3].split(/[/]+/);
+                    realms.forEach((realm) => {console.log("Realm filter added = " + realm); limitedStore.admissibleRealm.push(realm)});
                     break;
                 }
                 //class filter
-                case 2 : {
+                case "2" : {
                     let classes = mainPart[3].split(/[-]+/);
                     classes.forEach((clas) => {limitedStore.admissibleClass.push(clas)});
                     break;
                 }
                 //less power filter
-                case 3 : {
+                case "3" : {
                     limitedStore.admissibleMaxPower.push(mainPart[3]);
                     break;
                 }
                 //more power filter
-                case 4 : {
+                case "4" : {
                     limitedStore.admissibleMinPower.push(mainPart[3]);
                     break;
                 }
                 //exact power filter
-                case 5 : {
+                case "5" : {
                     limitedStore.admissiblePower.push(mainPart[3]);
                     break;
                 }
                 //type power filter 
                 //types = blocker (6), evolution (7), tapped (8), untapped (9), spell (11)
-                case 6 :
-                case 7 :
-                case 8 :
-                case 9 :
-                case 11 : {
+                case "6" :
+                case "7" :
+                case "8" :
+                case "9" :
+                case "11" : {
                     limitedStore.admissibleMaxPower.push(mainPart[3]);
                     break;
                 }
                 //random
-                case 10 : {
+                case "10" : {
                     break;
                 }
             }

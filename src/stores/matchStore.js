@@ -29,6 +29,8 @@ export const useMatchStore = defineStore({
             this.player1 = players[0];
             this.player2 = players[1];
 
+            this.gamelog = [];
+
             this.initCardStoreWithDisplayedCards();
 
             this.initNewTurn();
@@ -52,9 +54,13 @@ export const useMatchStore = defineStore({
         initNewTurn(currentTurn) {
             this.currentTurnCanSendToMana = true;
             this.currentTurnManaAvailable = currentTurn === "player1" ? this.player2['manaZone'].length : this.player1['manaZone'].length;
+
+            //untapp current turn's player's cards
+            this.getCardsInZoneForPlayer("battleZone", currentTurn === "player1" ? "player2" : "player1").forEach((card) => {card.tapped = false;});
         },
 
         getCardsInZoneForPlayer(zone, player) {
+            //console.log("Get cards in zone [" + zone + "] for player [" + player + "]");
             let currentPlayer = player === "player1" ? this.player1 : this.player2;
             return currentPlayer[zone];
         },
