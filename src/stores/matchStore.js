@@ -1,9 +1,7 @@
 import { defineStore } from "pinia";
 import utils from "@/Utils";
-import decoder from "../Decoder";
-import { interpret } from "xstate";
-import matchMachine from "../machines/matchMachine";
 import { useImageStore } from "./imageStore";
+import decoder from "../Decoder";
 
 export const useMatchStore = defineStore({
     id: 'match',
@@ -94,6 +92,10 @@ export const useMatchStore = defineStore({
 
         async moveCard(index, zoneFrom, zoneTo, player, informServer) {
             let currentPlayer = player === "player1" ? this.player1 : this.player2;
+            if(zoneFrom === "deck") {
+                const imageStore = useImageStore();
+                imageStore.addCardImage(currentPlayer[zoneFrom][index].name, currentPlayer[zoneFrom][index].image);
+            }
             currentPlayer[zoneTo].push(currentPlayer[zoneFrom][index]);
             currentPlayer[zoneFrom].splice(index, 1);
 
@@ -176,27 +178,35 @@ export const useMatchStore = defineStore({
                 + "\' to attack!");
 
             //inform the server of this action
-            const awaitingResponse = await fetch("/api/game/action/" + action + "/" + player);
-            let attackResponse = await awaitingResponse.json();
+            let actionCard1 = this.cardForAttack + "/" + "battleZone" + "/" + player;
+            let actionCard2 = this.cardToAttack + "/" + "battleZone" + "/" + (player === "player1" ? "player2" : "player1");
+
+            const awaitingResponse = await fetch("/api/game/2cardAction/" + actionCard1 + "/" + actionCard2 + "/attack");
+            let aftermath = await awaitingResponse.json();
 
             //perform action provided by server
-            this.applyAttackChanges(player, attackResponse, service);
+            this.applyAttackChanges(player, aftermath, service);
         },
 
-        applyAttackChanges(player, attackResponse, service) {
-            //get player1 response
-            let player1Response = attackResponse.at(0);
-            let moveResponse = player1Response.substring(0, 3);
-            switch(moveResponse) {
-                case "NMV" : {
-                    //player1Component.value?.executeAction(player1Response.substring(4));
+        applyAttackChanges(player, aftermath, service) {
+
+            //tap attacking card
+            let attackingCard = this.getCardFromZone(player, 'battleZone', this.cardForAttack);
+            if(attackingCard !== undefined) {
+                attackingCard.tapped = true;
+            }
+
+            //get attacking player response
+            let attackingPlayerResponse = aftermath.card1State;
+            switch(attackingPlayerResponse) {
+                case "" : {
+                    
                     break;
                 }
                 //move player1 last selected card to graveyard
-                case "MTG" : {
-                    let cardIndex = player === 'player1' ? this.cardForAttack : this.cardToAttack;
-                    this.addMomentToGamelog("Card \'" + this.getCardFromZone('player1', 'battleZone', cardIndex).name + "\' of player1 was destroyed!");
-                    this.moveCard(cardIndex, "battleZone", "graveyard", 'player1', false);
+                case "destroyed" : {
+                    this.addMomentToGamelog("Card \'" + this.getCardFromZone(player, 'battleZone', this.cardForAttack).name + "\' of " + player + " was destroyed!");
+                    this.moveCard(this.cardForAttack, "battleZone", "graveyard", player, false);
                     break;
                 }
                 default : {
@@ -204,18 +214,18 @@ export const useMatchStore = defineStore({
                 }
             }
         
-            //get player2 response
-            let player2Response = attackResponse.at(1);
-            switch(player2Response) {
+            //get defending player response
+            let defendingPlayerResponse = aftermath.card2State;
+            switch(defendingPlayerResponse) {
                 case "" : {
-                    //player2Component.value?.executeAction("");
+                    
                     break;
                 }
                 //move player2 last selected card to graveyard
-                case "MTG" : {
-                    let cardIndex = player === 'player1' ? this.cardToAttack : this.cardForAttack;
-                    this.addMomentToGamelog("Card \'" + this.getCardFromZone('player2', 'battleZone', cardIndex).name + "\' of player2 was destroyed!");
-                    this.moveCard(player === 'player1' ? this.cardToAttack : this.cardForAttack, "battleZone", "graveyard", 'player2', false);
+                case "destroyed" : {
+                    let defendingPlayer = player === "player1" ? "player2" : "player1";
+                    this.addMomentToGamelog("Card \'" + this.getCardFromZone(defendingPlayer, 'battleZone', this.cardToAttack).name + "\' of " + defendingPlayer + " was destroyed!");
+                    this.moveCard(this.cardToAttack, "battleZone", "graveyard", defendingPlayer, false);
                     break;
                 }
                 default : {
@@ -223,18 +233,15 @@ export const useMatchStore = defineStore({
                 }
             }
             
-            //tap attacking card
-            let attackingCard = this.getCardFromZone(player, 'battleZone', this.cardForAttack);
-            if(attackingCard !== undefined) {
-                attackingCard.tapped = true;
-            }
-
             //get possible ability activation
-            let ability = attackResponse.at(2);
-            if(ability !== undefined) {
+            let ability = aftermath.triggeredAbilities;
+            if(ability !== undefined && ability !== []) {
                 service.send('YOUR_TURN_LIMITED');
                 //service.stop();
-                decoder.decodeAbility(ability);
+                ability.forEach((abilityPart) => {
+                    decoder.decodeAbility(abilityPart);
+                })
+                
             }
             //reset selected attribute
             this.resetSelectedAttributeOfAllCards();

@@ -17,7 +17,7 @@ var decoder = {
         const abilityPartsSeparator = " ";
         const abilityStepsSeparator = "*";
 
-        console.log("Ability = " + ability);
+        console.log(ability);
 
         //separate encoded ability into steps
         //a step represent what a player may do

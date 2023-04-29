@@ -23,7 +23,6 @@ const cssProps = computed(() => {
     }
 });
 
-
 const imageStore = useImageStore();
 
 const image = computed(() => {
