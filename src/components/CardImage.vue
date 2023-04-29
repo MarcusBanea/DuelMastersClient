@@ -33,7 +33,7 @@ const image = computed(() => {
     
     
 <template>
-    <div v-if="zoomOnHoverActivated" :style="cssProps" class="image-container m-auto hover:scale-[3] hover:delay-500 duration-300 hover:border-2 hover:border-myBeige">
+    <div v-if="zoomOnHoverActivated" :style="cssProps" class="image-container relative m-auto hover:scale-[3] hover:delay-500 hover:z-50 duration-300 hover:border-2 hover:border-myBeige">
         <img :src="image" />
     </div>
     <div v-else :style="cssProps" class="image-container m-auto">
