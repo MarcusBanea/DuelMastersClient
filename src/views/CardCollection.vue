@@ -17,6 +17,9 @@ const selectedCard = ref();
 const selectedCardIndex = ref(0);
 const cardClicked = ref(false);
 
+const currentCards = ref(cards.value);
+const currentPageNumber = ref(0);
+
 const cardRarities = [
   "Common",
   "Uncommon",
@@ -28,8 +31,8 @@ const cardRarities = [
 
 async function setSelectedCard(cardIndex) {
 
-  selectedCardIndex.value = cardIndex;
-  let cardImageId = cards.value[selectedCardIndex.value].imageId;
+  selectedCardIndex.value = cardIndex + currentPageNumber.value * 19;
+  let cardImageId = currentCards.value[selectedCardIndex.value].imageId;
 
   const response = await fetch("/api/file/download/bytes/" + cardImageId);
   selectedCard.value = await response.json();
@@ -57,11 +60,11 @@ async function getCardsWithRarity(rarity) {
       break;
     }
     case "Very Rare": {
-      rarityString = "VeryRare";
+      rarityString = "Very Rare";
       break;
     }
     case "Super Rare": {
-      rarityString = "SuperRare";
+      rarityString = "Super Rare";
       break;
     }
     case "Legendary": {
@@ -69,9 +72,21 @@ async function getCardsWithRarity(rarity) {
       break;
     }
   }
-  const response = await fetch("/api/cards/all" + rarityString);
-  cards.value = await response.json();
+
+  currentCards.value = [];
+  cards.value.forEach((card) => {
+    if(card.rarity === rarityString) {
+      currentCards.value.push(card);
+    }
+  })
+
+  currentPageNumber.value = 0;
 }
+
+const currentPageCards = computed(() => {
+  return currentCards.value.slice(currentPageNumber.value * 19, (currentPageNumber.value + 1) * 19);
+})
+
 </script>
 
 
@@ -79,16 +94,15 @@ async function getCardsWithRarity(rarity) {
 
   <Header :money="user.money" :nickname="user.nickname" ></Header>
 
-  <div class="bg-myDarkGreen h-full grid grid-cols-2 col-gap-2">
+  <div class="bg-myDarkGreen h-[90%] grid grid-cols-2 col-gap-2">
     <div class="
         bg-myBlack
         text-white
         font-bold
         grid
-        grid-rows-[min-content_min-content]
-        h-screen
+        grid-rows-[10%_80%_10%]
       ">
-      <ul id="Rarity-navbar" class="grid grid-cols-6 h-auto mt-5 mb-4 border-b-4">
+      <ul id="Rarity-navbar" class="grid grid-cols-6 mt-5 mb-4 border-b-4">
         <li class="
             text-myDarkGreen
             cursor-pointer
@@ -103,23 +117,68 @@ async function getCardsWithRarity(rarity) {
         </li>
       </ul>
 
-      <ul id="Cards-names" class="grid place-items-center" :key="cards">
-        <li class="
+      <div class="h-full">
+        <ul id="Cards-names" class="grid place-items-center" :key="currentCards">
+          <li class="
             cursor-pointer
             mb-2
+            pl-8
+            pr-8
             transition
             duration-1000
             ease-in-out
             hover:scale-110 hover:bg-gray-100 hover:text-myBlack
             text-xl
             min-w-min
-          " v-for="(card, index) in cards" :key="card" @click="setSelectedCard(index)">
+          " v-for="(card, index) in currentPageCards" :key="card" @click="setSelectedCard(index)">
           {{ card.name }}
-        </li>
-      </ul>
+          </li>
+        </ul>
+      </div>
+
+      <div class="flex justify-around">
+        <div v-if="currentPageNumber + 1 < (currentCards.length / 19)" class="
+            border-4
+            mb-2
+            pl-8
+            pr-8
+            b-myBeige
+            text-myDarkGreen
+            cursor-pointer
+            transition
+            duration-1000
+            ease-in-out
+            hover:bg-gray-100 hover:text-myBlack
+            text-2xl
+            grid"
+            @click="currentPageNumber++">
+            <div class="m-auto">
+              NEXT PAGE
+            </div> 
+        </div>
+        <div v-if="currentPageNumber > 0" class="
+            border-4
+            b-myBeige
+            text-myDarkGreen
+            pl-8
+            pr-8
+            cursor-pointer
+            transition
+            duration-1000
+            ease-in-out
+            hover:bg-gray-100 hover:text-myBlack
+            text-2xl
+            grid"
+            @click="currentPageNumber--">
+            <div class="m-auto">
+              PREVIOUS PAGE
+            </div>  
+        </div>
+      </div>
+
     </div>
 
-    <div v-if="cardClicked" class="grid place-items-center h-screen">
+    <div v-if="cardClicked" class="grid place-items-center h-[90%]">
       <div class="grid place-items-center shadow-md rounded px-8 pt-6 pb-8 m-4">
         <ImageContainer container-width="50%" :image-url="getSelectedCardImage" />
       </div>
