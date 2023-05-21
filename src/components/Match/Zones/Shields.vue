@@ -25,7 +25,7 @@ function limitedSelection(index) {
         <div v-for="(card, index) in matchStore.getCardsInZoneForPlayer('shields', player)" :key="card">
 
             <div v-if="!limited">
-                <div v-if="card.selected == true" class="border-4 border-myLightGreen">
+                <div v-if="card.selected == true" class="pulse_animation">
                     <img src="../../../assets/Shield.jpg" class="h-28"/>
                 </div>
                 <div v-else >
@@ -34,7 +34,7 @@ function limitedSelection(index) {
             </div>
 
             <div v-else>
-                <div v-if="card.limitedSelected" class="border-4 border-myLimitedGreen">
+                <div v-if="card.limitedSelected" class="pulse_animation">
                     <img src="../../../assets/Shield.jpg" class="h-28"
                         @click="limitedSelection(index)"/>
                 </div>
@@ -47,3 +47,28 @@ function limitedSelection(index) {
     </div>
 
 </template>
+
+<style scoped>
+
+@-webkit-keyframes pulse {
+    0% { -webkit-transform: scale(0.9); opacity: 0.7; }
+    50% { -webkit-transform: scale(1); opacity: 1; }
+    100% { -webkit-transform: scale(0.9); opacity: 0.7; }
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.9); opacity: 0.7; }
+    50% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+.pulse_animation {
+    
+    -webkit-animation: pulse 3s infinite ease-in-out;
+    -o-animation: pulse 3s infinite ease-in-out;
+    -ms-animation: pulse 3s infinite ease-in-out; 
+    -moz-animation: pulse 3s infinite ease-in-out; 
+    animation: pulse 3s infinite ease-in-out;
+}
+
+</style>
