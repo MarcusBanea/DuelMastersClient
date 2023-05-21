@@ -11,6 +11,9 @@ export const useMatchStore = defineStore({
 
         currentTurnManaAvailable : null,
         currentTurnCanSendToMana : null,
+        currentTurnCanDrawCard: null,
+        //can be changed by drawing cards abilities
+        currentTurnDrawCardLimit: null,
 
         cardForAttack : null,
         cardToAttack : null,
@@ -54,6 +57,8 @@ export const useMatchStore = defineStore({
         initNewTurn(currentTurn) {
             this.currentTurnCanSendToMana = true;
             this.currentTurnManaAvailable = currentTurn === "player1" ? this.player2['manaZone'].length : this.player1['manaZone'].length;
+            this.currentTurnCanDrawCard = true;
+            this.currentTurnDrawCardLimit = 1;
 
             //untapp current turn's player's cards
             this.getCardsInZoneForPlayer("battleZone", currentTurn === "player1" ? "player2" : "player1").forEach((card) => {card.tapped = false;});
@@ -65,7 +70,17 @@ export const useMatchStore = defineStore({
             return currentPlayer[zone];
         },
 
-        sendCardFromHandToBattleZone(index, player) {
+        getCardsInZoneForPlayerWithIndex(zone, player) {
+            let currentPlayer = player === "player1" ? this.player1 : this.player2;
+            let cards = currentPlayer[zone];
+            let returnedCards = [];
+            cards.forEach((card) => {
+                returnedCards.push(player + "_" + zone + "_" + cards.indexOf(card));
+            });
+            return returnedCards;
+        },
+
+        sendCardFromHandToBattleZone(index, player, service) {
             let currentPlayer = player === "player1" ? this.player1 : this.player2;
             this.currentTurnManaAvailable -= currentPlayer['hand'][index].mana;
             //deactivate card highlighted status
@@ -73,7 +88,7 @@ export const useMatchStore = defineStore({
 
             this.addMomentToGamelog(player + " moved card \'" + this.getCardFromZone(player, 'hand', index).name + "\' to battle zone.");
 
-            this.moveCard(index, "hand", "battleZone", player, true);
+            this.moveCard(index, "hand", "battleZone", player, true, service);
                 
             //this.basicMove(index, "MoveToBattleZone", player);
         },
@@ -84,19 +99,20 @@ export const useMatchStore = defineStore({
 
             this.addMomentToGamelog(player + " added card \'" + this.getCardFromZone(player, 'hand', index).name + "\' to mana.");
 
-            this.moveCard(index, "hand", "manaZone", player, true);
+            this.moveCard(index, "hand", "manaZone", player, true, null);
 
             //this.basicMove(index, "MoveToMana", player);
         },
 
         drawCard(player) {
-            this.moveCard(0, "deck", "hand", player, true);
+            this.currentTurnCanDrawCard = false;
+            this.moveCard(0, "deck", "hand", player, true, null);
             //this.basicMove(null, "DrawCard", player);
 
             this.addMomentToGamelog(player + " draws a card.");
         },
 
-        async moveCard(index, zoneFrom, zoneTo, player, informServer) {
+        async moveCard(index, zoneFrom, zoneTo, player, informServer, service) {
             let currentPlayer = player === "player1" ? this.player1 : this.player2;
             if(zoneFrom === "deck") {
                 const imageStore = useImageStore();
@@ -106,7 +122,15 @@ export const useMatchStore = defineStore({
             currentPlayer[zoneFrom].splice(index, 1);
 
             if(informServer) {
-                await fetch("/api/game/moveCard/" + player + "/" + zoneFrom + "/" + zoneTo + "/" + index);
+                const placementResponse = await fetch("/api/game/moveCard/" + player + "/" + zoneFrom + "/" + zoneTo + "/" + index);
+                if(zoneFrom === "hand" && zoneTo === "battleZone") {
+                    const placement = await placementResponse.json();
+                    if(placement !== undefined && placement !== null && placement !== []) {
+                        console.log("placement ability triggered: " + placement.triggeredAbilities);
+
+                        this.decodeAbilityEnterLimitedState(service, placement.triggeredAbilities);
+                    }
+                }
             }
         },
 
@@ -155,13 +179,20 @@ export const useMatchStore = defineStore({
             //server will provide a list
             //if the list contains only one message, then all cards can be attacked
             //else, only the cards from that list can be attacked
-            if(attackOptions == "ALL") {
-                let opponent = player === 'player1' ? this.player2 : this.player1;
+            console.log("Card attack options: " + attackOptions);
+            let opponent = player === 'player1' ? this.player2 : this.player1;
+            if(attackOptions.at(0) == "NONE") {
+                //nothing to do
+            }
+            else if(attackOptions.at(0) == "ALL") {
                 opponent['battleZone'].forEach((card) => {card.selected = true;})
                 opponent['shields'].forEach((card) => {card.selected = true;})
             }
             else {
-                //TODO
+                attackOptions.forEach((card) => {
+                    let cardDetails = card.split(/[_]+/);
+                    opponent[cardDetails[0]][cardDetails[1]].selected = true;
+                });
             }
         },
 
@@ -212,7 +243,7 @@ export const useMatchStore = defineStore({
                 //move player1 last selected card to graveyard
                 case "destroyed" : {
                     this.addMomentToGamelog("Card \'" + this.getCardFromZone(player, 'battleZone', this.cardForAttack).name + "\' of " + player + " was destroyed!");
-                    this.moveCard(this.cardForAttack, "battleZone", "graveyard", player, false);
+                    this.moveCard(this.cardForAttack, "battleZone", "graveyard", player, false, null);
                     break;
                 }
                 default : {
@@ -231,7 +262,7 @@ export const useMatchStore = defineStore({
                 case "destroyed" : {
                     let defendingPlayer = player === "player1" ? "player2" : "player1";
                     this.addMomentToGamelog("Card \'" + this.getCardFromZone(defendingPlayer, 'battleZone', this.cardToAttack).name + "\' of " + defendingPlayer + " was destroyed!");
-                    this.moveCard(this.cardToAttack, "battleZone", "graveyard", defendingPlayer, false);
+                    this.moveCard(this.cardToAttack, "battleZone", "graveyard", defendingPlayer, false, null);
                     break;
                 }
                 default : {
@@ -241,17 +272,23 @@ export const useMatchStore = defineStore({
             
             //get possible ability activation
             let ability = aftermath.triggeredAbilities;
+            console.log("Ability = " + ability);
             if(ability !== undefined && ability !== []) {
-                service.send('YOUR_TURN_LIMITED');
-                //service.stop();
-                ability.forEach((abilityPart) => {
-                    decoder.decodeAbility(abilityPart);
-                })
-                
+                this.decodeAbilityEnterLimitedState(service, ability);
             }
             //reset selected attribute
             this.resetSelectedAttributeOfAllCards();
         },
+
+        decodeAbilityEnterLimitedState(service, ability) {
+            service.send('YOUR_TURN_LIMITED');
+            //service.stop();
+            console.log("Ability to decode : " + ability);
+            ability.forEach((abilityPart) => {
+                decoder.decodeAbility(abilityPart, service);
+            })
+        },
+
 
         toggleLimitedHighlightStatusOfCards(player, zone, index) {
             let zoneCards = this.getCardsInZoneForPlayer(zone, player);

@@ -19,6 +19,8 @@ export const useLimitedStore = defineStore({
 
         admissiblePlayer: [],
 
+        admissibleDraw: false,
+
         isDataLoaded : false
     }),
     actions : {
@@ -51,7 +53,7 @@ export const useLimitedStore = defineStore({
                     this.cards.forEach((card) => {
                         let cardDetails = card.split(/[ ,]+/);
 
-                        matchStore.moveCard(cardDetails[2], cardDetails[1], "hand", cardDetails[0]);
+                        matchStore.moveCard(cardDetails[2], cardDetails[1], "hand", cardDetails[0], false, null);
                     });
                     this.cards = [];
                     break;
@@ -98,7 +100,7 @@ export const useLimitedStore = defineStore({
                 let card = matchStore.getCardFromZone(player, zone, index);
                 //check card realm
                 console.log("Admissible realms = " + this.admissibleRealm);
-                console.log("Current realm = " + card.cardRealm.toUpperCase());
+                console.log("Current realm = " + card.realm.toUpperCase());
                 if(this.admissibleRealm.length > 0 && !this.admissibleRealm.includes(card.cardRealm.toUpperCase())) {
                     return false;
                 }
