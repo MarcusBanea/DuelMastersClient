@@ -81,7 +81,11 @@ export const useMatchStore = defineStore({
             return returnedCards;
         },
 
-        sendCardFromHandToBattleZone(index, player, service, state) {
+        sendCardFromHandToBattleZone(index, player, service) {
+
+            //TODO - "state" object is obsolete, as we can access the state through the "service" object
+            service.send("HIDE_HAND");
+
             let currentPlayer = player === "player1" ? this.player1 : this.player2;
             this.currentTurnManaAvailable -= currentPlayer['hand'][index].mana;
             //deactivate card highlighted status
@@ -89,12 +93,14 @@ export const useMatchStore = defineStore({
 
             this.addMomentToGamelog(player + " moved card \'" + this.getCardFromZone(player, 'hand', index).name + "\' to battle zone.");
 
-            this.moveCard(index, "hand", "battleZone", player, true, service, state);
+            this.moveCard(index, "hand", "battleZone", player, true, service);
                 
             //this.basicMove(index, "MoveToBattleZone", player);
         },
 
         sendCardFromHandToMana(index, player) {
+            service.send("HIDE_HAND");
+
             this.currentTurnManaAvailable++;
             this.currentTurnCanSendToMana = false;
 
@@ -113,7 +119,7 @@ export const useMatchStore = defineStore({
             this.addMomentToGamelog(player + " draws a card.");
         },
 
-        async moveCard(index, zoneFrom, zoneTo, player, informServer, service, state) {
+        async moveCard(index, zoneFrom, zoneTo, player, informServer, service) {
             let currentPlayer = player === "player1" ? this.player1 : this.player2;
             if(zoneFrom === "deck") {
                 const imageStore = useImageStore();
@@ -129,7 +135,7 @@ export const useMatchStore = defineStore({
                     if(placement !== undefined && placement !== null && placement !== []) {
                         console.log("placement ability triggered: " + placement.triggeredAbilities);
 
-                        this.decodeAbilityEnterLimitedState(service, state, placement.triggeredAbilities);
+                        this.decodeAbilityEnterLimitedState(service, placement.triggeredAbilities);
                     }
                 }
             }
@@ -281,7 +287,7 @@ export const useMatchStore = defineStore({
             this.resetSelectedAttributeOfAllCards();
         },
 
-        decodeAbilityEnterLimitedState(service, state, ability) {
+        decodeAbilityEnterLimitedState(service, ability) {
             let limitedStore = useLimitedStore();
             ability.forEach((abilityPart) => {
                 console.log("Ability sent to queue : " + abilityPart);
@@ -289,7 +295,7 @@ export const useMatchStore = defineStore({
             })
 
             //send first ability to decode
-            limitedStore.sendAbilityToDecodeFromQueueOfAbilities(service, state);
+            limitedStore.sendAbilityToDecodeFromQueueOfAbilities(service);
         },
 
 

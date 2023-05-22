@@ -10,7 +10,7 @@ var decoder = {
     *  extra attribute - power (for filter = 3, 4, 5), realm (for filter = 1), ...
     *  zone + player indicator - MNx (x = 0 for current player, x = 1 for opponent, x = 2 for both players)
     */
-    decodeAbility(ability, service, state) {
+    decodeAbility(ability, service) {
 
         let limitedStore = useLimitedStore();
         let matchStore = useMatchStore();
@@ -27,7 +27,7 @@ var decoder = {
         steps.forEach((step) => {
             console.log("Step = " + step);
 
-            if(step.startsWith("OP:")) {
+            if (step.startsWith("OP:")) {
                 //TODO
                 limitedStore.tempSwitchToOpponentTurn = true;
                 step = step.substring(step.indexOf(":") + 1);
@@ -54,10 +54,10 @@ var decoder = {
                 let zones = mainPart[4].split(/[-]+/);
                 let player = "";
                 zones.forEach((zone) => {
-                    //console.log("zone = " + zone);
+                    console.log("zone = " + zone);
                     let encodedPlayer = zone.substring(2);
-                    player = this.getPlayer(encodedPlayer, state);
-                    //console.log("player = " + player);
+                    player = this.getPlayer(encodedPlayer, service);
+                    console.log("player = " + player);
                 });
 
                 //get cards in zones
@@ -90,7 +90,7 @@ var decoder = {
                         //get all cards with this realm
                         cardsInZones.forEach((card) => {
                             let cardDetails = card.split(/[_]+/);
-                            if(!realms.includes(matchStore.getCardFromZone(cardDetails[0], cardDetails[1], cardDetails[2]).realm)) {
+                            if (!realms.includes(matchStore.getCardFromZone(cardDetails[0], cardDetails[1], cardDetails[2]).realm)) {
                                 cardsInZones.splice(cardsInZones.indexOf(card), 1);
                             }
                         })
@@ -102,7 +102,7 @@ var decoder = {
                         //get all cards with this class
                         cardsInZones.forEach((card) => {
                             let cardDetails = card.split(/[_]+/);
-                            if(!classes.includes(matchStore.getCardFromZone(cardDetails[0], cardDetails[1], cardDetails[2]).cardClass)) {
+                            if (!classes.includes(matchStore.getCardFromZone(cardDetails[0], cardDetails[1], cardDetails[2]).cardClass)) {
                                 cardsInZones.splice(cardsInZones.indexOf(card), 1);
                             }
                         })
@@ -118,7 +118,7 @@ var decoder = {
                         //get all cards with this power level lower than this
                         cardsInZones.forEach((card) => {
                             let cardDetails = card.split(/[_]+/);
-                            if(matchStore.getCardFromZone(cardDetails[0], cardDetails[1], cardDetails[2]).power >= mainPart[3]) {
+                            if (matchStore.getCardFromZone(cardDetails[0], cardDetails[1], cardDetails[2]).power >= mainPart[3]) {
                                 cardsInZones.splice(cardsInZones.indexOf(card), 1);
                             }
                         })
@@ -134,7 +134,7 @@ var decoder = {
                         //get all cards with this power level higher than this
                         cardsInZones.forEach((card) => {
                             let cardDetails = card.split(/[_]+/);
-                            if(matchStore.getCardFromZone(cardDetails[0], cardDetails[1], cardDetails[2]).power <= mainPart[3]) {
+                            if (matchStore.getCardFromZone(cardDetails[0], cardDetails[1], cardDetails[2]).power <= mainPart[3]) {
                                 cardsInZones.splice(cardsInZones.indexOf(card), 1);
                             }
                         })
@@ -150,7 +150,7 @@ var decoder = {
                         //get all cards with this same power level as this
                         cardsInZones.forEach((card) => {
                             let cardDetails = card.split(/[_]+/);
-                            if(matchStore.getCardFromZone(cardDetails[0], cardDetails[1], cardDetails[2]).power !== mainPart[3]) {
+                            if (matchStore.getCardFromZone(cardDetails[0], cardDetails[1], cardDetails[2]).power !== mainPart[3]) {
                                 cardsInZones.splice(cardsInZones.indexOf(card), 1);
                             }
                         })
@@ -170,18 +170,18 @@ var decoder = {
                     //random
                     case "10": {
                         cardsInZones[0] = cardsInZones[Math.floor(Math.random() * cardsInZones.length)];
-                        cardsInZones = cardsInZones.slice(0,1);
+                        cardsInZones = cardsInZones.slice(0, 1);
                         break;
                     }
-                    case "12" : {
+                    case "12": {
                         //top of deck
-                        cardsInZones = cardsInZones.slice(0,1);
+                        cardsInZones = cardsInZones.slice(0, 1);
                         break;
                     }
                 }
 
-                // console.log("Cards in zones:");
-                // console.log(cardsInZones);
+                console.log("Cards in zones:");
+                console.log(cardsInZones);
                 // cardsInZones.forEach((card) => {
                 //     console.log(card);
                 // })
@@ -190,45 +190,62 @@ var decoder = {
                 console.log("Second part = " + secondPart);
 
                 //what is happening with these cards? (they will be moved in another zone)
-                switch(secondPart) {
-                    case "DES" : {
+                switch (secondPart) {
+                    case "DES": {
                         //move to graveyard
                         cardsInZones.forEach((card) => {
                             let cardDetails = card.split(/[_]+/);
                             //inform server should be true
                             matchStore.moveCard(cardDetails[2], cardDetails[1], "graveyard", cardDetails[0], false, service);
-                        }) 
+                        })
                         break;
                     }
-                    case "MTH" : {
+                    case "MTH": {
                         //move to hand
                         cardsInZones.forEach((card) => {
                             let cardDetails = card.split(/[_]+/);
                             //inform server should be true
                             matchStore.moveCard(cardDetails[2], cardDetails[1], "hand", cardDetails[0], false, service);
-                        }) 
+                        })
                         break;
                     }
-                    case "MTM" : {
+                    case "MTM": {
                         //move to mana
                         cardsInZones.forEach((card) => {
                             let cardDetails = card.split(/[_]+/);
                             //inform server should be true
                             matchStore.moveCard(cardDetails[2], cardDetails[1], "mana", cardDetails[0], false, service);
-                        }) 
+                        })
                         break;
                     }
-                    case "MTS" : {
+                    case "MTS": {
                         //move to shields
                         cardsInZones.forEach((card) => {
                             let cardDetails = card.split(/[_]+/);
                             //inform server should be true
                             matchStore.moveCard(cardDetails[2], cardDetails[1], "shields", cardDetails[0], false, service);
-                        }) 
+                        })
                         break;
                     }
                 }
-                limitedStore.sendAbilityToDecodeFromQueueOfAbilities(service, state);
+                limitedStore.resetAdimissibleFields();
+                //check if there are more abilities in the ability queue
+                if (limitedStore.abilities.length > 0) {
+                    limitedStore.sendAbilityToDecodeFromQueueOfAbilities(service, service);
+                }
+                else {
+                    //return to the last main-turn state
+                    console.log("MainTurn = " + limitedStore.mainTurn);
+                    if((limitedStore.mainTurn === "player1Turn" && service.state.matches("player1TurnLimited")) ||
+                        (limitedStore.mainTurn === "player2Turn" && service.state.matches("player2TurnLimited"))) 
+                    {
+                        service.send("YOUR_TURN");
+                    }
+                    else if((limitedStore.mainTurn === "player1Turn" && service.state.matches("player2TurnLimited")) ||
+                        (limitedStore.mainTurn === "player2Turn" && service.state.matches("player1TurnLimited"))) {
+                        service.send("OPP_TURN");
+                    }
+                }
 
             }
             //counter filter, the result number will be used for drawing an amount of cards / selecting cards for another ability
@@ -321,7 +338,7 @@ var decoder = {
                 zones.forEach((zone) => {
                     limitedStore.admissibleZone.push(this.getZoneFullName(zone.substring(0, 2)))
                     let encodedPlayer = zone.substring(2);
-                    let admissiblePlayers = this.getPlayer(encodedPlayer, state);
+                    let admissiblePlayers = this.getPlayer(encodedPlayer, service);
                     admissiblePlayers.forEach((player) => {
                         if (!limitedStore.admissiblePlayer.includes(player)) {
                             limitedStore.admissiblePlayer.push(player);
@@ -338,7 +355,7 @@ var decoder = {
         })
     },
 
-    
+
 
     getZoneFullName(encodedZone) {
         switch (encodedZone) {
@@ -364,26 +381,29 @@ var decoder = {
         }
     },
 
-    getPlayer(encodedPlayer, state) {
+    getPlayer(encodedPlayer, service) {
         switch (encodedPlayer) {
             case "0": {
-                if(state.matches("player1TurnLimited")) {
+                if (service.state.matches("player1TurnLimited")) {
                     return ["player1"];
                 }
-                else if(state.matches("player2TurnLimited")) {
+                else if (service.state.matches("player2TurnLimited")) {
                     return ["player2"];
                 }
             }
             case "1": {
-                if(state.matches("player1TurnLimited")) {
+                if (service.state.matches("player1TurnLimited")) {
                     return ["player2"];
                 }
-                else if(state.matches("player2TurnLimited")) {
+                else if (service.state.matches("player2TurnLimited")) {
                     return ["player1"];
                 }
             }
             case "2": {
                 return ["player1", "player2"];
+            }
+            default : {
+                return [];
             }
         }
     }

@@ -52,21 +52,28 @@ export const useLimitedStore = defineStore({
             }
         },
 
-        sendAbilityToDecodeFromQueueOfAbilities(service, state) {
+        sendAbilityToDecodeFromQueueOfAbilities(service) {
             let abilityPart = this.abilities[0];
+            console.log("This ability will be executed = " + abilityPart);
+            console.log("There are " + this.abilities.length + " abilities left in queue!");
+            if(this.abilities.length === 1) {
+                this.abilities = [];
+            }
+            else {
+                this.abilities = this.abilities.slice(1, this.abilities.length);
+            }
             let playerForWhichTheAbilityWasActivated = abilityPart.split(/[#]+/)[0];
             if (playerForWhichTheAbilityWasActivated === "player1") {
                 service.send('YOUR_TURN_LIMITED');
-                decoder.decodeAbility(abilityPart.split(/[#]+/)[1], service, state);
+                decoder.decodeAbility(abilityPart.split(/[#]+/)[1], service);
             }
             else if (playerForWhichTheAbilityWasActivated === "player2") {
                 service.send('OPP_TURN_LIMITED');
-                decoder.decodeAbility(abilityPart.split(/[#]+/)[1], service, state);
+                decoder.decodeAbility(abilityPart.split(/[#]+/)[1], service);
             }
             else {
                 console.log("ERROR: No player for ability activation!");
             }
-            this.abilities = this.abilities.slice(0, 1);
         },
 
         executeLimitedAction(service, state) {
@@ -127,7 +134,7 @@ export const useLimitedStore = defineStore({
             resetAdimissibleFields();
             //check if there are more abilities in the ability queue
             if(this.abilities.length > 0) {
-                this.sendAbilityToDecodeFromQueueOfAbilities(service, state);
+                this.sendAbilityToDecodeFromQueueOfAbilities(service);
             }
             else {
                 //return to the last main-turn state
