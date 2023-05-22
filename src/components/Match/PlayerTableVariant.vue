@@ -97,7 +97,8 @@ const limited_turn_button_style = computed(() => {
         FULL CONTROL
     </button>
 
-    <button v-if="state.matches(player + 'TurnLimited')" :class = end_turn_button_style @click="limitedStore.executeLimitedAction() ;send('YOUR_TURN')">
+    <button v-if="state.matches(player + 'TurnLimited') && limitedStore.isSelectionComplete()" :class = end_turn_button_style 
+        @click="limitedStore.executeLimitedAction(service, state)">
         EXECUTE
     </button>
 

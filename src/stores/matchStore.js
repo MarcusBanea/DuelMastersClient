@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import utils from "@/Utils";
 import { useImageStore } from "./imageStore";
 import decoder from "../Decoder";
+import { useLimitedStore } from "./limitedStore";
 
 export const useMatchStore = defineStore({
     id: 'match',
@@ -80,7 +81,7 @@ export const useMatchStore = defineStore({
             return returnedCards;
         },
 
-        sendCardFromHandToBattleZone(index, player, service) {
+        sendCardFromHandToBattleZone(index, player, service, state) {
             let currentPlayer = player === "player1" ? this.player1 : this.player2;
             this.currentTurnManaAvailable -= currentPlayer['hand'][index].mana;
             //deactivate card highlighted status
@@ -88,7 +89,7 @@ export const useMatchStore = defineStore({
 
             this.addMomentToGamelog(player + " moved card \'" + this.getCardFromZone(player, 'hand', index).name + "\' to battle zone.");
 
-            this.moveCard(index, "hand", "battleZone", player, true, service);
+            this.moveCard(index, "hand", "battleZone", player, true, service, state);
                 
             //this.basicMove(index, "MoveToBattleZone", player);
         },
@@ -112,7 +113,7 @@ export const useMatchStore = defineStore({
             this.addMomentToGamelog(player + " draws a card.");
         },
 
-        async moveCard(index, zoneFrom, zoneTo, player, informServer, service) {
+        async moveCard(index, zoneFrom, zoneTo, player, informServer, service, state) {
             let currentPlayer = player === "player1" ? this.player1 : this.player2;
             if(zoneFrom === "deck") {
                 const imageStore = useImageStore();
@@ -128,7 +129,7 @@ export const useMatchStore = defineStore({
                     if(placement !== undefined && placement !== null && placement !== []) {
                         console.log("placement ability triggered: " + placement.triggeredAbilities);
 
-                        this.decodeAbilityEnterLimitedState(service, placement.triggeredAbilities);
+                        this.decodeAbilityEnterLimitedState(service, state, placement.triggeredAbilities);
                     }
                 }
             }
@@ -273,20 +274,22 @@ export const useMatchStore = defineStore({
             //get possible ability activation
             let ability = aftermath.triggeredAbilities;
             console.log("Ability = " + ability);
-            if(ability !== undefined && ability !== []) {
+            if(ability !== undefined && ability.length > 0) {
                 this.decodeAbilityEnterLimitedState(service, ability);
             }
             //reset selected attribute
             this.resetSelectedAttributeOfAllCards();
         },
 
-        decodeAbilityEnterLimitedState(service, ability) {
-            service.send('YOUR_TURN_LIMITED');
-            //service.stop();
-            console.log("Ability to decode : " + ability);
+        decodeAbilityEnterLimitedState(service, state, ability) {
+            let limitedStore = useLimitedStore();
             ability.forEach((abilityPart) => {
-                decoder.decodeAbility(abilityPart, service);
+                console.log("Ability sent to queue : " + abilityPart);
+                limitedStore.abilities.push(abilityPart);
             })
+
+            //send first ability to decode
+            limitedStore.sendAbilityToDecodeFromQueueOfAbilities(service, state);
         },
 
 

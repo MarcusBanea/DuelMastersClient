@@ -39,7 +39,7 @@ const full_control_table_variant_style = computed(() => {
 <template>
 
     <div v-if="state.matches(player + 'Hand')" id="hand_container" :class = hand_container_style>
-        <Hand :player = player :send = send :state = state />
+        <Hand :player = player :send = send :state = state :service = service />
     </div>
 
     <div v-else-if="state.matches('player1TurnLimited') || state.matches('player2TurnLimited')" :class = limited_table_variant_style>

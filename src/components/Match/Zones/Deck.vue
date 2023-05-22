@@ -1,7 +1,10 @@
 <script setup>
+import { useLimitedStore } from '../../../stores/limitedStore';
 import { useMatchStore } from '../../../stores/matchStore';
 
 const matchStore = useMatchStore();
+
+const limitedStore = useLimitedStore();
 
 const props = defineProps({
     player: String,
@@ -15,6 +18,21 @@ const props = defineProps({
     <div v-if="matchStore.currentTurnCanDrawCard === true && state.matches(player + 'Turn')" 
         class="w-[40%] h-[90%] border-2 border-myBeige m-auto grid cursor-pointer pulse_animation"
         @click="state.matches(player + 'Turn') ? matchStore.drawCard(player) : null">
+
+        <div class="grid">
+            <img src="../../../assets/Shield.jpg" class="h-28 relative m-auto opacity-30"/>
+            <p class="text-myBeige mt-8 mb-8 ml-4 absolute">
+                DECK
+                <br>
+                GET CARD
+            </p>
+        </div>
+
+    </div>
+
+    <div v-else-if="state.matches(player + 'TurnLimited') && limitedStore.admissibleDraw === true && limitedStore.limit > 0" 
+        class="w-[40%] h-[90%] border-2 border-myBeige m-auto grid cursor-pointer pulse_animation"
+        @click="state.matches(player + 'Turn') ? (matchStore.drawCard(player) && limitedStore.limit--) : null">
 
         <div class="grid">
             <img src="../../../assets/Shield.jpg" class="h-28 relative m-auto opacity-30"/>

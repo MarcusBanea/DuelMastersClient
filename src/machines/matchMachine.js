@@ -6,33 +6,31 @@ const matchMachine = createMachine({
     id: 'match',
     initial: 'player1Turn',
     context: {
-
-      numberOfCardsToBeSelected: 0,
-
-      //TODO - used when toggle hand visibility, return to last state
-      lastState: null
-
     },
 
     states: {
         player1Turn: {
-            entry: [() => {let matchStore = useMatchStore(); matchStore.addMomentToGamelog("It's player1 turn now!")}],
+            entry: [() => {
+              let matchStore = useMatchStore();
+              matchStore.addMomentToGamelog("It's player1 turn now!");
+            }],
             on: {
                 END_TURN: {
                     target: 'player2Turn',
                     actions: () => {let matchStore = useMatchStore(); matchStore.initNewTurn('player1')}
                 },
                 OPP_TURN_LIMITED: {
-                  target: 'player2TurnLimited'
+                  target: 'player2TurnLimited',
+                  actions: () => {
+                    let limitedStore = useLimitedStore(); 
+                    limitedStore.mainTurn = "player1Turn";
+                  }
                 },
                 YOUR_TURN_LIMITED: {
                   target: 'player1TurnLimited',
                   actions: () => {
-                    //let limitedStore = useLimitedStore(); 
-                    //limitedStore.limit = 2; 
-                    //limitedStore.action = "MTH"; 
-                    //limitedStore.admissibleZone.push("battleZone"); 
-                    //limitedStore.admissibleZone.push("manaZone")
+                    let limitedStore = useLimitedStore(); 
+                    limitedStore.mainTurn = "player1Turn";
                   }
                 },
                 SHOW_HAND: {
@@ -45,13 +43,21 @@ const matchMachine = createMachine({
             on : {
                 END_TURN: {
                     target: 'player1Turn',
-                    actions: () => {let matchStore = useMatchStore(); matchStore.initNewTurn('player2')}
+                    actions: () => {let matchStore = useMatchStore(); matchStore.initNewTurn('player2');}
                 },
                 OPP_TURN_LIMITED: {
-                  target: 'player1TurnLimited'
+                  target: 'player1TurnLimited',
+                  actions: () => {
+                    let limitedStore = useLimitedStore(); 
+                    limitedStore.mainTurn = "player2Turn";
+                  }
                 },
                 YOUR_TURN_LIMITED: {
-                  target: 'player2TurnLimited'
+                  target: 'player2TurnLimited',
+                  actions: () => {
+                    let limitedStore = useLimitedStore(); 
+                    limitedStore.mainTurn = "player2Turn";
+                  }
                 },
                 SHOW_HAND: {
                   target: 'player2Hand'
@@ -66,6 +72,9 @@ const matchMachine = createMachine({
                 },
                 YOUR_TURN: {
                   target: 'player1Turn'
+                },
+                YOUR_TURN_LIMITED: {
+                  target: 'player1TurnLimited'
                 },
                 OPP_TURN_LIMITED: {
                   target: 'player2TurnLimited'
@@ -83,6 +92,9 @@ const matchMachine = createMachine({
                 },
                 YOUR_TURN: {
                   target: 'player2Turn'
+                },
+                YOUR_TURN_LIMITED: {
+                  target: 'player2TurnLimited'
                 },
                 OPP_TURN_LIMITED: {
                   target: 'player1TurnLimited'

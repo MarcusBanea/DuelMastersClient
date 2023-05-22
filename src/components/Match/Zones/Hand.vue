@@ -8,7 +8,8 @@ const matchStore = useMatchStore();
 const props = defineProps({
     player: String,
     state: Object,
-    send: Object
+    send: Object,
+    service: Object
 });
 
 </script>
@@ -20,7 +21,7 @@ const props = defineProps({
         <CardHandBlock v-for="(card, index) in matchStore.getCardsInZoneForPlayer('hand', player)" :key="card" :name="card.name" :index="index" 
             :mana="card.mana" 
             @send-to-mana="send({type: 'HIDE_HAND'}); matchStore.sendCardFromHandToMana(index, player)"
-            @send-to-battle-zone="send({type: 'HIDE_HAND'});  matchStore.sendCardFromHandToBattleZone(index, player);"
+            @send-to-battle-zone="send({type: 'HIDE_HAND'});  matchStore.sendCardFromHandToBattleZone(index, player, service, state);"
         />
 
     </div>

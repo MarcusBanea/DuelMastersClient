@@ -10,14 +10,10 @@ var decoder = {
     *  extra attribute - power (for filter = 3, 4, 5), realm (for filter = 1), ...
     *  zone + player indicator - MNx (x = 0 for current player, x = 1 for opponent, x = 2 for both players)
     */
-    decodeAbility(ability, service) {
+    decodeAbility(ability, service, state) {
 
         let limitedStore = useLimitedStore();
         let matchStore = useMatchStore();
-
-        const abilityFiltersSeparator = "_";
-        const abilityPartsSeparator = " ";
-        const abilityStepsSeparator = "*";
 
         console.log("Ability = " + ability);
 
@@ -31,16 +27,22 @@ var decoder = {
         steps.forEach((step) => {
             console.log("Step = " + step);
 
+            if(step.startsWith("OP:")) {
+                //TODO
+                limitedStore.tempSwitchToOpponentTurn = true;
+                step = step.substring(step.indexOf(":") + 1);
+            }
+
             if (step.startsWith("DRAW")) {
                 limitedStore.admissibleDraw = true;
                 limitedStore.limit = step[5];
+                //TODO - decrement the limit number after each "Draw Card" click
             }
             //no user action needed, so entering the limited state is not necessary
             else if (step.startsWith("GET")) {
-                let parts = step.split(/[ ]+/);
 
                 //iterate over parts
-                //most of the time, first part will represent the main action (choosing cards :) )
+                let parts = step.split(/[ ]+/);
 
                 //decode main action
                 let mainPart = parts[0].split(/[_]+/);
@@ -52,10 +54,10 @@ var decoder = {
                 let zones = mainPart[4].split(/[-]+/);
                 let player = "";
                 zones.forEach((zone) => {
-                    console.log("zone = " + zone);
+                    //console.log("zone = " + zone);
                     let encodedPlayer = zone.substring(2);
-                    player = this.getPlayer(encodedPlayer);
-                    console.log("player = " + player);
+                    player = this.getPlayer(encodedPlayer, state);
+                    //console.log("player = " + player);
                 });
 
                 //get cards in zones
@@ -64,16 +66,16 @@ var decoder = {
                     let zoneName = this.getZoneFullName(zone.substring(0, 2));
                     player.forEach((playerIndicator) => {
                         let tempCards = matchStore.getCardsInZoneForPlayerWithIndex(zoneName, playerIndicator);
-                        console.log("Temp cards = " + tempCards);
+                        //console.log("Temp cards = " + tempCards);
                         cardsInZones = cardsInZones.concat(tempCards);
                     });
                 });
 
-                console.log("Cards before filter:");
-                console.log(cardsInZones);
-                cardsInZones.forEach((card) => {
-                    console.log(card);
-                })
+                // console.log("Cards before filter:");
+                // console.log(cardsInZones);
+                // cardsInZones.forEach((card) => {
+                //     console.log(card);
+                // })
 
 
                 //get all cards from ability-set zone with ability-set filter
@@ -178,11 +180,11 @@ var decoder = {
                     }
                 }
 
-                console.log("Cards in zones:");
-                console.log(cardsInZones);
-                cardsInZones.forEach((card) => {
-                    console.log(card);
-                })
+                // console.log("Cards in zones:");
+                // console.log(cardsInZones);
+                // cardsInZones.forEach((card) => {
+                //     console.log(card);
+                // })
 
                 let secondPart = parts[1];
                 console.log("Second part = " + secondPart);
@@ -226,7 +228,7 @@ var decoder = {
                         break;
                     }
                 }
-                service.send('YOUR_TURN');
+                limitedStore.sendAbilityToDecodeFromQueueOfAbilities(service, state);
 
             }
             //counter filter, the result number will be used for drawing an amount of cards / selecting cards for another ability
@@ -238,10 +240,9 @@ var decoder = {
                 //TODO
             }
             else {
-                let parts = step.split(/[ ]+/);
-
                 //iterate over parts
                 //most of the time, first part will represent the main action (choosing cards :) )
+                let parts = step.split(/[ ]+/);
 
                 //decode main action
                 let mainPart = parts[0].split(/[_]+/);
@@ -320,7 +321,7 @@ var decoder = {
                 zones.forEach((zone) => {
                     limitedStore.admissibleZone.push(this.getZoneFullName(zone.substring(0, 2)))
                     let encodedPlayer = zone.substring(2);
-                    let admissiblePlayers = this.getPlayer(encodedPlayer);
+                    let admissiblePlayers = this.getPlayer(encodedPlayer, state);
                     admissiblePlayers.forEach((player) => {
                         if (!limitedStore.admissiblePlayer.includes(player)) {
                             limitedStore.admissiblePlayer.push(player);
@@ -336,6 +337,8 @@ var decoder = {
             }
         })
     },
+
+    
 
     getZoneFullName(encodedZone) {
         switch (encodedZone) {
@@ -361,13 +364,23 @@ var decoder = {
         }
     },
 
-    getPlayer(encodedPlayer) {
+    getPlayer(encodedPlayer, state) {
         switch (encodedPlayer) {
             case "0": {
-                return ["player1"];
+                if(state.matches("player1TurnLimited")) {
+                    return ["player1"];
+                }
+                else if(state.matches("player2TurnLimited")) {
+                    return ["player2"];
+                }
             }
             case "1": {
-                return ["player2"];
+                if(state.matches("player1TurnLimited")) {
+                    return ["player2"];
+                }
+                else if(state.matches("player2TurnLimited")) {
+                    return ["player1"];
+                }
             }
             case "2": {
                 return ["player1", "player2"];
