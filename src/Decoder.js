@@ -231,7 +231,7 @@ var decoder = {
                 limitedStore.resetAdimissibleFields();
                 //check if there are more abilities in the ability queue
                 if (limitedStore.abilities.length > 0) {
-                    limitedStore.sendAbilityToDecodeFromQueueOfAbilities(service, service);
+                    limitedStore.sendAbilityToDecodeFromQueueOfAbilities(service);
                 }
                 else {
                     //return to the last main-turn state

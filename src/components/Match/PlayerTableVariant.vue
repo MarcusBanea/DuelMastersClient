@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, ref, watch} from '@vue/runtime-core';
 import { useLimitedStore } from '../../stores/limitedStore';
 import BattleZone from './Zones/BattleZone.vue';
 import Mana from './Zones/Mana.vue';
@@ -53,6 +53,12 @@ const limited_turn_button_style = computed(() => {
     return style;
 });
 
+const isExecuteActionButtonVisible = ref(false);
+
+watch(limitedStore.cards, (cards) => {
+    isExecuteActionButtonVisible.value = cards.length == limitedStore.limit ? true : false;
+});
+
 </script>
 
 
@@ -67,9 +73,9 @@ const limited_turn_button_style = computed(() => {
 
     <div id="middleZone_container" :class = middleZone_container_style>
 
-        <Graveyard :player = player />
+        <Graveyard :player = player @click="(service.state.matches(player + 'Turn') || service.state.matches(player + 'TurnLimited')) && service.send('SHOW_GRAVEYARD')"/>
 
-        <Shields :player = player :limited = limited />
+        <Shields :player = player :limited = limited :service = service />
 
         <Deck :player = player :state = state />
 
@@ -97,8 +103,8 @@ const limited_turn_button_style = computed(() => {
         FULL CONTROL
     </button>
 
-    <button v-if="state.matches(player + 'TurnLimited') && limitedStore.isSelectionComplete()" :class = end_turn_button_style 
-        @click="limitedStore.executeLimitedAction(service, state)">
+    <button v-if="state.matches(player + 'TurnLimited') && isExecuteActionButtonVisible" :class = end_turn_button_style 
+        @click="limitedStore.executeLimitedAction(service, state); isExecuteActionButtonVisible = false;">
         EXECUTE
     </button>
 

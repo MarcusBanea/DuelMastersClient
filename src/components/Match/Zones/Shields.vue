@@ -8,12 +8,19 @@ const limitedStore = useLimitedStore();
 
 const props = defineProps({
     player: String,
+    service: Object,
 
     limited: Boolean
 });
 
 function limitedSelection(index) {
     limitedStore.limitedSelection(props.player, 'shields', index);
+}
+
+//when the opponent is attacking, notify the match interface which card was selected
+function opponentSelectCard(index) {
+    console.log("Service = " + props.service);
+    matchStore.selectedCardToAttack(props.player === 'player1' ? 'player2' : 'player1', index, "shields", props.service); 
 }
 
 </script>
@@ -26,7 +33,7 @@ function limitedSelection(index) {
 
             <div v-if="!limited">
                 <div v-if="card.selected == true" class="pulse_animation">
-                    <img src="../../../assets/Shield.jpg" class="h-28"/>
+                    <img src="../../../assets/Shield.jpg" class="h-28" @click="opponentSelectCard(index)"/>
                 </div>
                 <div v-else >
                     <img src="../../../assets/Shield.jpg" class="h-28"/>

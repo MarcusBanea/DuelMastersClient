@@ -1,17 +1,21 @@
 <script setup>
 import { computed, ref } from '@vue/runtime-core';
 import { useImageStore } from '../stores/imageStore';
+import { useLimitedStore } from '../stores/limitedStore';
 import { useMatchStore } from '../stores/matchStore';
 
 const props = defineProps({
     name: String, 
     index: Number,
     rotate: Boolean,
+    player: String,
 
     mana: Number,
+    service: Object
 });
 
 const matchStore = useMatchStore();
+const limitedStore = useLimitedStore();
 
 const emits = defineEmits(['sendToBattleZone', 'sendToMana']);
 
@@ -27,8 +31,13 @@ const cssProps = computed(() => {
 const cardClicked = ref(false);
 
 function clickOnCard() {
-    if(props.mana <= matchStore.currentTurnManaAvailable || matchStore.currentTurnCanSendToMana == true) {
-        cardClicked.value = true;
+    if (props.service.state.matches(props.player + "Hand")) {
+        if (props.mana <= matchStore.currentTurnManaAvailable || matchStore.currentTurnCanSendToMana == true) {
+            cardClicked.value = true;
+        }
+    }
+    else if (props.service.state.matches(props.player + "HandLimited")) {
+        limitedStore.limitedSelection(props.player, "hand", index);
     }
 }
 
@@ -62,7 +71,8 @@ const image = computed(() => {
 
             </div>
 
-            <div v-else-if="mana <= matchStore.currentTurnManaAvailable || matchStore.currentTurnCanSendToMana == true" class="m-auto grid grid-rows-2 gap-4">
+            <div v-else-if="(mana <= matchStore.currentTurnManaAvailable || matchStore.currentTurnCanSendToMana == true) && 
+                service.state.matches(player + 'Hand')" class="m-auto grid grid-rows-2 gap-4">
 
                 <button v-if="mana <= matchStore.currentTurnManaAvailable" class="bg-myBeige text-myBlack font-bold rounded w-[100%] px-4" @click="sendToBattleZone()">
                     BATTLE ZONE

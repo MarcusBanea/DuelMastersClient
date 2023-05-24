@@ -98,7 +98,7 @@ export const useMatchStore = defineStore({
             //this.basicMove(index, "MoveToBattleZone", player);
         },
 
-        sendCardFromHandToMana(index, player) {
+        sendCardFromHandToMana(index, player, service) {
             service.send("HIDE_HAND");
 
             this.currentTurnManaAvailable++;
@@ -203,33 +203,37 @@ export const useMatchStore = defineStore({
             }
         },
 
-        async selectedCardToAttack(player, index, service) {
-
-            console.log("Service = " + service);
+        async selectedCardToAttack(player, index, zone, service) {
 
             this.cardToAttack = index;
-            console.log("ATTACK : " + this.cardForAttack);
-            console.log("DEFEND : " + this.cardToAttack);
 
-            this.attack(player, service);
+            this.attack(player, zone, service);
         },
 
-        async attack(player, service) {
-            let action = "Attack ";
-            action += this.cardForAttack + " " + this.cardToAttack;
+        async attack(player, zone, service) {
 
-            this.addMomentToGamelog(player + " used card \'" + this.getCardFromZone(player, 'battleZone', this.cardForAttack).name
-                + "\' to attack!");
+            //TODO - check if defending player has blocker
+            let hasBlocker = false;
 
-            //inform the server of this action
-            let actionCard1 = this.cardForAttack + "/" + "battleZone" + "/" + player;
-            let actionCard2 = this.cardToAttack + "/" + "battleZone" + "/" + (player === "player1" ? "player2" : "player1");
+            //if there is no blocker, and the attacked card was from shields, then there is no battle
+            //the shield/s is "destroyed", and moved to the defending player's hand
+            if(hasBlocker) {
+                //TODO
+            }
+            else {
+                this.addMomentToGamelog(player + " used card \'" + this.getCardFromZone(player, 'battleZone', this.cardForAttack).name
+                    + "\' to attack!");
 
-            const awaitingResponse = await fetch("/api/game/2cardAction/" + actionCard1 + "/" + actionCard2 + "/attack");
-            let aftermath = await awaitingResponse.json();
+                //inform the server of this action
+                let actionCard1 = this.cardForAttack + "/" + "battleZone" + "/" + player;
+                let actionCard2 = this.cardToAttack + "/" + zone + "/" + (player === "player1" ? "player2" : "player1");
 
-            //perform action provided by server
-            this.applyAttackChanges(player, aftermath, service);
+                const awaitingResponse = await fetch("/api/game/2cardAction/" + actionCard1 + "/" + actionCard2 + "/attack");
+                let aftermath = await awaitingResponse.json();
+
+                //perform action provided by server
+                this.applyAttackChanges(player, aftermath, service);
+            }
         },
 
         applyAttackChanges(player, aftermath, service) {
@@ -270,6 +274,12 @@ export const useMatchStore = defineStore({
                     let defendingPlayer = player === "player1" ? "player2" : "player1";
                     this.addMomentToGamelog("Card \'" + this.getCardFromZone(defendingPlayer, 'battleZone', this.cardToAttack).name + "\' of " + defendingPlayer + " was destroyed!");
                     this.moveCard(this.cardToAttack, "battleZone", "graveyard", defendingPlayer, false, null);
+                    break;
+                }
+                case "MTH" : {
+                    let defendingPlayer = player === "player1" ? "player2" : "player1";
+                    this.addMomentToGamelog(player + " destroyed a shield!");
+                    this.moveCard(this.cardToAttack, "shields", "hand", defendingPlayer, false, null);
                     break;
                 }
                 default : {

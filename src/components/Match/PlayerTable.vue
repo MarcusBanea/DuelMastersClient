@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import PlayerTableVariant from './PlayerTableVariant.vue';
 import Hand from './Zones/Hand.vue';
+import GraveyardContent from './Zones/GraveyardContent.vue';
 
 const props = defineProps({
     player: String,
@@ -38,8 +39,12 @@ const full_control_table_variant_style = computed(() => {
 
 <template>
 
-    <div v-if="state.matches(player + 'Hand')" id="hand_container" :class = hand_container_style>
+    <div v-if="state.matches(player + 'Hand') || state.matches(player + 'HandLimited')" id="hand_container" :class = hand_container_style>
         <Hand :player = player :send = send :state = state :service = service />
+    </div>
+
+    <div v-else-if="state.matches(player + 'Graveyard') || state.matches(player + 'GraveyardLimited')" id="graveyard_container" :class = hand_container_style>
+        <GraveyardContent :player = player :send = send :state = state :service = service />
     </div>
 
     <div v-else-if="state.matches('player1TurnLimited') || state.matches('player2TurnLimited')" :class = limited_table_variant_style>

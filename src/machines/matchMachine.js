@@ -35,6 +35,9 @@ const matchMachine = createMachine({
                 },
                 SHOW_HAND: {
                   target: 'player1Hand'
+                },
+                SHOW_GRAVEYARD: {
+                  target: 'player1Graveyard'
                 }
             }
         },
@@ -61,6 +64,9 @@ const matchMachine = createMachine({
                 },
                 SHOW_HAND: {
                   target: 'player2Hand'
+                },
+                SHOW_GRAVEYARD: {
+                  target: 'player2Graveyard'
                 }
             }
         },
@@ -80,7 +86,10 @@ const matchMachine = createMachine({
                   target: 'player2TurnLimited'
                 },
                 SHOW_HAND: {
-                  target: 'player1Hand'
+                  target: 'player1HandLimited'
+                },
+                SHOW_GRAVEYARD: {
+                  target: 'player1GraveyardLimited'
                 }
             }
         },
@@ -100,7 +109,10 @@ const matchMachine = createMachine({
                   target: 'player1TurnLimited'
                 },
                 SHOW_HAND: {
-                  target: 'player2Hand'
+                  target: 'player2HandLimited'
+                },
+                SHOW_GRAVEYARD: {
+                  target: 'player2GraveyardLimited'
                 }
             }
         },
@@ -111,10 +123,52 @@ const matchMachine = createMachine({
             }
           }
         },
+        player1HandLimited: {
+          on: {
+            HIDE_HAND: {
+              target: 'player1TurnLimited'
+            }
+          }
+        },
         player2Hand: {
           on: {
             HIDE_HAND: {
               target: 'player2Turn'
+            }
+          }
+        },
+        player2HandLimited: {
+          on: {
+            HIDE_HAND: {
+              target: 'player2TurnLimited'
+            }
+          }
+        },
+        player1Graveyard : {
+          on : {
+            HIDE_GRAVEYARD : {
+              target: 'player1Turn'
+            }
+          }
+        },
+        player1GraveyardLimited : {
+          on : {
+            HIDE_GRAVEYARD : {
+              target: 'player1TurnLimited'
+            }
+          }
+        },
+        player2Graveyard : {
+          on : {
+            HIDE_GRAVEYARD : {
+              target: 'player2Turn'
+            }
+          }
+        },
+        player2GraveyardLimited : {
+          on : {
+            HIDE_GRAVEYARD : {
+              target: 'player2TurnLimited'
             }
           }
         }

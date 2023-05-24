@@ -63,20 +63,18 @@ export const useLimitedStore = defineStore({
                 this.abilities = this.abilities.slice(1, this.abilities.length);
             }
             let playerForWhichTheAbilityWasActivated = abilityPart.split(/[#]+/)[0];
-            if (playerForWhichTheAbilityWasActivated === "player1") {
+            //TODO - check current state
+            if (service.state.matches(playerForWhichTheAbilityWasActivated + "Turn")) {
                 service.send('YOUR_TURN_LIMITED');
                 decoder.decodeAbility(abilityPart.split(/[#]+/)[1], service);
             }
-            else if (playerForWhichTheAbilityWasActivated === "player2") {
+            else {
                 service.send('OPP_TURN_LIMITED');
                 decoder.decodeAbility(abilityPart.split(/[#]+/)[1], service);
             }
-            else {
-                console.log("ERROR: No player for ability activation!");
-            }
         },
 
-        executeLimitedAction(service, state) {
+        executeLimitedAction(service) {
             const matchStore = useMatchStore();
             //TODO - update mana available on current turn
             switch (this.action) {
@@ -131,14 +129,21 @@ export const useLimitedStore = defineStore({
                 }
             }
 
-            resetAdimissibleFields();
+            this.resetAdimissibleFields();
             //check if there are more abilities in the ability queue
             if(this.abilities.length > 0) {
                 this.sendAbilityToDecodeFromQueueOfAbilities(service);
             }
             else {
                 //return to the last main-turn state
-                service.send(this.mainTurn);
+                if ((this.mainTurn === "player1Turn" && service.state.matches("player1TurnLimited")) ||
+                    (this.mainTurn === "player2Turn" && service.state.matches("player2TurnLimited"))) {
+                    service.send("YOUR_TURN");
+                }
+                else if ((this.mainTurn === "player1Turn" && service.state.matches("player2TurnLimited")) ||
+                    (this.mainTurn === "player2Turn" && service.state.matches("player1TurnLimited"))) {
+                    service.send("OPP_TURN");
+                }
             }
         },
 

@@ -19,9 +19,9 @@ const props = defineProps({
     <div class="w-full h-full flex flex-row flex-nowrap overflow-x-auto">
 
         <CardHandBlock v-for="(card, index) in matchStore.getCardsInZoneForPlayer('hand', player)" :key="card" :name="card.name" :index="index" 
-            :mana="card.mana" 
-            @send-to-mana="matchStore.sendCardFromHandToMana(index, player)"
-            @send-to-battle-zone="matchStore.sendCardFromHandToBattleZone(index, player, service, state);"
+            :mana="card.mana" :service = "service" :player = "player"
+            @send-to-mana="matchStore.sendCardFromHandToMana(index, player, service)"
+            @send-to-battle-zone="matchStore.sendCardFromHandToBattleZone(index, player, service);"
         />
 
     </div>
