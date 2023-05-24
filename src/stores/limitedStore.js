@@ -82,7 +82,6 @@ export const useLimitedStore = defineStore({
                     console.log("Move cards to hand.");
                     this.cards.forEach((card) => {
                         let cardDetails = card.split(/[ ,]+/);
-
                         matchStore.moveCard(cardDetails[2], cardDetails[1], "hand", cardDetails[0], false, null);
                     });
                     this.cards = [];
@@ -92,7 +91,6 @@ export const useLimitedStore = defineStore({
                     console.log("Move cards to mana.");
                     this.cards.forEach((card) => {
                         let cardDetails = card.split(/[ ,]+/);
-
                         matchStore.moveCard(cardDetails[2], cardDetails[1], "mana", cardDetails[0], false, null);
                     });
                     this.cards = [];
@@ -102,7 +100,6 @@ export const useLimitedStore = defineStore({
                     console.log("Move cards to battle zone.");
                     this.cards.forEach((card) => {
                         let cardDetails = card.split(/[ ,]+/);
-
                         matchStore.moveCard(cardDetails[2], cardDetails[1], "battleZone", cardDetails[0], false, null);
                     });
                     this.cards = [];
@@ -112,7 +109,6 @@ export const useLimitedStore = defineStore({
                     console.log("Move cards to graveyard.");
                     this.cards.forEach((card) => {
                         let cardDetails = card.split(/[ ,]+/);
-
                         matchStore.moveCard(cardDetails[2], cardDetails[1], "graveyard", cardDetails[0], false, null);
                     });
                     this.cards = [];
@@ -132,17 +128,19 @@ export const useLimitedStore = defineStore({
             this.resetAdimissibleFields();
             //check if there are more abilities in the ability queue
             if(this.abilities.length > 0) {
+                console.log("There are more abilities left to execute! There are : " + this.abilities.length + " left!");
                 this.sendAbilityToDecodeFromQueueOfAbilities(service);
             }
             else {
                 //return to the last main-turn state
+                console.log("No abilities left to execute! Return to original state!");
                 if ((this.mainTurn === "player1Turn" && service.state.matches("player1TurnLimited")) ||
                     (this.mainTurn === "player2Turn" && service.state.matches("player2TurnLimited"))) {
                     service.send("YOUR_TURN");
                 }
                 else if ((this.mainTurn === "player1Turn" && service.state.matches("player2TurnLimited")) ||
                     (this.mainTurn === "player2Turn" && service.state.matches("player1TurnLimited"))) {
-                    service.send("OPP_TURN");
+                    service.send("END_TURN");
                 }
             }
         },

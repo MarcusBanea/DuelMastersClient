@@ -10,7 +10,7 @@ var decoder = {
     *  extra attribute - power (for filter = 3, 4, 5), realm (for filter = 1), ...
     *  zone + player indicator - MNx (x = 0 for current player, x = 1 for opponent, x = 2 for both players)
     */
-    decodeAbility(ability, service) {
+    decodeAbility(ability, service, cardIndex, cardZone, cardPlayer) {
 
         let limitedStore = useLimitedStore();
         let matchStore = useMatchStore();
@@ -33,7 +33,16 @@ var decoder = {
                 step = step.substring(step.indexOf(":") + 1);
             }
 
-            if (step.startsWith("DRAW")) {
+            //simple moving ability, no user action needed
+            if(step.startsWith("MT")) {
+                switch(step) {
+                    case "MTM" : {
+                        matchStore.moveCard(cardIndex, cardZone, "mana", cardPlayer, false, service);
+                        break;
+                    }
+                }
+            }
+            else if (step.startsWith("DRAW")) {
                 limitedStore.admissibleDraw = true;
                 limitedStore.limit = step[5];
                 //TODO - decrement the limit number after each "Draw Card" click

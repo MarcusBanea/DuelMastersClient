@@ -30,14 +30,14 @@ const cssProps = computed(() => {
 
 const cardClicked = ref(false);
 
-function clickOnCard() {
+function clickOnCard(index) {
     if (props.service.state.matches(props.player + "Hand")) {
         if (props.mana <= matchStore.currentTurnManaAvailable || matchStore.currentTurnCanSendToMana == true) {
             cardClicked.value = true;
         }
     }
     else if (props.service.state.matches(props.player + "HandLimited")) {
-        limitedStore.limitedSelection(props.player, "hand", index);
+        limitedStore.limitedSelection(props.player, "hand", props.index);
     }
 }
 

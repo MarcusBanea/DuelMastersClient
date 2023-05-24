@@ -257,6 +257,26 @@ export const useMatchStore = defineStore({
                     this.moveCard(this.cardForAttack, "battleZone", "graveyard", player, false, null);
                     break;
                 }
+                case "MTH" : {
+                    this.addMomentToGamelog("Card \'" + this.getCardFromZone(player, 'battleZone', this.cardForAttack).name + "\' of " + player + " was moved to hand.");
+                    this.moveCard(this.cardForAttack, "battleZone", "hand", player, false, null);
+                    break;
+                }
+                case "MTM" : {
+                    this.addMomentToGamelog("Card \'" + this.getCardFromZone(player, 'battleZone', this.cardForAttack).name + "\' of " + player + " was moved to mana.");
+                    this.moveCard(this.cardForAttack, "battleZone", "manaZone", player, false, null);
+                    break;
+                }
+                case "MTS" : {
+                    this.addMomentToGamelog("Card \'" + this.getCardFromZone(player, 'battleZone', this.cardForAttack).name + "\' of " + player + " was moved to shields.");
+                    this.moveCard(this.cardForAttack, "battleZone", "shields", player, false, null);
+                    break;
+                }
+                case "MTD" : {
+                    //TODO
+                    console.log("MTD not implemented!");
+                    break;
+                }
                 default : {
                     break;
                 }
@@ -264,6 +284,7 @@ export const useMatchStore = defineStore({
         
             //get defending player response
             let defendingPlayerResponse = aftermath.card2State;
+            let defendingPlayer = player === "player1" ? "player2" : "player1";
             switch(defendingPlayerResponse) {
                 case "" : {
                     
@@ -271,15 +292,34 @@ export const useMatchStore = defineStore({
                 }
                 //move player2 last selected card to graveyard
                 case "destroyed" : {
-                    let defendingPlayer = player === "player1" ? "player2" : "player1";
                     this.addMomentToGamelog("Card \'" + this.getCardFromZone(defendingPlayer, 'battleZone', this.cardToAttack).name + "\' of " + defendingPlayer + " was destroyed!");
                     this.moveCard(this.cardToAttack, "battleZone", "graveyard", defendingPlayer, false, null);
                     break;
                 }
-                case "MTH" : {
-                    let defendingPlayer = player === "player1" ? "player2" : "player1";
+                //shield moved to hand
+                case "SMTH" : {
                     this.addMomentToGamelog(player + " destroyed a shield!");
                     this.moveCard(this.cardToAttack, "shields", "hand", defendingPlayer, false, null);
+                    break;
+                }
+                case "MTH" : {
+                    this.addMomentToGamelog("Card \'" + this.getCardFromZone(defendingPlayer, 'battleZone', this.cardToAttack).name + "\' of " + defendingPlayer + " was moved to hand.");
+                    this.moveCard(this.cardToAttack, "battleZone", "hand", defendingPlayer, false, null);
+                    break;
+                }
+                case "MTM" : {
+                    this.addMomentToGamelog("Card \'" + this.getCardFromZone(defendingPlayer, 'battleZone', this.cardToAttack).name + "\' of " + defendingPlayer + " was moved to mana.");
+                    this.moveCard(this.cardToAttack, "battleZone", "manaZone", defendingPlayer, false, null);
+                    break;
+                }
+                case "MTS" : {
+                    this.addMomentToGamelog("Card \'" + this.getCardFromZone(defendingPlayer, 'battleZone', this.cardToAttack).name + "\' of " + defendingPlayer + " was moved to shields.");
+                    this.moveCard(this.cardToAttack, "battleZone", "shields", defendingPlayer, false, null);
+                    break;
+                }
+                case "MTD" : {
+                    //TODO
+                    console.log("MTD not implemented!");
                     break;
                 }
                 default : {
@@ -299,9 +339,14 @@ export const useMatchStore = defineStore({
 
         decodeAbilityEnterLimitedState(service, ability) {
             let limitedStore = useLimitedStore();
-            ability.forEach((abilityPart) => {
-                console.log("Ability sent to queue : " + abilityPart);
-                limitedStore.abilities.push(abilityPart);
+            ability.forEach((wholeAbility) => {
+                let player = wholeAbility.substring(0, wholeAbility.indexOf("#") + 1);
+                wholeAbility = wholeAbility.substring(wholeAbility.indexOf("#") + 1);
+                let abilityParts = wholeAbility.split(/[*]+/);
+                abilityParts.forEach((part) => {
+                    console.log("Ability sent to queue : " + player + part);
+                    limitedStore.abilities.push(player + part);
+                })
             })
 
             //send first ability to decode
