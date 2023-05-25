@@ -10,7 +10,7 @@ var decoder = {
     *  extra attribute - power (for filter = 3, 4, 5), realm (for filter = 1), ...
     *  zone + player indicator - MNx (x = 0 for current player, x = 1 for opponent, x = 2 for both players)
     */
-    decodeAbility(ability, service, cardIndex, cardZone, cardPlayer) {
+    decodeAbility(ability, service) {
 
         let limitedStore = useLimitedStore();
         let matchStore = useMatchStore();
@@ -28,7 +28,6 @@ var decoder = {
             console.log("Step = " + step);
 
             if (step.startsWith("OP:")) {
-                //TODO
                 limitedStore.tempSwitchToOpponentTurn = true;
                 step = step.substring(step.indexOf(":") + 1);
             }
@@ -37,7 +36,7 @@ var decoder = {
             if(step.startsWith("MT")) {
                 switch(step) {
                     case "MTM" : {
-                        matchStore.moveCard(cardIndex, cardZone, "mana", cardPlayer, false, service);
+                        //matchStore.moveCard(cardIndex, cardZone, "mana", cardPlayer, false, service);
                         break;
                     }
                 }
@@ -360,6 +359,76 @@ var decoder = {
 
                 //set action
                 limitedStore.action = secondPart;
+
+                //check if there is any card with the adimissible properties
+                //if not, don't switch to limited state and reset limited filters
+                let admissibleCardsCounter = 0;
+                let noFilterUsed = true;
+                limitedStore.admissiblePlayer.forEach((player) => {
+                    limitedStore.admissibleZone.forEach((zone) => {
+                        //get cards in zone for player
+                        matchStore.getCardsInZoneForPlayer(zone, player).forEach((card) => {
+                            if(limitedStore.admissibleRealm.length > 0) {
+                                limitedStore.admissibleRealm.forEach((realm) => {
+                                    if(realm === card.getRealm()) {
+                                        admissibleCardsCounter++;
+                                    }
+                                })
+                                noFilterUsed = false;
+                            }
+                            if(limitedStore.admissibleClass.length > 0) {
+                                limitedStore.admissibleClass.forEach((clas) => {
+                                    if(clas === card.getCardClass()) {
+                                        admissibleCardsCounter++;
+                                    }
+                                })
+                                noFilterUsed = false;
+                            }
+                            if(limitedStore.admissibleMaxPower !== null) {
+                                if(card.getPower() < limitedStore.admissibleMaxPower) {
+                                    admissibleCardsCounter++;
+                                }
+                                noFilterUsed = false;
+                            }
+                            if(limitedStore.admissibleMinPower !== null) {
+                                if(card.getPower() > limitedStore.admissibleMaxPower) {
+                                    admissibleCardsCounter++;
+                                }
+                                noFilterUsed = false;
+                            }
+                            if(limitedStore.admissiblePower !== null) {
+                                if(card.getPower() == limitedStore.admissibleMaxPower) {
+                                    admissibleCardsCounter++;
+                                }
+                                noFilterUsed = false;
+                            }
+                            if(limitedStore.admissibleType.length > 0) {
+                                limitedStore.admissibleType.forEach((type) => {
+                                    //TODO
+                                })
+                                noFilterUsed = false;
+                            }
+
+                            if(noFilterUsed === true) {
+                                admissibleCardsCounter++;
+                            }
+                        })
+                    })
+                })
+                if(admissibleCardsCounter >= limitedStore.limit) {
+                    //continue
+                }
+                else {
+                    if ((limitedStore.mainTurn === "player1Turn" && service.state.matches("player1TurnLimited")) ||
+                        (limitedStore.mainTurn === "player2Turn" && service.state.matches("player2TurnLimited"))) {
+                        service.send("YOUR_TURN");
+                    }
+                    else if ((limitedStore.mainTurn === "player1Turn" && service.state.matches("player2TurnLimited")) ||
+                        (limitedStore.mainTurn === "player2Turn" && service.state.matches("player1TurnLimited"))) {
+                        service.send("END_TURN");
+                    }
+                    limitedStore.resetAdimissibleFields();
+                }
             }
         })
     },

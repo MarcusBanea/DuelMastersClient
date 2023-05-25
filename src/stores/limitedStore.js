@@ -74,12 +74,11 @@ export const useLimitedStore = defineStore({
             //TODO - check current state
             if (service.state.matches(playerForWhichTheAbilityWasActivated + "Turn")) {
                 service.send('YOUR_TURN_LIMITED');
-                decoder.decodeAbility(abilityPart.split(/[#]+/)[1], service);
             }
             else {
                 service.send('OPP_TURN_LIMITED');
-                decoder.decodeAbility(abilityPart.split(/[#]+/)[1], service);
             }
+            decoder.decodeAbility(abilityPart.split(/[#]+/)[1], service);
         },
 
         executeLimitedAction(service) {
