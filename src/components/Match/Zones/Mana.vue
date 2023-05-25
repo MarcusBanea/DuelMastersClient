@@ -27,7 +27,7 @@ function limitedSelection(index) {
         </div>
 
         <div v-else>
-            <div v-if="card.limitedSelected == true" class="border-4 border-myLimitedGreen">
+            <div v-if="card.limitedSelected == true" class="pulse_animation">
                 <CardImage :zoom-on-hover-activated="false" :name="card.name" container-width="70%" :rotated=true
                     @click="limitedSelection(index)"/>
             </div>
@@ -39,3 +39,28 @@ function limitedSelection(index) {
     </div>
 
 </template>
+
+<style scoped>
+
+@-webkit-keyframes pulse {
+    0% { -webkit-transform: scale(0.9); opacity: 0.7; }
+    50% { -webkit-transform: scale(1); opacity: 1; }
+    100% { -webkit-transform: scale(0.9); opacity: 0.7; }
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.9); opacity: 0.7; }
+    50% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+.pulse_animation {
+    
+    -webkit-animation: pulse 3s infinite ease-in-out;
+    -o-animation: pulse 3s infinite ease-in-out;
+    -ms-animation: pulse 3s infinite ease-in-out; 
+    -moz-animation: pulse 3s infinite ease-in-out; 
+    animation: pulse 3s infinite ease-in-out;
+}
+
+</style>

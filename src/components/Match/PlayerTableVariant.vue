@@ -53,12 +53,6 @@ const limited_turn_button_style = computed(() => {
     return style;
 });
 
-const isExecuteActionButtonVisible = ref(false);
-
-watch(limitedStore.cards, (cards) => {
-    isExecuteActionButtonVisible.value = cards.length == limitedStore.limit ? true : false;
-});
-
 </script>
 
 
@@ -87,23 +81,23 @@ watch(limitedStore.cards, (cards) => {
         <Mana :player = player :limited = limited />
     </div>
 
-    <button v-if="state.matches(player + 'Turn') || state.matches(player + 'TurnLimited')" :class = hand_button_style @click="send('SHOW_HAND');">
+    <button v-if="service.state.matches(player + 'Turn') || state.matches(player + 'TurnLimited')" :class = hand_button_style @click="send('SHOW_HAND');">
         HAND
     </button>
 
-    <button v-if="state.matches(player + 'Turn')" :class = end_turn_button_style @click="send('END_TURN')">
+    <button v-if="service.state.matches(player + 'Turn')" :class = end_turn_button_style @click="send('END_TURN')">
         END TURN
     </button>
 
-    <button v-if="state.matches(player + 'Turn')" :class = limited_turn_button_style @click="send('YOUR_TURN_LIMITED')">
+    <button v-if="service.state.matches(player + 'Turn')" :class = limited_turn_button_style @click="send('YOUR_TURN_LIMITED')">
         LIMITED
     </button>
 
-    <button v-if="state.matches(player + 'TurnLimited')" :class = limited_turn_button_style @click="send('YOUR_TURN')">
+    <button v-if="service.state.matches(player + 'TurnLimited')" :class = limited_turn_button_style @click="send('YOUR_TURN')">
         FULL CONTROL
     </button>
 
-    <button v-if="state.matches(player + 'TurnLimited') && isExecuteActionButtonVisible" :class = end_turn_button_style 
+    <button v-if="service.state.matches(player + 'TurnLimited') && limitedStore.isExecuteEnabled" :class = end_turn_button_style 
         @click="limitedStore.executeLimitedAction(service, state); isExecuteActionButtonVisible = false;">
         EXECUTE
     </button>

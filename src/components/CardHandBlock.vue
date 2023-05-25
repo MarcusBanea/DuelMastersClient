@@ -1,7 +1,6 @@
 <script setup>
 import { computed, ref } from '@vue/runtime-core';
 import { useImageStore } from '../stores/imageStore';
-import { useLimitedStore } from '../stores/limitedStore';
 import { useMatchStore } from '../stores/matchStore';
 
 const props = defineProps({
@@ -15,7 +14,6 @@ const props = defineProps({
 });
 
 const matchStore = useMatchStore();
-const limitedStore = useLimitedStore();
 
 const emits = defineEmits(['sendToBattleZone', 'sendToMana']);
 
@@ -30,14 +28,11 @@ const cssProps = computed(() => {
 
 const cardClicked = ref(false);
 
-function clickOnCard(index) {
+function clickOnCard() {
     if (props.service.state.matches(props.player + "Hand")) {
         if (props.mana <= matchStore.currentTurnManaAvailable || matchStore.currentTurnCanSendToMana == true) {
             cardClicked.value = true;
         }
-    }
-    else if (props.service.state.matches(props.player + "HandLimited")) {
-        limitedStore.limitedSelection(props.player, "hand", props.index);
     }
 }
 
@@ -61,13 +56,13 @@ const image = computed(() => {
 
 <template>
     
-    <div id="card_container" class="w-[300px] h-[90%] m-auto grid flex-none border-r-2  overflow-y-hidden">
+    <div id="card_container" class="w-[300px] h-[100%] m-auto grid flex-none border-r-2  overflow-y-hidden">
           
           <div id="card_image_container" class="m-auto w-[90%] h-[100%] grid">
 
             <div v-if="!cardClicked" id="card_image" class="m-auto w-[65%] h-[70%]">
-              
-                <img :src="image" container-width="50%" class="hover:scale-150 cursor-pointer" @click="clickOnCard"/>
+            
+                <img :src="image" container-width="50%" class="hover:scale-150 cursor-pointer m-auto" @click="clickOnCard"/>
 
             </div>
 

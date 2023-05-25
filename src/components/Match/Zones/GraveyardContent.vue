@@ -1,10 +1,12 @@
 <script setup>
+import { useLimitedStore } from '../../../stores/limitedStore';
 import { useMatchStore } from '../../../stores/matchStore';
 import CardGraveyardBlock from '../../CardGraveyardBlock.vue';
 import CardHandBlock from '../../CardHandBlock.vue';
 
 
 const matchStore = useMatchStore();
+const limitedStore = useLimitedStore();
 
 const props = defineProps({
     player: String,
@@ -19,9 +21,18 @@ const props = defineProps({
     
     <div class="w-full h-full flex flex-row flex-nowrap overflow-x-auto">
 
-        <CardGraveyardBlock v-for="(card, index) in matchStore.getCardsInZoneForPlayer('graveyard', player)" :key="card" :name="card.name" :index="index" 
-            :service = "service"
-        />
+        <div v-for="(card, index) in matchStore.getCardsInZoneForPlayer('graveyard', player)" :key="card">
+            <div v-if="card.limitedSelected === true" class="pulse_animation h-[100%]">
+                <CardGraveyardBlock :name="card.name" :index="index" :service = "service"
+                />
+            </div>
+            <div v-else class="h-[100%]">
+                <CardGraveyardBlock :name="card.name" :index="index" :service = "service"
+                    @click="service.state.matches(player + 'GraveyardLimited') && limitedStore.limitedSelection(index)"
+                />
+            </div>
+        </div>
+
 
     </div>
 

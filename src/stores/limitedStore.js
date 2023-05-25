@@ -29,6 +29,8 @@ export const useLimitedStore = defineStore({
 
         mainTurn: null,
 
+        isExecuteEnabled: false,
+
         isDataLoaded: false
     }),
     actions: {
@@ -49,6 +51,12 @@ export const useLimitedStore = defineStore({
                 console.log("Card removed from limited selection: " + card);
                 this.cards.splice(this.cards.indexOf(card), 1);
                 matchStore.toggleLimitedHighlightStatusOfCards(player, zone, index);
+            }
+            if(this.cards.length == this.limit) {
+                this.isExecuteEnabled = true;
+            }
+            else {
+                this.isExecuteEnabled = false;
             }
         },
 
@@ -77,6 +85,10 @@ export const useLimitedStore = defineStore({
         executeLimitedAction(service) {
             const matchStore = useMatchStore();
             //TODO - update mana available on current turn
+            //sort cards by index (in order to keep card-index-zone consistency)
+            if(this.cards.length > 1) {
+                this.cards.sort((card1, card2) => card2.substring(card1.indexOf(" ")) - card1.substring(card1.indexOf(" ")));
+            }
             switch (this.action) {
                 case "MTH": {
                     console.log("Move cards to hand.");
@@ -91,7 +103,7 @@ export const useLimitedStore = defineStore({
                     console.log("Move cards to mana.");
                     this.cards.forEach((card) => {
                         let cardDetails = card.split(/[ ,]+/);
-                        matchStore.moveCard(cardDetails[2], cardDetails[1], "mana", cardDetails[0], false, null);
+                        matchStore.moveCard(cardDetails[2], cardDetails[1], "manaZone", cardDetails[0], false, null);
                     });
                     this.cards = [];
                     break;

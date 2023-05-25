@@ -76,7 +76,7 @@ function limitedSelection(index) {
             </div>
             <div v-else>
                 <div v-if="limited">
-                    <div v-if="card.limitedSelected == true" class="border-4 border-myLimitedGreen">
+                    <div v-if="card.limitedSelected == true" class="pulse_animation">
                         <CardImage :zoom-on-hover-activated="true" :name="card.name" container-width="100%" :rotated=card.tapped
                             @click="limitedSelection(index)"/>
                     </div>
