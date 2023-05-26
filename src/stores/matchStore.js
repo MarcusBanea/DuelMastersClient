@@ -61,6 +61,11 @@ export const useMatchStore = defineStore({
             this.currentTurnCanDrawCard = true;
             this.currentTurnDrawCardLimit = 1;
 
+            let currentPlayer = currentTurn === "player1" ? this.player2 : this.player1;
+            currentPlayer["manaZone"].forEach((card) => {
+                card.tapped = false;
+            })
+
             //untapp current turn's player's cards
             this.getCardsInZoneForPlayer("battleZone", currentTurn === "player1" ? "player2" : "player1").forEach((card) => {card.tapped = false;});
         },
@@ -87,6 +92,16 @@ export const useMatchStore = defineStore({
             service.send("HIDE_HAND");
 
             let currentPlayer = player === "player1" ? this.player1 : this.player2;
+
+            //tap used mana
+            let manaUsed = currentPlayer["hand"][index].mana;
+            currentPlayer["manaZone"].forEach((card) => {
+                if(!card.tapped && manaUsed > 0) {
+                    card.tapped = true;
+                    manaUsed--;
+                }
+            })
+
             this.currentTurnManaAvailable -= currentPlayer['hand'][index].mana;
             //deactivate card highlighted status
             currentPlayer['hand'][index].selected = false;
@@ -124,6 +139,10 @@ export const useMatchStore = defineStore({
             if(zoneFrom === "deck") {
                 const imageStore = useImageStore();
                 imageStore.addCardImage(currentPlayer[zoneFrom][index].name, currentPlayer[zoneFrom][index].image);
+            }
+            if(zoneTo === "manaZone") {
+                //TODO - check ability that makes the card be put into mana zone tapped
+                currentPlayer[zoneFrom][index].tapped = false;
             }
             currentPlayer[zoneTo].push(currentPlayer[zoneFrom][index]);
             currentPlayer[zoneFrom].splice(index, 1);

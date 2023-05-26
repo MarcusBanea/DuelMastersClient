@@ -23,7 +23,12 @@ function limitedSelection(index) {
     
     <div v-for="(card, index) in matchStore.getCardsInZoneForPlayer('manaZone', player)" :key="card" class="w-[100px] h-[100px]">
         <div v-if="!limited">
-            <CardImage :zoom-on-hover-activated="false" :name="card.name" container-width="70%" :rotated=true />
+            <div v-if="!card.tapped">
+                <CardImage :zoom-on-hover-activated="false" :name="card.name" container-width="70%" :rotated=false />
+            </div>
+            <div v-else>
+                <CardImage :zoom-on-hover-activated="false" :name="card.name" container-width="70%" :rotated=true />
+            </div>
         </div>
 
         <div v-else>
