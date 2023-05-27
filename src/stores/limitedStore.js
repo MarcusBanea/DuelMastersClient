@@ -22,6 +22,8 @@ export const useLimitedStore = defineStore({
         admissibleMinPower: null,
         admissiblePower: null,
         admissibleType: [],
+        //0 - tapped, 1 - untapped, 2 - any
+        admissibleTapped: null,
 
         admissiblePlayer: [],
         admissibleDraw: false,
@@ -171,6 +173,11 @@ export const useLimitedStore = defineStore({
             else {
                 const matchStore = useMatchStore();
                 let card = matchStore.getCardFromZone(player, zone, index);
+                //check tapped property
+                if((this.admissibleTapped == 0 && !card.tapped) || 
+                    (this.admissibleTapped == 1 && card.tapped)) {
+                    return false;
+                }
                 //check card realm
                 console.log("Admissible realms = " + this.admissibleRealm);
                 console.log("Current realm = " + card.realm.toUpperCase());

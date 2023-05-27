@@ -118,7 +118,7 @@ export const useMatchStore = defineStore({
             if(!cardIsSpeedAttacker) {
                 currentPlayer['hand'][index].tapped = true;
             }
-            
+
             this.currentTurnManaAvailable -= currentPlayer['hand'][index].mana;
             //deactivate card highlighted status
             currentPlayer['hand'][index].selected = false;
@@ -268,6 +268,7 @@ export const useMatchStore = defineStore({
                     limitedStore.admissiblePlayer.push(opponentIndicator);
                     limitedStore.admissibleZone.push("battleZone");
                     limitedStore.admissibleType.push("T0");
+                    limitedStore.admissibleTapped = 1;
                     limitedStore.limit = 1;
                     limitedStore.tempSwitchToOpponentTurn = true;
                     //limitedStore.mainTurn = player + "Turn";
