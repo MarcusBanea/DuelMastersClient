@@ -211,9 +211,19 @@ export const useLimitedStore = defineStore({
 
         chooseBlocker(service) {
             service.send("END_TURN");
-            let cardDetails = this.cards[0].split(/[ ]+/);
             let matchStore = useMatchStore();
-            matchStore.selectedCardToAttack(cardDetails[0] == "player1" ? "player2" : "player1", cardDetails[2], cardDetails[1], service, false);
+
+            let cardDetails = this.cards[0].split(/[ ]+/);
+            let currentPlayer = "";
+            if(cardDetails[0] == "player1") {
+                currentPlayer = "player2";
+                matchStore.player2["battleZone"][cardDetails[2]].tapped = true;
+            }
+            else {
+                currentPlayer = "player1";
+                matchStore.player1["battleZone"][cardDetails[2]].tapped = true;
+            }
+            matchStore.selectedCardToAttack(currentPlayer, cardDetails[2], cardDetails[1], service, false);
             this.resetAdimissibleFields();
         },
 

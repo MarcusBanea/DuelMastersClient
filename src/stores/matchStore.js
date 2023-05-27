@@ -105,6 +105,20 @@ export const useMatchStore = defineStore({
                 }
             })
 
+            //check if the placed card is a speed attacker
+            //if no, apply summoning sickness (make it tapped)
+            let cardIsSpeedAttacker = false;
+            if(currentPlayer['hand'][index].type.length > 0) {
+                currentPlayer['hand'][index].type.forEach((type) => {
+                    if(type === "SA0") {
+                        cardIsSpeedAttacker = true;
+                    }
+                })
+            }
+            if(!cardIsSpeedAttacker) {
+                currentPlayer['hand'][index].tapped = true;
+            }
+            
             this.currentTurnManaAvailable -= currentPlayer['hand'][index].mana;
             //deactivate card highlighted status
             currentPlayer['hand'][index].selected = false;
