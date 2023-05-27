@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { useMatchStore } from "./matchStore";
 import decoder from "../Decoder";
+import { isNavigationFailure } from "vue-router";
 
 export const useLimitedStore = defineStore({
     id: 'limited',
@@ -30,6 +31,7 @@ export const useLimitedStore = defineStore({
         mainTurn: null,
 
         isExecuteEnabled: false,
+        blockerSelection: false,
 
         isDataLoaded: false
     }),
@@ -191,8 +193,28 @@ export const useLimitedStore = defineStore({
                 if (this.admissiblePower !== null && this.admissiblePower !== card.power) {
                     return false;
                 }
+                if(this.admissibleType.length > 0) {
+                    let admissibleCard = false;
+                    card.type.forEach((type) => {
+                        console.log("Card type = " + type);
+                        if(this.admissibleType.includes(type)) {
+                            admissibleCard = true;
+                        }
+                    })
+                    if(admissibleCard == false) {
+                        return false;
+                    }
+                }
             }
             return true;
+        },
+
+        chooseBlocker(service) {
+            service.send("END_TURN");
+            let cardDetails = this.cards[0].split(/[ ]+/);
+            let matchStore = useMatchStore();
+            matchStore.selectedCardToAttack(cardDetails[0] == "player1" ? "player2" : "player1", cardDetails[2], cardDetails[1], service, false);
+            this.resetAdimissibleFields();
         },
 
         isSelectionComplete() {
@@ -216,6 +238,7 @@ export const useLimitedStore = defineStore({
             this.admissibleDraw = false;
 
             this.tempSwitchToOpponentTurn = false;
+            this.blockerSelection = false;
         }
     }
 });

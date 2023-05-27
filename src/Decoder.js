@@ -33,6 +33,7 @@ var decoder = {
             }
 
             //simple moving ability, no user action needed
+            //TODO - should be removed
             if(step.startsWith("MT")) {
                 switch(step) {
                     case "MTM" : {
@@ -370,7 +371,7 @@ var decoder = {
                         matchStore.getCardsInZoneForPlayer(zone, player).forEach((card) => {
                             if(limitedStore.admissibleRealm.length > 0) {
                                 limitedStore.admissibleRealm.forEach((realm) => {
-                                    if(realm === card.getRealm()) {
+                                    if(realm === card.realm) {
                                         admissibleCardsCounter++;
                                     }
                                 })

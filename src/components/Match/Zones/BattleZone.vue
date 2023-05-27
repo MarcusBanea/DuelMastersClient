@@ -35,7 +35,7 @@ function selectCardForAttack(index) {
 //when the opponent is attacking, notify the match interface which card was selected
 function opponentSelectCard(index) {
     console.log("Service = " + props.service);
-    matchStore.selectedCardToAttack(props.player === 'player1' ? 'player2' : 'player1', index, "battleZone", props.service); 
+    matchStore.selectedCardToAttack(props.player === 'player1' ? 'player2' : 'player1', index, "battleZone", props.service, true); 
 }
 
 function selectedCardForCommandExecution(index, zone) {
