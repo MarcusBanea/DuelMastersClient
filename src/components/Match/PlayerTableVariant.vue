@@ -102,9 +102,15 @@ const limited_turn_button_style = computed(() => {
         EXECUTE
     </button>
 
-    <button v-if="service.state.matches(player + 'TurnLimited') && limitedStore.isExecuteEnabled && limitedStore.blockerSelection" :class = end_turn_button_style 
+    <button v-if="service.state.matches(player + 'TurnLimited') && limitedStore.blockerSelection" :class = end_turn_button_style 
         @click="limitedStore.chooseBlocker(service) ">
-        CHOOSE
+        <p v-if="limitedStore.isExecuteEnabled">
+            CHOOSE
+        </p>
+        <p v-else>
+            NO BLOCK
+        </p>
+       
     </button>
 
 </template>

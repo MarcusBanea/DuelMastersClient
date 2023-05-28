@@ -18,6 +18,7 @@ export const useMatchStore = defineStore({
 
         cardForAttack: null,
         cardToAttack: null,
+        cardToAttackZone: null,
 
         gamelog: [],
 
@@ -239,11 +240,10 @@ export const useMatchStore = defineStore({
             }
         },
 
-        async selectedCardToAttack(player, index, zone, service, checkForBlocker) {
-
-            this.cardToAttack = index;
+        async selectedCardToAttack(player, index, zone, service, checkForBlocker, useLastCardSelected) {
 
             if (checkForBlocker) {
+                this.cardToAttack = index;
                 //check if opponent has an untapped blocker
                 let opponentHasBlocker = false;
                 let opponentBattleZoneCards = player == "player1" ? this.player2["battleZone"] : this.player1["battleZone"];
@@ -254,6 +254,8 @@ export const useMatchStore = defineStore({
                 })
 
                 if (opponentHasBlocker) {
+                    //save selected card zone
+                    this.cardToAttackZone = zone;
 
                     //reset highlight attribute of opponent's cards
                     opponentBattleZoneCards.forEach((card) => card.selected = false);
@@ -281,7 +283,10 @@ export const useMatchStore = defineStore({
                 }
             }
             else {
-                this.attack(player, zone, service);
+                if(!useLastCardSelected) {
+                    this.cardToAttack = index;
+                }
+                this.attack(player, this.cardToAttackZone, service);
             }
 
         },

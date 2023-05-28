@@ -20,7 +20,7 @@ function limitedSelection(index) {
 //when the opponent is attacking, notify the match interface which card was selected
 function opponentSelectCard(index) {
     console.log("Service = " + props.service);
-    matchStore.selectedCardToAttack(props.player === 'player1' ? 'player2' : 'player1', index, "shields", props.service, true); 
+    matchStore.selectedCardToAttack(props.player === 'player1' ? 'player2' : 'player1', index, "shields", props.service, true, false); 
 }
 
 </script>

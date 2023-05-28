@@ -232,17 +232,28 @@ export const useLimitedStore = defineStore({
             service.send("END_TURN");
             let matchStore = useMatchStore();
 
-            let cardDetails = this.cards[0].split(/[ ]+/);
-            let currentPlayer = "";
-            if(cardDetails[0] == "player1") {
-                currentPlayer = "player2";
-                matchStore.player2["battleZone"][cardDetails[2]].tapped = true;
+            //no blocker chosen, so the attack is not blocked
+            if (this.cards.length > 0) {
+                let cardDetails = this.cards[0].split(/[ ]+/);
+                let currentPlayer = "";
+                if (cardDetails[0] == "player1") {
+                    currentPlayer = "player2";
+                    matchStore.player1["battleZone"][cardDetails[2]].tapped = true;
+                }
+                else {
+                    currentPlayer = "player1";
+                    matchStore.player2["battleZone"][cardDetails[2]].tapped = true;
+                }
+                console.log("Player = " + currentPlayer);
+                console.log("Index = " + cardDetails[2]);
+                console.log("Zone = " + cardDetails[1]);
+                matchStore.cardToAttackZone = "battleZone";
+                matchStore.selectedCardToAttack(currentPlayer, cardDetails[2], cardDetails[1], service, false, false);
             }
             else {
-                currentPlayer = "player1";
-                matchStore.player1["battleZone"][cardDetails[2]].tapped = true;
+                matchStore.selectedCardToAttack(service.state.matches("player1TurnLimited") ? "player1" : "player2", null, null, service, false, true);
             }
-            matchStore.selectedCardToAttack(currentPlayer, cardDetails[2], cardDetails[1], service, false);
+            
             this.resetAdimissibleFields();
         },
 
