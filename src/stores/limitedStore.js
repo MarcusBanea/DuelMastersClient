@@ -75,11 +75,16 @@ export const useLimitedStore = defineStore({
                 this.abilities = this.abilities.slice(1, this.abilities.length);
             }
             let playerForWhichTheAbilityWasActivated = abilityPart.split(/[#]+/)[0];
+            console.log(playerForWhichTheAbilityWasActivated + " will execute ability!");
+            console.log("Current turn is " + service.state.value);
             //TODO - check current state
-            if (service.state.matches(playerForWhichTheAbilityWasActivated + "Turn")) {
+            if(service.state.matches(playerForWhichTheAbilityWasActivated + "TurnLimited")) {
+                //nothing to do
+            }
+            else if (service.state.matches(playerForWhichTheAbilityWasActivated + "Turn")) {
                 service.send('YOUR_TURN_LIMITED');
             }
-            else {
+            else  {
                 service.send('OPP_TURN_LIMITED');
             }
             decoder.decodeAbility(abilityPart.split(/[#]+/)[1], service);
@@ -89,9 +94,12 @@ export const useLimitedStore = defineStore({
             const matchStore = useMatchStore();
             //TODO - update mana available on current turn
             //sort cards by index (in order to keep card-index-zone consistency)
+            console.log("Before sort = " + this.cards);
             if(this.cards.length > 1) {
-                this.cards.sort((card1, card2) => card2.substring(card1.indexOf(" ")) - card1.substring(card1.indexOf(" ")));
+                this.cards.sort();
             }
+            this.cards.reverse();
+            console.log("After sort = " + this.cards);
             switch (this.action) {
                 case "MTH": {
                     console.log("Move cards to hand.");
@@ -141,6 +149,10 @@ export const useLimitedStore = defineStore({
             }
 
             this.resetAdimissibleFields();
+            this.checkForAbilitiesLeftToExecute(service);
+        },
+
+        checkForAbilitiesLeftToExecute(service) {
             //check if there are more abilities in the ability queue
             if(this.abilities.length > 0) {
                 console.log("There are more abilities left to execute! There are : " + this.abilities.length + " left!");

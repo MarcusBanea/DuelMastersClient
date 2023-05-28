@@ -43,9 +43,11 @@ var decoder = {
                 }
             }
             else if (step.startsWith("DRAW")) {
-                limitedStore.admissibleDraw = true;
-                limitedStore.limit = step[5];
-                //TODO - decrement the limit number after each "Draw Card" click
+                let player = service.state.matches("player1TurnLimited") ? "player1" : "player2";
+                for(let i = 0; i < step.substring(5); i++) {
+                    matchStore.drawCard(player);
+                }
+                limitedStore.checkForAbilitiesLeftToExecute(service);
             }
             //no user action needed, so entering the limited state is not necessary
             else if (step.startsWith("GET")) {
@@ -238,23 +240,7 @@ var decoder = {
                     }
                 }
                 limitedStore.resetAdimissibleFields();
-                //check if there are more abilities in the ability queue
-                if (limitedStore.abilities.length > 0) {
-                    limitedStore.sendAbilityToDecodeFromQueueOfAbilities(service);
-                }
-                else {
-                    //return to the last main-turn state
-                    console.log("MainTurn = " + limitedStore.mainTurn);
-                    if((limitedStore.mainTurn === "player1Turn" && service.state.matches("player1TurnLimited")) ||
-                        (limitedStore.mainTurn === "player2Turn" && service.state.matches("player2TurnLimited"))) 
-                    {
-                        service.send("YOUR_TURN");
-                    }
-                    else if((limitedStore.mainTurn === "player1Turn" && service.state.matches("player2TurnLimited")) ||
-                        (limitedStore.mainTurn === "player2Turn" && service.state.matches("player1TurnLimited"))) {
-                        service.send("OPP_TURN");
-                    }
-                }
+                limitedStore.checkForAbilitiesLeftToExecute(service);
 
             }
             //counter filter, the result number will be used for drawing an amount of cards / selecting cards for another ability
@@ -371,7 +357,7 @@ var decoder = {
                         matchStore.getCardsInZoneForPlayer(zone, player).forEach((card) => {
                             if(limitedStore.admissibleRealm.length > 0) {
                                 limitedStore.admissibleRealm.forEach((realm) => {
-                                    if(realm === card.realm) {
+                                    if(realm === card.realm.toUpperCase()) {
                                         admissibleCardsCounter++;
                                     }
                                 })
@@ -379,7 +365,7 @@ var decoder = {
                             }
                             if(limitedStore.admissibleClass.length > 0) {
                                 limitedStore.admissibleClass.forEach((clas) => {
-                                    if(clas === card.getCardClass()) {
+                                    if(clas === card.getCardClass().toUpperCase()) {
                                         admissibleCardsCounter++;
                                     }
                                 })

@@ -30,9 +30,9 @@ const props = defineProps({
 
     </div>
 
-    <div v-else-if="state.matches(player + 'TurnLimited') && limitedStore.admissibleDraw === true && limitedStore.limit > 0" 
+    <div v-else-if="state.matches(player + 'TurnLimited') && limitedStore.admissibleDraw == true && limitedStore.limit > 0" 
         class="w-[40%] h-[90%] border-2 border-myBeige m-auto grid cursor-pointer pulse_animation"
-        @click="state.matches(player + 'Turn') ? (matchStore.drawCard(player) && limitedStore.limit--) : null">
+        @click="matchStore.drawCard(player) && limitedStore.limit--">
 
         <div class="grid">
             <img src="../../../assets/Shield.jpg" class="h-28 relative m-auto opacity-30"/>
