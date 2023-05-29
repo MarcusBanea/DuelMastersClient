@@ -29,6 +29,10 @@ function goToMatch() {
     router.push("/match");
 }
 
+function goToMatchAI() {
+    router.push("/matchAI");
+}
+
 </script>
 
 
@@ -77,7 +81,7 @@ function goToMatch() {
         <div class="grid place-items-center">
             <img src="../assets/avatar.jpg" class="absolute w-[5%] rounded-full border-4" :title="nickname" />
         </div>
-        <div>
+        <div class="w-[100%]">
             <p class="float-left min-w-min">
                 {{ userStore.money }}
             </p>
@@ -101,7 +105,7 @@ function goToMatch() {
 
             <p class="min-w-min p-2 transition duration-1000 ease-in-out
                 hover:scale-110 hover:bg-myLightGray hover:text-myBlack text-myLightGray cursor-pointer rounded"
-                @click="goToMatch()">
+                @click="goToMatchAI()">
                 AI MATCH
             </p>
         </div>

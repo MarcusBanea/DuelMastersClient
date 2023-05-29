@@ -6,9 +6,10 @@ import matchMachine from '../machines/matchMachine';
 import { useMachine } from '@xstate/vue';
 import { watch } from "vue";
 import PlayerTable from "../components/Match/PlayerTable.vue";
+import AITable from "../components/Match/AITable.vue";
 
 const matchStore = useMatchStore();
-matchStore.init(false);
+matchStore.init(true);
 
 const {state, send, service} = useMachine(matchMachine);
 
@@ -22,7 +23,7 @@ const isGameLogOpen = ref(false)
     <div v-if="matchStore.isDataLoaded" id="page" class="bg-myLightBlue w-screen h-[90%] grid grid-rows-[47%_5%_47%]">
 
         <div id="opponent_container" class="w-full">
-            <PlayerTable player = "player2" :state = state :send = send :service = service />
+            <AITable player = "player2" :state = state :send = send :service = service />
         </div>
 
         <div id="turn_indicator_container">
@@ -55,10 +56,3 @@ const isGameLogOpen = ref(false)
 
   </div>
 </template>
-
-
-
-
-<style scoped>
-
-</style>

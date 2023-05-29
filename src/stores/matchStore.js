@@ -22,15 +22,25 @@ export const useMatchStore = defineStore({
 
         gamelog: [],
 
-        isDataLoaded: false
+        isDataLoaded: false,
+
+        usingAI: null
     }),
     actions: {
-        async init() {
+        async init(usingAI) {
+            this.usingAI = usingAI;
             const userId = "633f18459af2fa78268b91d4";
             //get players details
-            const responsePlayers = await fetch("/api/game/initialize/" + userId + "/" + userId);
-            const players = await responsePlayers.json();
-
+            let players = null;
+            if(usingAI) {
+                const responsePlayers = await fetch("/api/game/initializeMatchVsAI/" + userId);
+                players = await responsePlayers.json();
+            }
+            else {
+                const responsePlayers = await fetch("/api/game/initialize/" + userId + "/" + userId);
+                players = await responsePlayers.json();
+            }
+            
             this.player1 = players[0];
             this.player2 = players[1];
 
@@ -43,7 +53,33 @@ export const useMatchStore = defineStore({
             this.isDataLoaded = true;
         },
 
+        async newAITurn() {
+            const responseAIMove = await fetch("/api/game/getAIMove");
+            const aiMoves = await responseAIMove.json();
+
+            aiMoves.forEach((move) => {
+                //get cards
+                if (move.cards !== null) {
+                    console.log("Move cards = " + move.cards);
+                    move.cards.forEach((card) => {
+                        let cardDetails = card.split(/[ ]+/);
+                        console.log("Player = " + cardDetails[0]);
+                        console.log("ZoneFrom = " + cardDetails[1]);
+                        console.log("ZoneTo = " + cardDetails[2]);
+                        console.log("Index = " + cardDetails[3]);
+                        if(cardDetails[2] == "battleZone") {
+                            this.applyGameEffectOnMoveCardFromHandToBattleZone(this.getCurrentPlayer(cardDetails[0]), cardDetails[3]);
+                        }
+                        this.moveCard(cardDetails[3], cardDetails[1], cardDetails[2], cardDetails[0], false, null);
+                    })
+                }
+            })
+
+            console.log(aiMoves);
+        },
+
         initCardStoreWithDisplayedCards() {
+            console.log("WOW");
             const imageStore = useImageStore();
             let zones = ["battleZone", "manaZone", "hand", "graveyard"];
             zones.forEach((zone) => {
@@ -70,18 +106,18 @@ export const useMatchStore = defineStore({
                 })
             }
 
-            //untapp current turn's player's cards
+            //untap current turn's player's cards
             this.getCardsInZoneForPlayer("battleZone", currentTurn === "player1" ? "player2" : "player1").forEach((card) => { card.tapped = false; });
         },
 
         getCardsInZoneForPlayer(zone, player) {
             //console.log("Get cards in zone [" + zone + "] for player [" + player + "]");
-            let currentPlayer = player === "player1" ? this.player1 : this.player2;
+            let currentPlayer = this.getCurrentPlayer(player);
             return currentPlayer[zone];
         },
 
         getCardsInZoneForPlayerWithIndex(zone, player) {
-            let currentPlayer = player === "player1" ? this.player1 : this.player2;
+            let currentPlayer = this.getCurrentPlayer(player);
             let cards = currentPlayer[zone];
             let returnedCards = [];
             cards.forEach((card) => {
@@ -95,8 +131,20 @@ export const useMatchStore = defineStore({
             //TODO - "state" object is obsolete, as we can access the state through the "service" object
             service.send("HIDE_HAND");
 
-            let currentPlayer = player === "player1" ? this.player1 : this.player2;
+            let currentPlayer = this.getCurrentPlayer(player);
 
+            this.applyGameEffectOnMoveCardFromHandToBattleZone(currentPlayer);
+            //deactivate card highlighted status
+            currentPlayer['hand'][index].selected = false;
+
+            this.addMomentToGamelog(player + " moved card \'" + this.getCardFromZone(player, 'hand', index).name + "\' to battle zone.");
+
+            this.moveCard(index, "hand", "battleZone", player, true, service);
+
+            //this.basicMove(index, "MoveToBattleZone", player);
+        },
+
+        applyGameEffectOnMoveCardFromHandToBattleZone(currentPlayer, index) {
             //tap used mana
             let manaUsed = currentPlayer["hand"][index].mana;
             currentPlayer["manaZone"].forEach((card) => {
@@ -121,14 +169,6 @@ export const useMatchStore = defineStore({
             }
 
             this.currentTurnManaAvailable -= currentPlayer['hand'][index].mana;
-            //deactivate card highlighted status
-            currentPlayer['hand'][index].selected = false;
-
-            this.addMomentToGamelog(player + " moved card \'" + this.getCardFromZone(player, 'hand', index).name + "\' to battle zone.");
-
-            this.moveCard(index, "hand", "battleZone", player, true, service);
-
-            //this.basicMove(index, "MoveToBattleZone", player);
         },
 
         sendCardFromHandToMana(index, player, service) {
@@ -153,7 +193,7 @@ export const useMatchStore = defineStore({
         },
 
         async moveCard(index, zoneFrom, zoneTo, player, informServer, service) {
-            let currentPlayer = player === "player1" ? this.player1 : this.player2;
+            let currentPlayer = this.getCurrentPlayer(player);
             if (zoneFrom === "deck") {
                 const imageStore = useImageStore();
                 imageStore.addCardImage(currentPlayer[zoneFrom][index].name, currentPlayer[zoneFrom][index].image);
@@ -435,6 +475,11 @@ export const useMatchStore = defineStore({
 
         addMomentToGamelog(moment) {
             this.gamelog.push(utils.getCurrentTime() + "  -  " + moment);
+        },
+
+        //TODO - not current player, but cards of used player in this context
+        getCurrentPlayer(player) {
+            return player === "player1" ? this.player1 : this.player2;
         }
     }
 })

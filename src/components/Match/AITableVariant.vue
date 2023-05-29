@@ -6,7 +6,6 @@ import Mana from './Zones/Mana.vue';
 import Shields from './Zones/Shields.vue';
 import Deck from './Zones/Deck.vue';
 import Graveyard from './Zones/Graveyard.vue';
-import { useMatchStore } from '../../stores/matchStore';
 
 
 const props = defineProps({
@@ -54,14 +53,6 @@ const limited_turn_button_style = computed(() => {
     return style;
 });
 
-function endTurn() {
-    let matchStore = useMatchStore();
-    if(matchStore.usingAI == true) {
-        matchStore.newAITurn();
-    }
-    props.service.send('END_TURN');
-}
-
 </script>
 
 
@@ -94,7 +85,7 @@ function endTurn() {
         HAND
     </button>
 
-    <button v-if="service.state.matches(player + 'Turn')" :class = end_turn_button_style @click="endTurn()">
+    <button v-if="service.state.matches(player + 'Turn')" :class = end_turn_button_style @click="send('END_TURN')">
         END TURN
     </button>
 
