@@ -33,12 +33,20 @@ function limitedSelection(index) {
 
         <div v-else>
             <div v-if="card.limitedSelected == true" class="pulse_animation">
-                <CardImage :zoom-on-hover-activated="false" :name="card.name" container-width="70%" :rotated=true
-                    @click="limitedSelection(index)"/>
+                <div v-if="!card.tapped">
+                    <CardImage :zoom-on-hover-activated="false" :name="card.name" container-width="70%" :rotated=false @click="limitedSelection(index)"/>
+                </div>
+                <div v-else>
+                    <CardImage :zoom-on-hover-activated="false" :name="card.name" container-width="70%" :rotated=true @click="limitedSelection(index)"/>
+                </div>
             </div>
             <div v-else>
-                <CardImage :zoom-on-hover-activated="false" :name="card.name" container-width="70%" :rotated=true
-                    @click="limitedSelection(index)"/>
+                <div v-if="!card.tapped">
+                    <CardImage :zoom-on-hover-activated="false" :name="card.name" container-width="70%" :rotated=false @click="limitedSelection(index)"/>
+                </div>
+                <div v-else>
+                    <CardImage :zoom-on-hover-activated="false" :name="card.name" container-width="70%" :rotated=true @click="limitedSelection(index)"/>
+                </div>
             </div>
         </div>
     </div>
