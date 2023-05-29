@@ -85,7 +85,7 @@ export const useMatchStore = defineStore({
             let cards = currentPlayer[zone];
             let returnedCards = [];
             cards.forEach((card) => {
-                returnedCards.push(player + "_" + zone + "_" + cards.indexOf(card));
+                returnedCards.push(player + " " + zone + " " + cards.indexOf(card));
             });
             return returnedCards;
         },

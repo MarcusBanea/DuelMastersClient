@@ -100,7 +100,7 @@ var decoder = {
                         let realms = mainPart[3].split(/[/]+/);
                         //get all cards with this realm
                         cardsInZones.forEach((card) => {
-                            let cardDetails = card.split(/[_]+/);
+                            let cardDetails = card.split(/[ ]+/);
                             if (!realms.includes(matchStore.getCardFromZone(cardDetails[0], cardDetails[1], cardDetails[2]).realm)) {
                                 cardsInZones.splice(cardsInZones.indexOf(card), 1);
                             }
@@ -112,7 +112,7 @@ var decoder = {
                         let classes = mainPart[3].split(/[-]+/);
                         //get all cards with this class
                         cardsInZones.forEach((card) => {
-                            let cardDetails = card.split(/[_]+/);
+                            let cardDetails = card.split(/[ ]+/);
                             if (!classes.includes(matchStore.getCardFromZone(cardDetails[0], cardDetails[1], cardDetails[2]).cardClass)) {
                                 cardsInZones.splice(cardsInZones.indexOf(card), 1);
                             }
@@ -128,7 +128,7 @@ var decoder = {
                         }
                         //get all cards with this power level lower than this
                         cardsInZones.forEach((card) => {
-                            let cardDetails = card.split(/[_]+/);
+                            let cardDetails = card.split(/[ ]+/);
                             if (matchStore.getCardFromZone(cardDetails[0], cardDetails[1], cardDetails[2]).power >= mainPart[3]) {
                                 cardsInZones.splice(cardsInZones.indexOf(card), 1);
                             }
@@ -144,7 +144,7 @@ var decoder = {
                         }
                         //get all cards with this power level higher than this
                         cardsInZones.forEach((card) => {
-                            let cardDetails = card.split(/[_]+/);
+                            let cardDetails = card.split(/[ ]+/);
                             if (matchStore.getCardFromZone(cardDetails[0], cardDetails[1], cardDetails[2]).power <= mainPart[3]) {
                                 cardsInZones.splice(cardsInZones.indexOf(card), 1);
                             }
@@ -160,7 +160,7 @@ var decoder = {
                         }
                         //get all cards with this same power level as this
                         cardsInZones.forEach((card) => {
-                            let cardDetails = card.split(/[_]+/);
+                            let cardDetails = card.split(/[ ]+/);
                             if (matchStore.getCardFromZone(cardDetails[0], cardDetails[1], cardDetails[2]).power !== mainPart[3]) {
                                 cardsInZones.splice(cardsInZones.indexOf(card), 1);
                             }
@@ -205,7 +205,7 @@ var decoder = {
                     case "DES": {
                         //move to graveyard
                         cardsInZones.forEach((card) => {
-                            let cardDetails = card.split(/[_]+/);
+                            let cardDetails = card.split(/[ ]+/);
                             //inform server should be true
                             matchStore.moveCard(cardDetails[2], cardDetails[1], "graveyard", cardDetails[0], false, service);
                         })
@@ -214,7 +214,7 @@ var decoder = {
                     case "MTH": {
                         //move to hand
                         cardsInZones.forEach((card) => {
-                            let cardDetails = card.split(/[_]+/);
+                            let cardDetails = card.split(/[ ]+/);
                             //inform server should be true
                             matchStore.moveCard(cardDetails[2], cardDetails[1], "hand", cardDetails[0], false, service);
                         })
@@ -223,7 +223,7 @@ var decoder = {
                     case "MTM": {
                         //move to mana
                         cardsInZones.forEach((card) => {
-                            let cardDetails = card.split(/[_]+/);
+                            let cardDetails = card.split(/[ ]+/);
                             //inform server should be true
                             matchStore.moveCard(cardDetails[2], cardDetails[1], "mana", cardDetails[0], false, service);
                         })
@@ -232,13 +232,18 @@ var decoder = {
                     case "MTS": {
                         //move to shields
                         cardsInZones.forEach((card) => {
-                            let cardDetails = card.split(/[_]+/);
+                            let cardDetails = card.split(/[ ]+/);
                             //inform server should be true
                             matchStore.moveCard(cardDetails[2], cardDetails[1], "shields", cardDetails[0], false, service);
                         })
                         break;
                     }
                 }
+                //inform server
+                limitedStore.cards = cardsInZones;
+                limitedStore.action = secondPart;
+                limitedStore.informServerOfAbilityExecution();
+
                 limitedStore.resetAdimissibleFields();
                 limitedStore.checkForAbilitiesLeftToExecute(service);
 

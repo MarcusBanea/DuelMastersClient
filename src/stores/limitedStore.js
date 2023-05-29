@@ -107,7 +107,6 @@ export const useLimitedStore = defineStore({
                         let cardDetails = card.split(/[ ,]+/);
                         matchStore.moveCard(cardDetails[2], cardDetails[1], "hand", cardDetails[0], false, null);
                     });
-                    this.cards = [];
                     break;
                 }
                 case "MTM": {
@@ -116,7 +115,6 @@ export const useLimitedStore = defineStore({
                         let cardDetails = card.split(/[ ,]+/);
                         matchStore.moveCard(cardDetails[2], cardDetails[1], "manaZone", cardDetails[0], false, null);
                     });
-                    this.cards = [];
                     break;
                 }
                 case "MTB": {
@@ -125,7 +123,6 @@ export const useLimitedStore = defineStore({
                         let cardDetails = card.split(/[ ,]+/);
                         matchStore.moveCard(cardDetails[2], cardDetails[1], "battleZone", cardDetails[0], false, null);
                     });
-                    this.cards = [];
                     break;
                 }
                 case "DES": {
@@ -134,7 +131,6 @@ export const useLimitedStore = defineStore({
                         let cardDetails = card.split(/[ ,]+/);
                         matchStore.moveCard(cardDetails[2], cardDetails[1], "graveyard", cardDetails[0], false, null);
                     });
-                    this.cards = [];
                     break;
                 }
                 case "TAP": {
@@ -142,12 +138,11 @@ export const useLimitedStore = defineStore({
                         let cardDetails = card.split(/[ ,]+/);
                         matchStore.getCardFromZone(cardDetails[0], cardDetails[1], cardDetails[2]).tapped = true;
                     });
-                    this.cards = [];
                     console.log("Card was tapped.");
                     break;
                 }
             }
-
+            this.informServerOfAbilityExecution();
             this.resetAdimissibleFields();
             this.checkForAbilitiesLeftToExecute(service);
         },
@@ -193,7 +188,7 @@ export const useLimitedStore = defineStore({
                 //check card realm
                 console.log("Admissible realms = " + this.admissibleRealm);
                 console.log("Current realm = " + card.realm.toUpperCase());
-                if (this.admissibleRealm.length > 0 && !this.admissibleRealm.includes(card.cardRealm.toUpperCase())) {
+                if (this.admissibleRealm.length > 0 && !this.admissibleRealm.includes(card.realm.toUpperCase())) {
                     return false;
                 }
                 //check card class
@@ -255,6 +250,12 @@ export const useLimitedStore = defineStore({
             }
             
             this.resetAdimissibleFields();
+        },
+
+        async informServerOfAbilityExecution() {
+            console.log("Cards = " + this.cards);
+            console.log("Action = " + this.action);
+            await fetch("/api/game/informServer/" + this.cards + "/" + this.action);
         },
 
         isSelectionComplete() {
