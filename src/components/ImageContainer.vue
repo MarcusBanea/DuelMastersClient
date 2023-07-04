@@ -9,7 +9,9 @@ const props = defineProps({
     imageBorderRadius: String,
 
     flipAnimationOn: Boolean,
-    cardRarity: String
+    cardRarity: String,
+
+    isPack: Boolean
 });
 
 const cssProps = computed(() => {
@@ -45,7 +47,6 @@ function getImage() {
 }
 
 
-
 const clicked = ref(false);
 
 </script>
@@ -61,12 +62,24 @@ const clicked = ref(false);
                 @click="clicked = true" />
             <img v-else-if="props.cardRarity === 'Rare' && clicked === false" src="../assets/rare-card.png"
                 @click="clicked = true" />
-            <img v-else-if="props.cardRarity === 'VeryRare' && clicked === false" src="../assets/very-rare-card.png"
+            <img v-else-if="props.cardRarity === 'Very Rare' && clicked === false" src="../assets/very-rare-card.png"
                 @click="clicked = true" />
-            <img v-else-if="props.cardRarity === 'SuperRare' && clicked === false" src="../assets/super-rare-card.png"
+            <img v-else-if="props.cardRarity === 'Super Rare' && clicked === false" src="../assets/super-rare-card.png"
                 @click="clicked = true" />
             <img v-else-if="props.cardRarity === 'Legendary' && clicked === false" src="../assets/legendary-card.png"
                 @click="clicked = true" />
+        </div>
+        <div v-else-if="isPack">
+            <img v-if="props.imageUrl === 'Bronze Pack'" src="../assets/Bronze Pack.png"/>
+            <img v-else-if="props.imageUrl === 'Bronze Premium Pack'" src="../assets/Bronze Premium Pack.png"/>
+            <img v-else-if="props.imageUrl === 'Silver Pack'" src="../assets/Silver Pack.png"/>
+            <img v-else-if="props.imageUrl === 'Silver Premium Pack'" src="../assets/Silver Premium Pack.png" />
+            <img v-else-if="props.imageUrl === 'Gold Pack'" src="../assets/Gold Pack.png"/>
+            <img v-else-if="props.imageUrl === 'Gold Premium Pack'" src="../assets/Gold Premium Pack.png"/>
+            <img v-else-if="props.imageUrl === 'Platinum Pack'" src="../assets/Platinum Pack.png"/>
+            <img v-else-if="props.imageUrl === 'Ruby Pack'" src="../assets/Ruby Pack.png"/>
+            <img v-else-if="props.imageUrl === 'Diamond Pack'" src="../assets/Diamond Pack.png"/>
+            <img v-else-if="props.imageUrl === 'Shogu Pack'" src="../assets/Shogu Pack.png"/>
         </div>
         <div v-else>
             <img :src="getImage()" />

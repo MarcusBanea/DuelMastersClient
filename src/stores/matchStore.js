@@ -53,7 +53,7 @@ export const useMatchStore = defineStore({
             this.isDataLoaded = true;
         },
 
-        async newAITurn() {
+        async newAITurn(service) {
             const responseAIMove = await fetch("/api/game/getAIMove");
             const aiMoves = await responseAIMove.json();
 
@@ -63,10 +63,10 @@ export const useMatchStore = defineStore({
                     console.log("Move cards = " + move.cards);
                     move.cards.forEach((card) => {
                         let cardDetails = card.split(/[ ]+/);
-                        console.log("Player = " + cardDetails[0]);
-                        console.log("ZoneFrom = " + cardDetails[1]);
-                        console.log("ZoneTo = " + cardDetails[2]);
-                        console.log("Index = " + cardDetails[3]);
+                        // console.log("Player = " + cardDetails[0]);
+                        // console.log("ZoneFrom = " + cardDetails[1]);
+                        // console.log("ZoneTo = " + cardDetails[2]);
+                        // console.log("Index = " + cardDetails[3]);
                         if(cardDetails[2] == "battleZone") {
                             this.applyGameEffectOnMoveCardFromHandToBattleZone(this.getCurrentPlayer(cardDetails[0]), cardDetails[3]);
                         }
@@ -76,12 +76,13 @@ export const useMatchStore = defineStore({
             })
 
             console.log(aiMoves);
+            service.send("END_TURN");
         },
 
         initCardStoreWithDisplayedCards() {
             console.log("WOW");
             const imageStore = useImageStore();
-            let zones = ["battleZone", "manaZone", "hand", "graveyard"];
+            let zones = ["battleZone", "manaZone", "hand", "graveyard", "shields"];
             zones.forEach((zone) => {
                 this.player1[zone].forEach((card) => {
                     imageStore.addCardImage(card.name, card.image);
@@ -133,7 +134,7 @@ export const useMatchStore = defineStore({
 
             let currentPlayer = this.getCurrentPlayer(player);
 
-            this.applyGameEffectOnMoveCardFromHandToBattleZone(currentPlayer);
+            this.applyGameEffectOnMoveCardFromHandToBattleZone(currentPlayer, index);
             //deactivate card highlighted status
             currentPlayer['hand'][index].selected = false;
 
@@ -173,22 +174,15 @@ export const useMatchStore = defineStore({
 
         sendCardFromHandToMana(index, player, service) {
             service.send("HIDE_HAND");
-
             this.currentTurnManaAvailable++;
             this.currentTurnCanSendToMana = false;
-
             this.addMomentToGamelog(player + " added card \'" + this.getCardFromZone(player, 'hand', index).name + "\' to mana.");
-
             this.moveCard(index, "hand", "manaZone", player, true, null);
-
-            //this.basicMove(index, "MoveToMana", player);
         },
 
         drawCard(player) {
             this.currentTurnCanDrawCard = false;
             this.moveCard(0, "deck", "hand", player, true, null);
-            //this.basicMove(null, "DrawCard", player);
-
             this.addMomentToGamelog(player + " draws a card.");
         },
 
@@ -439,7 +433,6 @@ export const useMatchStore = defineStore({
 
             //get possible ability activation
             let ability = aftermath.triggeredAbilities;
-            console.log("Ability = " + ability);
             if (ability !== undefined && ability.length > 0) {
                 this.decodeAbilityEnterLimitedState(service, ability);
             }

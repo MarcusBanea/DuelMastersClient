@@ -17,21 +17,15 @@ function goToAllCards() {
     router.push("/cardCollection");
 }
 
-function goToShop() {
-    router.push("/packs");
-}
-
 function goToCombineCards() {
     router.push("/combineCards");
 }
 
-function goToMatch() {
-    router.push("/match");
-}
+function goToShop() { router.push("/packs"); }
 
-function goToMatchAI() {
-    router.push("/matchAI");
-}
+function goToMatch() { router.push("/match"); }
+
+function goToMatchAI() { router.push("/matchAI"); }
 
 </script>
 

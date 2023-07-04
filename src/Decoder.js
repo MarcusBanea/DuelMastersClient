@@ -425,8 +425,6 @@ var decoder = {
         })
     },
 
-
-
     getZoneFullName(encodedZone) {
         switch (encodedZone) {
             case "MN": {

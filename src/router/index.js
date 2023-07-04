@@ -10,10 +10,16 @@ import { useUserStore } from "../stores/userStore";
 import { ref } from "vue";
 import { useImageStore } from "../stores/imageStore";
 import MatchViewAI from "../views/MatchViewAI.vue";
+import Home from "../views/Home.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes: [
+        {
+            path: "/",
+            name: "",
+            component: Home
+        },
         {
             path: "/addCard",
             name: "addCard",

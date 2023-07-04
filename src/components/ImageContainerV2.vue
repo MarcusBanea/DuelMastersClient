@@ -45,18 +45,15 @@ const imageSrc = computed(() => {
     else {
         imgBlob = new Blob([_base64ToArrayBuffer(props.image)]);
     }
-    let urlCreator = URL;
-    let imgUrl = urlCreator.createObjectURL(imgBlob);
-    return imgUrl;
+    return URL.createObjectURL(imgBlob);
 });
-
-const clicked = ref(false);
 
 </script>
     
     
 <template>
-    <div v-if="zoomOnHoverActivated" :style="cssProps" class="image-container m-auto hover:scale-[3] hover:delay-500 duration-300 hover:border-2 hover:border-myBeige">
+    <div v-if="zoomOnHoverActivated" :style="cssProps" class="image-container m-auto hover:scale-[3] 
+        hover:delay-500 duration-300 hover:border-2 hover:border-myBeige">
         <img :src="imageSrc" />
     </div>
     <div v-else :style="cssProps" class="image-container m-auto">

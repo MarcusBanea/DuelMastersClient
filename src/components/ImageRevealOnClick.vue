@@ -62,9 +62,9 @@ const clicked = ref(false);
             @click="clicked = true" />
         <img v-else-if="image.rarity === 'Rare' && clicked === false" src="../assets/rare-card.png"
             @click="clicked = true" />
-        <img v-else-if="image.rarity === 'VeryRare' && clicked === false" src="../assets/very-rare-card.png"
+        <img v-else-if="image.rarity === 'Very Rare' && clicked === false" src="../assets/very-rare-card.png"
             @click="clicked = true" />
-        <img v-else-if="image.rarity === 'SuperRare' && clicked === false" src="../assets/super-rare-card.png"
+        <img v-else-if="image.rarity === 'Super Rare' && clicked === false" src="../assets/super-rare-card.png"
             @click="clicked = true" />
         <img v-else-if="image.rarity === 'Legendary' && clicked === false" src="../assets/legendary-card.png"
             @click="clicked = true" />

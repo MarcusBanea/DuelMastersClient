@@ -57,7 +57,7 @@ const limited_turn_button_style = computed(() => {
 function endTurn() {
     let matchStore = useMatchStore();
     if(matchStore.usingAI == true) {
-        matchStore.newAITurn();
+        matchStore.newAITurn(props.service);
     }
     props.service.send('END_TURN');
 }
@@ -68,7 +68,8 @@ function endTurn() {
 
 <template>
         
-    <BattleZone v-if="player === 'player1'" :state = state :send = send :player = player :limited = limited :service = service />
+    <BattleZone v-if="player === 'player1'" :state = state :send = send 
+        :player = player :limited = limited :service = service />
 
     <div v-else :class = manaZone_container_style>
         <Mana :player = player :limited = limited />
@@ -96,14 +97,6 @@ function endTurn() {
 
     <button v-if="service.state.matches(player + 'Turn')" :class = end_turn_button_style @click="endTurn()">
         END TURN
-    </button>
-
-    <button v-if="service.state.matches(player + 'Turn')" :class = limited_turn_button_style @click="send('YOUR_TURN_LIMITED')">
-        LIMITED
-    </button>
-
-    <button v-if="service.state.matches(player + 'TurnLimited')" :class = limited_turn_button_style @click="send('YOUR_TURN')">
-        FULL CONTROL
     </button>
 
     <button v-if="service.state.matches(player + 'TurnLimited') && limitedStore.isExecuteEnabled && !limitedStore.blockerSelection" :class = end_turn_button_style 

@@ -36,13 +36,9 @@ function clickOnCard() {
     }
 }
 
-function sendToBattleZone(index) {
-    emits('sendToBattleZone', props.index);
-}
+function sendToBattleZone(index) { emits('sendToBattleZone', props.index); }
 
-function sendToMana(index) {
-    emits('sendToMana', props.index);
-}
+function sendToMana(index) { emits('sendToMana', props.index); }
 
 const imageStore = useImageStore();
 

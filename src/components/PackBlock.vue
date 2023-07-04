@@ -1,12 +1,11 @@
 <script setup>
+import { computed } from 'vue';
 import ImageContainer from './ImageContainer.vue';
 
 const props = defineProps({
     name: String,
     price: String,
-    content: String,
-
-    image: String
+    content: String
 });
 
 const emits = defineEmits(['openPack']);
@@ -28,7 +27,7 @@ function openPack() {
 
             <div id="pack_image" class="m-auto w-[75%] h-[90%] border-2">
               
-                <ImageContainer container-width="80%" :image-url="image"/>
+                <ImageContainer container-width="80%" :image-url="name" :is-pack="true"/>
 
             </div>
 

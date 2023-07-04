@@ -1,66 +1,30 @@
 <script setup>
 import { ref } from "@vue/reactivity";
-import ImageContainer from "../components/ImageContainer.vue";
-import ImageRevealOnClick from "../components/ImageRevealOnClick.vue";
 import Header from "../components/Header.vue";
 import PackBlock from "../components/PackBlock.vue";
 import { computed } from "@vue/runtime-core";
 import CardBlock from "../components/CardBlock.vue";
+import { useUserStore } from "../stores/userStore";
 
 //list of packs
 const response = await fetch("/api/packs");
 const packs = ref(await response.json());
 
-//current user
-const responseUser = await fetch("/api/users/633f18459af2fa78268b91d4");
-const user = ref(await responseUser.json());
+const userStore = useUserStore();
 
 //selected pack
 const selectedPack = ref(null);
 const openedPack = ref(false);
 const contentOfPack = ref();
 
-function selectPack(index) {
-  openedPack.value = false;
-  selectedPack.value = packs.value[index];
-  contentOfPack.value = null;
-}
-
-async function openSelectedPack() {
-  let packType = selectedPack.value.name;
-  //currently using a hardcoded user id, will be replaced with connected user id in the future version
-  const response = await fetch("/api/users/openPack/633f18459af2fa78268b91d4?packType=" + packType);
-  contentOfPack.value = [...(await response.json())];
-
-
-  // for (const element of contentOfPackIds.value) {
-  //   const responseCard = await fetch("/api/cards/getOne/" + element);
-  //   let tempCardData = await responseCard.json();
-  //   //console.log(tempCardData.imageId);
-  //   const responseImage = await fetch("/api/file/download/bytes/" + tempCardData.imageId);
-  //   let tempImageData = await responseImage.json();
-  //   //console.log(tempImageData.content);
-  //   contentOfPackImages.value.push(tempImageData.content);
-  //   //element.imageUrl = tempImageData.content;
-  // }
-
-  const responseUser = await fetch("/api/users/633f18459af2fa78268b91d4");
-  user.value = await responseUser.json();
-  selectedPack.value = null;
-  openedPack.value = true;
-}
-
-
-async function openSelectedPackV2(packType) {
-  console.log("pack = " + packType);
+async function openSelectedPack(packType) {
+  console.log("Pack open = " + packType);
   selectedPack.value = packs.value.filter(currentPack => currentPack.name == packType);
   //currently using a hardcoded user id, will be replaced with connected user id in the future version
   const response = await fetch("/api/users/openPack/633f18459af2fa78268b91d4?packType=" + packType);
   contentOfPack.value = [...(await response.json())];
 
-  const responseUser = await fetch("/api/users/633f18459af2fa78268b91d4");
-  user.value = await responseUser.json();
-  //selectedPack.value = null;
+  userStore.money -= selectedPack.value.price;
   openedPack.value = true;
 }
 
@@ -93,11 +57,8 @@ const isPackSelected = computed(() => {
 </script>
 
 
-
-
-
 <template>
-  <Header :money="user.money" :nickname="user.nickname" ></Header>
+  <Header></Header>
   <div id="page" class="bg-myLightBlue w-screen h-[90%] grid grid-rows-[15%_85%]">
     
     <div id="page_title_container" class="w-screen grid place-items-center">
@@ -112,7 +73,7 @@ const isPackSelected = computed(() => {
       
         <div id="pack_cards" class="w-full h-full flex flex-row flex-nowrap overflow-x-auto">
 
-          <CardBlock v-for="(card, index) in contentOfPack" :key="card" :image="card"/>
+          <CardBlock v-for="card in contentOfPack" :key="card" :image="card"/>
 
         </div>
 
@@ -149,8 +110,8 @@ const isPackSelected = computed(() => {
 
       <div v-else id="page_content_packs" class="bg-myDarkBlue border-4 border-myBlack w-[1500px] h-[90%] m-auto flex flex-row flex-nowrap overflow-x-auto">
 
-        <PackBlock v-for="(pack, index) in packs" :key="pack" :name="pack.name" :price="pack.price" :content="getListOfCardTypesFromPack(pack)" :image="pack.image"
-          @open-pack="openSelectedPackV2($event, name)"
+        <PackBlock v-for="pack in packs" :key="pack" :name="pack.name" :price="pack.price" :content="getListOfCardTypesFromPack(pack)"
+          @open-pack="openSelectedPack($event, pack.name)"
         />
 
       </div>

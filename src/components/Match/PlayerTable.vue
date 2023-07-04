@@ -39,19 +39,19 @@ const full_control_table_variant_style = computed(() => {
 
 <template>
 
-    <div v-if="state.matches(player + 'Hand') || state.matches(player + 'HandLimited')" id="hand_container" :class = hand_container_style>
+    <div v-if="service.state.matches(player + 'Hand') || state.matches(player + 'HandLimited')" id="hand_container" :class = hand_container_style>
         <Hand :player = player :send = send :state = state :service = service />
     </div>
 
-    <div v-else-if="state.matches(player + 'Graveyard') || state.matches(player + 'GraveyardLimited')" id="graveyard_container" :class = hand_container_style>
+    <div v-else-if="service.state.matches(player + 'Graveyard') || state.matches(player + 'GraveyardLimited')" id="graveyard_container" :class = hand_container_style>
         <GraveyardContent :player = player :send = send :state = state :service = service />
     </div>
 
-    <div v-else-if="state.matches('player1TurnLimited') || state.matches('player2TurnLimited')" :class = limited_table_variant_style>
+    <div v-else-if="service.state.matches('player1TurnLimited') || state.matches('player2TurnLimited')" :class = limited_table_variant_style>
         <PlayerTableVariant :player = player :state = state :send = send :limited = true :service = service />
     </div>
 
-    <div v-else-if="state.matches(player + 'Turn')" :class = full_control_table_variant_style>
+    <div v-else-if="service.state.matches(player + 'Turn')" :class = full_control_table_variant_style>
         <PlayerTableVariant :player = player :state = state :send = send :service = service />
     </div>
     <div v-else :class = full_control_table_variant_style>

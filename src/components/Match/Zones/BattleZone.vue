@@ -2,7 +2,6 @@
 import { computed, ref } from 'vue';
 import { useMatchStore } from '../../../stores/matchStore';
 import { useLimitedStore } from '../../../stores/limitedStore';
-import ImageContainerV2 from '../../ImageContainerV2.vue';
 import CardImage from '../../CardImage.vue';
 
 const matchStore = useMatchStore();
@@ -17,16 +16,6 @@ const props = defineProps({
     limited: Boolean
 });
 
-const lastCardSelectedIndex = ref(-1);
-
-//save the index of the (last) selected card from the battle zone and send it to match interface
-//the match interface will notify the opponent player interface to highlight the attack options for this selected card
-function selectCard(index) {
-    lastCardSelectedIndex.value = index;
-
-    matchStore.selectCard(props.player, 'battleZone', index);
-}
-
 function selectCardForAttack(index) {
     matchStore.resetSelectedAttributeOfAllCards();
     matchStore.selectCardForAttack(props.player, index);
@@ -36,15 +25,6 @@ function selectCardForAttack(index) {
 function opponentSelectCard(index) {
     console.log("Service = " + props.service);
     matchStore.selectedCardToAttack(props.player === 'player1' ? 'player2' : 'player1', index, "battleZone", props.service, true, false); 
-}
-
-function selectedCardForCommandExecution(index, zone) {
-    //add card to selection for command (ability) execution
-    let cardCode = zone + " " + index;
-    selection.value.push(cardCode);
-    if(selection.value.length == selectionCounter.value) {
-        executeAbilityOnSelection();
-    }
 }
 
 const currentTurn = computed(() => {

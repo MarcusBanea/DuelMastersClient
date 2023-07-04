@@ -3,11 +3,6 @@ import { computed, ref } from "@vue/runtime-core";
 import ImageContainer from "../components/ImageContainer.vue";
 import Header from "../components/Header.vue";
 
-//current user
-const userId = "633f18459af2fa78268b91d4";
-const responseUser = await fetch("/api/users/" + userId);
-const user = ref(await responseUser.json());
-
 //list of cards
 const response = await fetch("/api/cards");
 const cards = ref(await response.json());
@@ -30,13 +25,10 @@ const cardRarities = [
 ];
 
 async function setSelectedCard(cardIndex) {
-
   selectedCardIndex.value = cardIndex + currentPageNumber.value * 19;
   let cardImageId = currentCards.value[selectedCardIndex.value].imageId;
-
   const response = await fetch("/api/file/download/bytes/" + cardImageId);
   selectedCard.value = await response.json();
-
   cardClicked.value = true;
 }
 
@@ -92,26 +84,13 @@ const currentPageCards = computed(() => {
 
 <template>
 
-  <Header :money="user.money" :nickname="user.nickname" ></Header>
+  <Header></Header>
 
   <div class="bg-myDarkGreen h-[90%] grid grid-cols-2 col-gap-2">
-    <div class="
-        bg-myBlack
-        text-white
-        font-bold
-        grid
-        grid-rows-[10%_80%_10%]
-      ">
+    <div class="bg-myBlack text-white font-bold grid grid-rows-[10%_80%_10%]">
       <ul id="Rarity-navbar" class="grid grid-cols-6 mt-5 mb-4 border-b-4">
-        <li class="
-            text-myDarkGreen
-            cursor-pointer
-            mb-7
-            transition
-            duration-1000
-            ease-in-out
-            hover:scale-110 hover:bg-gray-100 hover:text-myBlack
-            text-2xl
+        <li class="text-myDarkGreen cursor-pointer mb-7 transition duration-1000 ease-in-out hover:scale-110 hover:bg-gray-100 
+          hover:text-myBlack text-2xl
           " v-for="rarity in cardRarities" :key="rarity" @click="getCardsWithRarity(rarity)">
           {{ rarity }}
         </li>
@@ -119,56 +98,24 @@ const currentPageCards = computed(() => {
 
       <div class="h-full">
         <ul id="Cards-names" class="grid place-items-center" :key="currentCards">
-          <li class="
-            cursor-pointer
-            mb-2
-            pl-8
-            pr-8
-            transition
-            duration-1000
-            ease-in-out
-            hover:scale-110 hover:bg-gray-100 hover:text-myBlack
-            text-xl
-            min-w-min
-          " v-for="(card, index) in currentPageCards" :key="card" @click="setSelectedCard(index)">
-          {{ card.name }}
+          <li class=" cursor-pointer mb-2 pl-8 pr-8 transition duration-1000 ease-in-out hover:scale-110 hover:bg-gray-100 
+            hover:text-myBlack text-xl min-w-min
+            " v-for="(card, index) in currentPageCards" :key="card" @click="setSelectedCard(index)">
+            {{ card.name }}
           </li>
         </ul>
       </div>
 
       <div class="flex justify-around">
-        <div v-if="currentPageNumber + 1 < (currentCards.length / 19)" class="
-            border-4
-            mb-2
-            pl-8
-            pr-8
-            b-myBeige
-            text-myDarkGreen
-            cursor-pointer
-            transition
-            duration-1000
-            ease-in-out
-            hover:bg-gray-100 hover:text-myBlack
-            text-2xl
-            grid"
+        <div v-if="currentPageNumber + 1 < (currentCards.length / 19)" class="border-4 mb-2 pl-8 pr-8 b-myBeige text-myDarkGreen 
+          cursor-pointer transition duration-1000 ease-in-out hover:bg-gray-100 hover:text-myBlack text-2xl grid"
             @click="currentPageNumber++">
             <div class="m-auto">
               NEXT PAGE
             </div> 
         </div>
-        <div v-if="currentPageNumber > 0" class="
-            border-4
-            b-myBeige
-            text-myDarkGreen
-            pl-8
-            pr-8
-            cursor-pointer
-            transition
-            duration-1000
-            ease-in-out
-            hover:bg-gray-100 hover:text-myBlack
-            text-2xl
-            grid"
+        <div v-if="currentPageNumber > 0" class="border-4 b-myBeige text-myDarkGreen pl-8 pr-8 cursor-pointer transition
+            duration-1000 ease-in-out hover:bg-gray-100 hover:text-myBlack text-2xl grid"
             @click="currentPageNumber--">
             <div class="m-auto">
               PREVIOUS PAGE
@@ -185,10 +132,3 @@ const currentPageCards = computed(() => {
     </div>
   </div>
 </template>
-
-
-
-
-<style scoped>
-
-</style>
