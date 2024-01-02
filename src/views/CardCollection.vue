@@ -2,10 +2,14 @@
 import { computed, ref } from "@vue/runtime-core";
 import ImageContainer from "../components/ImageContainer.vue";
 import Header from "../components/Header.vue";
+import CardService from "../services/CardService";
 
 //list of cards
-const response = await fetch("/api/cards");
-const cards = ref(await response.json());
+//const response = await fetch("/api/cards");
+
+
+const responseCards = await CardService.getAllCards();
+const cards = ref(await responseCards.data);
 
 //selected card
 const selectedCard = ref();
@@ -26,14 +30,17 @@ const cardRarities = [
 
 async function setSelectedCard(cardIndex) {
   selectedCardIndex.value = cardIndex + currentPageNumber.value * 19;
-  let cardImageId = currentCards.value[selectedCardIndex.value].imageId;
-  const response = await fetch("/api/file/download/bytes/" + cardImageId);
-  selectedCard.value = await response.json();
+  //let cardImageId = currentCards.value[selectedCardIndex.value].imageId;
+  // const response = await fetch("/api/file/download/bytes/" + cardImageId);
+  const responseCard = await CardService.getCardImageByCardName(currentCards.value[selectedCardIndex.value].name);
+  selectedCard.value = await responseCard.data;
+  console.log(selectedCard.value);
   cardClicked.value = true;
 }
 
 const getSelectedCardImage = computed(() => {
-  return selectedCard.value.content;
+  // return selectedCard.value.content;
+  return selectedCard.value;
 });
 
 async function getCardsWithRarity(rarity) {

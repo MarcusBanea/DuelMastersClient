@@ -1,9 +1,10 @@
 <script setup>
 import { computed, ref } from '@vue/reactivity';
+import CardService from '../services/CardService';
 
 
 const props = defineProps({
-    imageId: String,
+    cardId: String,
     containerWidth: String,
     containerHeight: String,
     imageBorderRadius: String,
@@ -15,8 +16,9 @@ const props = defineProps({
     zoomOnHoverActivated: Boolean
 });
 
-const response = props.imageId != null ? await fetch("/api/file/download/bytes/" + props.imageId) : null;
-const image = props.imageId != null ? await response.json() : props.image;
+//const response = props.cardId != null ? await fetch("/api/file/download/bytes/" + props.cardId) : null;
+const response = props.cardId != null ? await CardService.getCardImageByCardId(props.cardId) : null;
+const image = props.cardId != null ? await response.data : props.image;
 
 const cssProps = computed(() => {
     return {
@@ -39,8 +41,8 @@ function _base64ToArrayBuffer(base64) {
 
 const imageSrc = computed(() => {
     let imgBlob;
-    if(props.imageId != null) {
-        imgBlob = new Blob([_base64ToArrayBuffer(image.content)]);
+    if(props.cardId != null) {
+        imgBlob = new Blob([_base64ToArrayBuffer(image)]);
     }
     else {
         imgBlob = new Blob([_base64ToArrayBuffer(props.image)]);

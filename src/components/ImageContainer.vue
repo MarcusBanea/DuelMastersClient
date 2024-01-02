@@ -33,7 +33,8 @@ function _base64ToArrayBuffer(base64) {
 }
 
 const imageSrc = computed(() => {
-    const imgBlob = new Blob([_base64ToArrayBuffer(props.imageUrl)]);
+    //const imgBlob = new Blob([_base64ToArrayBuffer(props.imageUrl)]);
+    const imgBlob = new Blob(props.imageUrl);
     let urlCreator = URL;
     let imgUrl = urlCreator.createObjectURL(imgBlob);
     return imgUrl;

@@ -5,10 +5,13 @@ import PackBlock from "../components/PackBlock.vue";
 import { computed } from "@vue/runtime-core";
 import CardBlock from "../components/CardBlock.vue";
 import { useUserStore } from "../stores/userStore";
+import PackService from "../services/PackService";
+import UserService from "../services/UserService";
 
 //list of packs
-const response = await fetch("/api/packs");
-const packs = ref(await response.json());
+// const response = await fetch("/api/packs");
+const responsePacks = await PackService.getAllPacks();
+const packs = ref(await responsePacks.data);
 
 const userStore = useUserStore();
 
@@ -21,7 +24,8 @@ async function openSelectedPack(packType) {
   console.log("Pack open = " + packType);
   selectedPack.value = packs.value.filter(currentPack => currentPack.name == packType);
   //currently using a hardcoded user id, will be replaced with connected user id in the future version
-  const response = await fetch("/api/users/openPack/633f18459af2fa78268b91d4?packType=" + packType);
+  //const response = await fetch("/api/users/openPack/633f18459af2fa78268b91d4?packType=" + packType);
+  const response = await UserService.openPack("Markus", packType);
   contentOfPack.value = [...(await response.json())];
 
   userStore.money -= selectedPack.value.price;

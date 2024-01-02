@@ -11,6 +11,7 @@ import { ref } from "vue";
 import { useImageStore } from "../stores/imageStore";
 import MatchViewAI from "../views/MatchViewAI.vue";
 import Home from "../views/Home.vue";
+import UserService from "../services/UserService";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -63,14 +64,13 @@ const router = createRouter({
     ]
 });
 
-const responseUser = await fetch("/api/users/633f18459af2fa78268b91d4");
-const user = ref(await responseUser.json());
+const responseUser = await UserService.getUser("Markus");
+const userBasicData = responseUser.data;
 
 router.beforeEach(() => {
     const userStore = useUserStore();
-    userStore.init(user.value.nickname, user.value.money);
+    userStore.init(userBasicData.nickname, userBasicData.money);
 
     const imageStore = useImageStore();
 })
-
 export default router;
