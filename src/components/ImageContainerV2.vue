@@ -1,10 +1,13 @@
 <script setup>
 import { computed, ref } from '@vue/reactivity';
 import CardService from '../services/CardService';
+import { useImageStore } from '../stores/imageStore.js'
 
+const imageStore = useImageStore();
 
 const props = defineProps({
     cardId: String,
+    cardName: String,
     containerWidth: String,
     containerHeight: String,
     imageBorderRadius: String,
@@ -16,9 +19,8 @@ const props = defineProps({
     zoomOnHoverActivated: Boolean
 });
 
-//const response = props.cardId != null ? await fetch("/api/file/download/bytes/" + props.cardId) : null;
-const response = props.cardId != null ? await CardService.getCardImageByCardId(props.cardId) : null;
-const image = props.cardId != null ? await response.data : props.image;
+const response = await getCardImageByName();
+const image = await response.data;
 
 const cssProps = computed(() => {
     return {
@@ -29,25 +31,14 @@ const cssProps = computed(() => {
     }
 });
 
-function _base64ToArrayBuffer(base64) {
-    var binary_string = atob(base64);
-    var len = binary_string.length;
-    var bytes = new Uint8Array(len);
-    for (var i = 0; i < len; i++) {
-        bytes[i] = binary_string.charCodeAt(i);
-    }
-    return bytes.buffer;
+async function getCardImageByName() {
+    let cardImage = await CardService.getCardImageByName(props.cardName);
+    return cardImage;
 }
 
 const imageSrc = computed(() => {
-    let imgBlob;
-    if(props.cardId != null) {
-        imgBlob = new Blob([_base64ToArrayBuffer(image)]);
-    }
-    else {
-        imgBlob = new Blob([_base64ToArrayBuffer(props.image)]);
-    }
-    return URL.createObjectURL(imgBlob);
+    imageStore.addCardImage(props.cardName, image);
+    return imageStore.cardImages[props.cardName];
 });
 
 </script>
@@ -58,7 +49,7 @@ const imageSrc = computed(() => {
         hover:delay-500 duration-300 hover:border-2 hover:border-myBeige">
         <img :src="imageSrc" />
     </div>
-    <div v-else :style="cssProps" class="image-container m-auto">
+    <div v-else :style="cssProps" class="image-container m-auto shadow-2xl">
         <img :src="imageSrc" />
     </div>
 </template>

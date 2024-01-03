@@ -17,9 +17,7 @@ export const useImageStore = defineStore({
         createBlobFromImage(image) {
             let imgBlob;
             imgBlob = new Blob([this._base64ToArrayBuffer(image)]);
-            let urlCreator = URL;
-            let imgUrl = urlCreator.createObjectURL(imgBlob);
-            return imgUrl;
+            return URL.createObjectURL(imgBlob);
         },
 
         _base64ToArrayBuffer(base64) {
