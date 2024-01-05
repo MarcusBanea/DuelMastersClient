@@ -1,7 +1,7 @@
 import AddCardView from "../views/AddCardView.vue";
 import { createRouter, createWebHashHistory, createWebHistory } from "vue-router";
 import CardCollection from "../views/CardCollection.vue";
-import Packs from "../views/Packs.vue";
+import PacksV2 from "../views/PacksV2.vue";
 import AddPackView from "../views/AddPackView.vue";
 import MyCollectionV2 from "../views/MyCollectionV2.vue";
 import CombineCardsView from "../views/CombineCardsView.vue";
@@ -34,7 +34,7 @@ const router = createRouter({
         {
             path: "/packs",
             name: "packs",
-            component: Packs
+            component: PacksV2
         },
         {
             path: "/addPack",

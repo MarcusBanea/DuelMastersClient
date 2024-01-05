@@ -5,27 +5,44 @@ import { useUserStore } from '../stores/userStore';
 
 const userStore = useUserStore();
 
+const lastSelectedPageIndex = ref(-1);
+
 function goToMyCollection() {
+    lastSelectedPageIndex.value = 0;
     router.push("/myCollection");
 }
 
 function goToAddCard() {
+    lastSelectedPageIndex.value = 1;
     router.push("/addCard");
 }
 
 function goToAllCards() {
+    lastSelectedPageIndex.value = 2;
     router.push("/cardCollection");
 }
 
 function goToCombineCards() {
+    lastSelectedPageIndex.value = 3;
     router.push("/combineCards");
 }
 
-function goToShop() { router.push("/packs"); }
+function goToShop() { 
+    lastSelectedPageIndex.value = 4;
+    router.push("/packs");
+}
 
-function goToMatch() { router.push("/match"); }
+function goToMatch() { 
+    lastSelectedPageIndex.value = 5;
+    router.push("/match");
+}
 
-function goToMatchAI() { router.push("/matchAI"); }
+function goToMatchAI() { 
+    lastSelectedPageIndex.value = 6;
+    router.push("/matchAI");
+}
+
+function goToHome() { router.push("/"); }
 
 </script>
 
@@ -34,35 +51,26 @@ function goToMatchAI() { router.push("/matchAI"); }
 <template>
     
     <div class="
-          relative
-          w-screen
-          h-[10%]
-          bg-myDarkBlue
-          grid
-          grid-cols-[30%_15%_10%_15%_30%]
-          place-items-center
-          text-myLightGray
-          border-b-4
-          border-myBeige
-        ">
+          relative w-screen h-[10%] bg-myDarkBlue grid grid-cols-[30%_15%_10%_15%_30%]
+          place-items-center text-myGold2 border-b-4 border-myGold2 ">
         <div class="w-[100%] grid grid-cols-4 gap-2">
             <p class="min-w-min p-2 transition duration-1000 ease-in-out
-                hover:scale-110 hover:bg-myLightGray hover:text-myBlack text-myLightGray cursor-pointer rounded"
+                hover:scale-110 hover:bg-myGold2 hover:text-myBlack text-myGold2 cursor-pointer rounded"
                 @click="goToMyCollection">
                 My Collection
             </p>
             <p class="min-w-min p-2 transition duration-1000 ease-in-out
-                hover:scale-110 hover:bg-transparent hover:text-myLightGray bg-myLightGray text-myBlack cursor-pointer rounded"
+                hover:scale-110 hover:bg-myGold2 hover:text-myBlack text-myGold2 cursor-pointer rounded"
                 @click="goToAddCard">
                 Add Card
             </p>
             <p class="min-w-min p-2 transition duration-1000 ease-in-out
-                hover:scale-110 hover:bg-myLightGray hover:text-myBlack text-myLightGray cursor-pointer rounded"
+                hover:scale-110 hover:bg-myGold2 hover:text-myBlack text-myGold2 cursor-pointer rounded"
                 @click="goToAllCards">
                 All Cards
             </p>
             <p class="min-w-min p-2 transition duration-1000 ease-in-out
-                hover:scale-110 hover:bg-myLightGray hover:text-myBlack text-myLightGray cursor-pointer rounded"
+                hover:scale-110 hover:bg-myGold2 hover:text-myBlack text-myGold2 cursor-pointer rounded"
                 @click="goToCombineCards">
                 Combine
             </p>
@@ -73,7 +81,7 @@ function goToMatchAI() { router.push("/matchAI"); }
             </p>
         </div>
         <div class="grid place-items-center">
-            <img src="../assets/avatar.jpg" class="absolute w-[5%] rounded-full border-4" :title="nickname" />
+            <img src="../assets/avatar.jpg" class="absolute w-[5%] rounded-full border-4 border-myGold2 cursor-pointer" @click="goToHome()" />
         </div>
         <div class="w-[100%]">
             <p class="float-left min-w-min">
@@ -86,19 +94,19 @@ function goToMatchAI() { router.push("/matchAI"); }
         <div class="w-[100%] grid grid-cols-4 gap-2">
 
             <p class="min-w-min p-2 transition duration-1000 ease-in-out
-                hover:scale-110 hover:bg-myLightGray hover:text-myBlack text-myLightGray cursor-pointer rounded"
+                hover:scale-110 hover:bg-myGold2 hover:text-myBlack text-myGold2 cursor-pointer rounded"
                 @click="goToShop()">
                 SHOP
             </p>
 
             <p class="min-w-min p-2 transition duration-1000 ease-in-out
-                hover:scale-110 hover:bg-myLightGray hover:text-myBlack text-myLightGray cursor-pointer rounded"
+                hover:scale-110 hover:bg-myGold2 hover:text-myBlack text-myGold2 cursor-pointer rounded"
                 @click="goToMatch()">
                 PLAYER MATCH
             </p>
 
             <p class="min-w-min p-2 transition duration-1000 ease-in-out
-                hover:scale-110 hover:bg-myLightGray hover:text-myBlack text-myLightGray cursor-pointer rounded"
+                hover:scale-110 hover:bg-myGold2 hover:text-myBlack text-myGold2 cursor-pointer rounded"
                 @click="goToMatchAI()">
                 AI MATCH
             </p>

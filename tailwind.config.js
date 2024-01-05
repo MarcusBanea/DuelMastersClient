@@ -24,6 +24,10 @@ module.exports = {
       backgroundImage: {
         'background1': "url('Background1.jpg')",
         'frame1': "url('frame1.png')"
+      },
+      fontFamily: {
+        'fantasy': ['Luminari', 'Chalkduster', 'Trattatello'],
+        'cursive': ['Cursive']
       }
     },
   },
