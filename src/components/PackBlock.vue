@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue';
 import ImageContainer from './ImageContainer.vue';
+import { ref } from "@vue/reactivity";
 
 const props = defineProps({
     name: String,
@@ -14,12 +15,43 @@ function openPack() {
   emits('openPack', props.name);
 }
 
+const rotateState = ref(true);
+
+function rotatePackBlock() {
+  rotateState.value = !rotateState.value;
+}
+
 </script>
 
 
 <template>
-  <div id="pack_container" class="w-[450px] h-[100%] m-auto grid grid-rows-[75%_25%] flex-none transition duration-1000 ease-in-out hover:text-myBlack text-myGold2 
-  hover:bg-gradient-to-b hover:via-myGold2 hover:from-current hover:to-current">
+  <Transition name="slide-fade" mode="out-in">
+  <div v-if="rotateState" id="pack_container" class="w-[450px] h-[100%] m-auto grid grid-rows-[75%_25%] flex-none transition duration-1000 ease-in-out hover:text-myBlack text-myGold2 
+  hover:bg-gradient-to-b hover:via-myGold2 hover:from-current hover:to-current" 
+  @click="rotatePackBlock()">
+    <div id="pack_image_container" class="m-auto w-[90%] h-[100%]">
+      <div id="pack_image" class="grid m-auto w-[75%] h-[100%]">
+        <ImageContainer container-width="80%" :image-url="name" :is-pack="true"/>
+      </div>
+    </div>
+
+    <div id="pack_info_container" class="w-full h-full grid grid-rows-[20%_20%]">
+      <div id="pack_info_packName_container" class="w-full h-full grid">
+        <p id="pack_info_packName_text" class="ml-auto mr-auto mt-2 text-3xl font-fantasy">
+          {{ name }}
+        </p>
+        <div class="grid">
+          <div class="w-20 grid grid-cols-[70%_30%] mt-2 m-auto text-md">
+            {{price}} <img src="../assets/money.png" class="w-[100%]" />
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div v-else id="pack_container" class="w-[450px] h-[100%] m-auto grid grid-rows-[75%_25%] bg-myBlack flex-none transition duration-1000 ease-in-out text-myGold2 border-2 border-myGold2" 
+    @click="rotatePackBlock()">
     <div id="pack_image_container" class="m-auto w-[90%] h-[100%]">
       <div id="pack_image" class="grid m-auto w-[75%] h-[100%]">
         <ImageContainer container-width="80%" :image-url="name" :is-pack="true"/>
@@ -34,7 +66,7 @@ function openPack() {
       </div>
 
       <div class="w-full h-full grid text-myGold2">
-        <div id="pack_info_details" class="border-2 border-myBeige bg-myBlack w-[90%] h-[90%] m-auto grid grid-cols-[60%_40%]">
+        <div id="pack_info_details" class="border-2 border-myGold2 bg-myBlack w-[90%] h-[90%] m-auto grid grid-cols-[60%_40%]">
           <div id="pack_info_details_text" class="w-full h-24 place-items-center">
             <p v-for="cardType in content" :key="cardType" class="">
               {{cardType}}
@@ -56,6 +88,7 @@ function openPack() {
       </div>
     </div>
   </div>
+</Transition>
 
 </template>
 
@@ -72,6 +105,33 @@ function openPack() {
     -ms-overflow-style: none;  /* Internet Explorer 10+ */
     scrollbar-width: none;  /* Firefox */
     overflow-y: scroll;
+}
+
+
+.slide-fade-enter-active {
+  animation: rotateAnimationIn 1s linear;
+}
+
+.slide-fade-leave-active {
+  transition: all 1s cubic-bezier(1, 0.5, 0.8, 1);
+  animation: rotateAnimationOut 1s linear;
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
+}
+
+
+@keyframes rotateAnimationOut {
+	from {transform: rotateY(0deg);}
+	to {transform: rotateY(90deg);}
+}
+
+@keyframes rotateAnimationIn {
+	from {transform: rotateY(-90deg);}
+	to {transform: rotateY(0deg);}
 }
 
 </style>

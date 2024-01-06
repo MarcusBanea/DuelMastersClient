@@ -7,6 +7,7 @@ import CardBlock from "../components/CardBlock.vue";
 import { useUserStore } from "../stores/userStore";
 import PackService from "../services/PackService";
 import UserService from "../services/UserService";
+import { TransitionGroup } from "vue";
 
 //list of packs
 // const response = await fetch("/api/packs");
@@ -60,18 +61,56 @@ const isPackSelected = computed(() => {
 });
 
 const packSlider = ref(null);
+const isLeftScrollPossible = ref(false);
+const isRightScrollPossible = ref(true);
 
 function scrollLeft() {
-  //var packSlider = document.getElementById("page_content_packs");
-  // var packSlider = document.querySelector("page_content_packs");
   packSlider.value.scrollLeft = packSlider.value.scrollLeft - 350;
+  if(packSlider.value.scrollLeft - 350 <= 0) {
+    isLeftScrollPossible.value = false;
+  }
+  isRightScrollPossible.value = true;
 }
 
 function scrollRight() {
-  // var packSlider = document.getElementById("page_content_packs");
-  // var packSlider = document.querySelector("page_content_packs");
   packSlider.value.scrollLeft = packSlider.value.scrollLeft + 350;
+  if(packSlider.value.scrollLeft + 350 >= (packSlider.value.scrollWidth - packSlider.value.clientWidth)) {
+    isRightScrollPossible.value = false;
+  }
+  isLeftScrollPossible.value = true;
 }
+
+const gradientOpacity = computed(() => {
+    return {
+        '--left-gradient': "left, rgba(0,0,0,1) 90%, rgba(0,0,0,0)",
+        '--right-gradient': "right, rgba(0,0,0,1) 90%, rgba(0,0,0,0)",
+        '--both-gradient': "left, rgba(255,0,0,0) 0%, rgba(255,0,0,1) 10%, rgba(255,0,0,1) 90%, rgba(255,0,0,0) 100%",
+    }
+});
+
+const gradient = computed(() => {
+  if(isRightScrollPossible.value == true && isLeftScrollPossible.value == true) {
+    return {
+      '--gradient': "left, rgba(255,0,0,0) 0%, rgba(255,0,0,1) 10%, rgba(255,0,0,1) 90%, rgba(255,0,0,0) 100%"
+    }
+  }
+  else if(isRightScrollPossible.value != true) {
+    return {
+      '--gradient': "right, rgba(0,0,0,1) 90%, rgba(0,0,0,0)"
+    }
+  }
+  else if(isLeftScrollPossible.value != true) {
+    return {
+      '--gradient': "left, rgba(0,0,0,1) 90%, rgba(0,0,0,0)"
+    }
+  }
+})
+
+function rotatePackBlock(packBlockId) {
+  packBlockRotateState.value[packBlockId] = !packBlockRotateState.value[packBlockId];
+}
+
+const packBlockRotateState = ref(Array(packs.value.length).fill(true));
 
 </script>
 
@@ -79,12 +118,6 @@ function scrollRight() {
 <template>
   <Header></Header>
   <div id="page" class="bg-background1 w-screen h-[90%] grid select-none">
-
-    <!-- <div id="page_title_container" class="w-screen grid place-items-center">
-      <p id="page_title_text" class="text-3xl text-myGold2 m-auto">
-        SHOP
-      </p>
-    </div> -->
 
     <div id="page_content_container" class="w-full grid">
 
@@ -131,18 +164,18 @@ function scrollRight() {
       <div v-else class="backdrop-blur-sm w-[1700px] h-[90%] m-auto flex ">
 
         <div id="scroll-left" class="text-myGold2 w-[5%] grid place-items-center mr-4">
-          <v-icon name="pr-angle-left" class="cursor-pointer" :scale="4" @click="scrollLeft()"/>
+          <v-icon v-if="isLeftScrollPossible" name="pr-angle-left" class="cursor-pointer" :scale="4" @click="scrollLeft()"/>
         </div>
 
-        <div id="page_content_packs" ref="packSlider" class="pack-slider flex flex-row flex-nowrap overflow-hidden scroll-smooth w-[90%] h-[100%]">
-
-          <PackBlock v-for="pack in packs" :key="pack" :name="pack.name" :price="pack.price"
-            :content="getListOfCardTypesFromPack(pack)" @open-pack="openSelectedPack($event, pack.name)" />
-
+        <div id="page_content_packs" ref="packSlider" :style="gradient" class="pack-slider flex flex-row flex-nowrap overflow-hidden scroll-smooth w-[90%] h-[100%]">
+            <PackBlock :id="'packBlock' + index" v-for="(pack, index) in packs" :key="pack" :name="pack.name" :price="pack.price"
+              :content="getListOfCardTypesFromPack(pack)" @open-pack="openSelectedPack($event, pack.name)"
+              />
         </div>
+        
 
         <div id="scroll-right" class="w-[5%] grid place-items-center ml-4">
-          <v-icon name="pr-angle-right" class="cursor-pointer" :scale="4" @click="scrollRight()"/>
+          <v-icon v-if="isRightScrollPossible" name="pr-angle-right" class="cursor-pointer" :scale="4" @click="scrollRight()"/>
         </div>
 
       </div>
@@ -159,7 +192,8 @@ function scrollRight() {
 <style scoped>
 
 .pack-slider {
-  -webkit-mask-image: -webkit-linear-gradient(left, rgba(0,0,0,1) 90%, rgba(0,0,0,0));
+  /* -webkit-mask-image: -webkit-linear-gradient(left, rgba(0,0,0,1) 90%, rgba(0,0,0,0)); */
+  -webkit-mask-image: -webkit-linear-gradient(var(--gradient));
 }
 
 </style>
