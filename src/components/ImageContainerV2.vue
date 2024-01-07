@@ -19,9 +19,6 @@ const props = defineProps({
     zoomOnHoverActivated: Boolean
 });
 
-const response = await getCardImageByName();
-const image = await response.data;
-
 const cssProps = computed(() => {
     return {
         '--container-width': props.containerWidth,
@@ -31,15 +28,44 @@ const cssProps = computed(() => {
     }
 });
 
-async function getCardImageByName() {
-    let cardImage = await CardService.getCardImageByName(props.cardName);
+async function getCardImage() {
+    let cardImage;
+    if(props.cardId != undefined) {
+        cardImage = await CardService.getCardImageByCardId(props.cardId);
+    }
+    else {
+        cardImage = await CardService.getCardImageByName(props.cardName);
+    }
     return cardImage;
 }
 
-const imageSrc = computed(() => {
-    imageStore.addCardImage(props.cardName, image);
-    return imageStore.cardImages[props.cardName];
-});
+async function getImage() {
+    if(props.cardId != undefined) {
+        if(imageStore.cardImages[props.cardId] == null) {
+            let response = await getCardImage();
+            let image = await response.data;
+            imageStore.addCardImage(props.cardId, image);
+        }
+    }
+    else {
+        if(imageStore.cardImages[props.cardName] == null) {
+            let response = await getCardImage();
+            let image = await response.data;
+            imageStore.addCardImage(props.cardName, image);
+            
+        }
+    }
+};
+
+const imgSrc = computed(() => {
+    getImage();
+    if(props.cardId != undefined) {
+        return imageStore.cardImages[props.cardId];
+    }
+    else { 
+        return imageStore.cardImages[props.cardName];
+    }
+})
 
 </script>
     
@@ -47,10 +73,10 @@ const imageSrc = computed(() => {
 <template>
     <div v-if="zoomOnHoverActivated" :style="cssProps" class="image-container m-auto hover:scale-[3] 
         hover:delay-500 duration-300 hover:border-2 hover:border-myBeige">
-        <img :src="imageSrc" />
+        <img :src="imgSrc" />
     </div>
     <div v-else :style="cssProps" class="image-container m-auto shadow-2xl">
-        <img :src="imageSrc" />
+        <img :src="imgSrc" />
     </div>
 </template>
     

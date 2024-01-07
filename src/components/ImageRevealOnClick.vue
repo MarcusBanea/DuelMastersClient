@@ -1,9 +1,13 @@
 <script setup>
 import { computed, ref } from '@vue/reactivity';
+import { useImageStore } from '../stores/imageStore.js'
+import CardService from '../services/CardService';
+
+const imageStore = useImageStore();
 
 
 const props = defineProps({
-    imageId: String,
+    cardId: String,
     containerWidth: String,
     containerHeight: String,
     imageBorderRadius: String,
@@ -11,8 +15,8 @@ const props = defineProps({
     flipAnimationOn: Boolean,
 });
 
-const response = await fetch("/api/cards/getOneWithImage/" + props.imageId);
-const image = await response.json();
+const response = await getCardImageByName();
+const image = await response.data;
 
 const imageCode = ref();
 
@@ -24,50 +28,22 @@ const cssProps = computed(() => {
     }
 });
 
-function _base64ToArrayBuffer(base64) {
-    var binary_string = atob(base64);
-    var len = binary_string.length;
-    var bytes = new Uint8Array(len);
-    for (var i = 0; i < len; i++) {
-        bytes[i] = binary_string.charCodeAt(i);
-    }
-    return bytes.buffer;
+async function getCardImageByName() {
+    let cardImage = await CardService.getCardImageByCardId(props.cardId);
+    return cardImage;
 }
 
 const imageSrc = computed(() => {
-    const imgBlob = new Blob([_base64ToArrayBuffer(image.imageBytes)]);
-    let urlCreator = URL;
-    let imgUrl = urlCreator.createObjectURL(imgBlob);
-    return imgUrl;
+    imageStore.addCardImage(props.cardId, image);
+    return imageStore.cardImages[props.cardId];
 });
-
-function getImage() {
-    const imgBlob = new Blob([_base64ToArrayBuffer(props.imageUrl)]);
-    let urlCreator = URL;
-    let imgUrl = urlCreator.createObjectURL(imgBlob);
-    return imgUrl;
-}
-
-const clicked = ref(false);
 
 </script>
     
     
 <template>
-    <div :style="cssProps" class="image-container">
-        <img v-if="clicked" :src="imageSrc" />
-        <img v-if="image.rarity === 'Common' && clicked === false" src="../assets/common-card.png"
-            @click="clicked = true" />
-        <img v-else-if="image.rarity === 'Uncommon' && clicked === false" src="../assets/uncommon-card.png"
-            @click="clicked = true" />
-        <img v-else-if="image.rarity === 'Rare' && clicked === false" src="../assets/rare-card.png"
-            @click="clicked = true" />
-        <img v-else-if="image.rarity === 'Very Rare' && clicked === false" src="../assets/very-rare-card.png"
-            @click="clicked = true" />
-        <img v-else-if="image.rarity === 'Super Rare' && clicked === false" src="../assets/super-rare-card.png"
-            @click="clicked = true" />
-        <img v-else-if="image.rarity === 'Legendary' && clicked === false" src="../assets/legendary-card.png"
-            @click="clicked = true" />
+    <div :style="cssProps" class="image-container grid palce-items-center">
+        <img :src="imageSrc"/>
     </div>
 </template>
     
@@ -83,8 +59,6 @@ const clicked = ref(false);
 }
 
 .image-container img {
-    width: 100%;
-    height: 100%;
     object-fit: cover;
     border-radius: var(--border-radius);
 }

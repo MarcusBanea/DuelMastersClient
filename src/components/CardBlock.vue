@@ -1,11 +1,12 @@
 <script setup>
-import ImageContainer from './ImageContainer.vue';
-import ImageRevealOnClick from './ImageRevealOnClick.vue';
+import ImageContainerV2 from './ImageContainerV2.vue';
+import { ref } from "@vue/reactivity";
 
 const props = defineProps({
-    image: String
+    cardId: String
 });
 
+const selected = ref(false);
 
 </script>
 
@@ -13,19 +14,30 @@ const props = defineProps({
 
 <template>
     
-    <div id="card_container" class="w-[450px] h-[90%] m-auto grid flex-none border-r-2">
+    <div id="card_container" class="w-[450px] h-[100%] m-auto grid flex-none select-none">
           
-          <div id="card_image_container" class="m-auto w-[90%] h-[100%] border-b-2">
+        <div v-if="selected" id="card_image_container" class="m-auto w-[90%] h-[100%] transition duration-1000 ease-in-out bg-gradient-to-b via-myGold2 from-current to-current"
+        @click="selected = !selected">
 
-            <div id="card_image" class="m-auto w-[75%] h-[90%] border-2">
-              
-                <ImageRevealOnClick :image-id="image" container-width="100%" :flip-animation-on="true"/>
+            <div id="card_image" class="grid m-auto w-[70%] h-[100%]">
+
+                <ImageContainerV2 :card-id="props.cardId" container-width="100%" container-height="70%"/>
 
             </div>
 
-          </div>
+        </div>
+
+        <div v-else id="card_image_container" class="m-auto w-[90%] h-[100%]" @click="selected = !selected">
+
+            <div id="card_image" class="grid m-auto w-[70%] h-[100%]">
+
+                <ImageContainerV2 :card-id="props.cardId" container-width="100%" container-height="70%"/>
+
+            </div>
 
         </div>
+
+    </div>
 
 </template>
 

@@ -27,10 +27,15 @@ async function openSelectedPack(packType) {
   //currently using a hardcoded user id, will be replaced with connected user id in the future version
   //const response = await fetch("/api/users/openPack/633f18459af2fa78268b91d4?packType=" + packType);
   const response = await UserService.openPack("Markus", packType);
-  contentOfPack.value = [...(await response.json())];
+  contentOfPack.value = await response.data;
 
-  userStore.money -= selectedPack.value.price;
+  console.log(contentOfPack.value);
+
+  // userStore.money -= selectedPack.value.price;
   openedPack.value = true;
+
+  isLeftScrollPossible.value = false;
+  isRightScrollPossible.value = true;
 }
 
 function getListOfCardTypesFromPack(pack) {
@@ -80,14 +85,6 @@ function scrollRight() {
   isLeftScrollPossible.value = true;
 }
 
-const gradientOpacity = computed(() => {
-    return {
-        '--left-gradient': "left, rgba(0,0,0,1) 90%, rgba(0,0,0,0)",
-        '--right-gradient': "right, rgba(0,0,0,1) 90%, rgba(0,0,0,0)",
-        '--both-gradient': "left, rgba(255,0,0,0) 0%, rgba(255,0,0,1) 10%, rgba(255,0,0,1) 90%, rgba(255,0,0,0) 100%",
-    }
-});
-
 const gradient = computed(() => {
   if(isRightScrollPossible.value == true && isLeftScrollPossible.value == true) {
     return {
@@ -106,12 +103,6 @@ const gradient = computed(() => {
   }
 })
 
-function rotatePackBlock(packBlockId) {
-  packBlockRotateState.value[packBlockId] = !packBlockRotateState.value[packBlockId];
-}
-
-const packBlockRotateState = ref(Array(packs.value.length).fill(true));
-
 </script>
 
 
@@ -122,11 +113,21 @@ const packBlockRotateState = ref(Array(packs.value.length).fill(true));
     <div id="page_content_container" class="w-full grid">
 
       <div v-if="isPackSelected" :key="isPackSelected" id="page_content_packCards_container"
-        class="border-4 border-myBlack w-[1500px] h-[90%] m-auto grid grid-rows-[80%_20%]">
+        class="backdrop-blur-sm w-[1700px] h-[90%] m-auto grid grid-rows-[80%_20%]">
 
-        <div id="pack_cards" class="w-full h-full flex flex-row flex-nowrap overflow-x-auto">
+        <div id="pack_cards" class="backdrop-blur-sm w-[1700px] h-[90%] m-auto flex ">
 
-          <CardBlock v-for="card in contentOfPack" :key="card" :image="card" />
+          <div id="scroll-left" class="text-myGold2 w-[5%] grid place-items-center mr-4">
+            <v-icon v-if="isLeftScrollPossible" name="pr-angle-left" class="cursor-pointer" :scale="4" @click="scrollLeft()"/>
+          </div>
+
+          <div id="page_content_packs" ref="packSlider" :style="gradient" class="pack-slider flex flex-row flex-nowrap overflow-hidden scroll-smooth w-[90%] h-[100%]">
+            <CardBlock v-for="card in contentOfPack" :key="card" :cardId="card" />
+          </div>
+
+          <div id="scroll-right" class="w-[5%] grid place-items-center ml-4">
+            <v-icon v-if="isRightScrollPossible" name="pr-angle-right" class="cursor-pointer" :scale="4" @click="scrollRight()"/>
+          </div>
 
         </div>
 
@@ -173,7 +174,6 @@ const packBlockRotateState = ref(Array(packs.value.length).fill(true));
               />
         </div>
         
-
         <div id="scroll-right" class="w-[5%] grid place-items-center ml-4">
           <v-icon v-if="isRightScrollPossible" name="pr-angle-right" class="cursor-pointer" :scale="4" @click="scrollRight()"/>
         </div>
