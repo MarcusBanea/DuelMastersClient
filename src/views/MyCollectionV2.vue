@@ -62,7 +62,7 @@ function getCardAbilities(card) {
 
             <div v-if="!isCardSelected" class="grid h-[60%] w-[80%] backdrop-blur-sm">
 
-                <div class="grid h-[470px] overflow-scroll overflow-x-hidden">
+                <div class="grid h-[470px] overflow-scroll overflow-x-hidden scroll-smooth">
                     <table class="h-[470px]">
                         <thead class="">
                             <tr class="text-myGold2 italic">
@@ -96,7 +96,7 @@ function getCardAbilities(card) {
 
             <div v-else class="grid grid-cols-[70%_30%] h-[60%] w-[80%] backdrop-blur-sm">
 
-                <div class="grid h-[470px] overflow-scroll overflow-x-hidden">
+                <div class="grid h-[470px] overflow-scroll overflow-x-hidden scroll-smooth">
                     <table class="table-fixed">
                         <thead class="">
                             <tr class="text-myGold2 italic">

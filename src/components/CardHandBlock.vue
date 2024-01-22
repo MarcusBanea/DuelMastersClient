@@ -2,6 +2,7 @@
 import { computed, ref } from '@vue/runtime-core';
 import { useImageStore } from '../stores/imageStore';
 import { useMatchStore } from '../stores/matchStore';
+import CardService from '../services/CardService';
 
 const props = defineProps({
     name: String, 
@@ -9,22 +10,13 @@ const props = defineProps({
     rotate: Boolean,
     player: String,
 
-    mana: Number,
+    mana: String,
     service: Object
 });
 
 const matchStore = useMatchStore();
 
 const emits = defineEmits(['sendToBattleZone', 'sendToMana']);
-
-
-const cssProps = computed(() => {
-    return {
-        '--container-width': props.containerWidth,
-        '--container-height': props.containerHeight,
-        '--border-radius': props.imageBorderRadius ? props.imageBorderRadius : '0%'
-    }
-});
 
 const cardClicked = ref(false);
 
@@ -42,9 +34,24 @@ function sendToMana(index) { emits('sendToMana', props.index); }
 
 const imageStore = useImageStore();
 
-const image = computed(() => {
+async function getCardImage() {
+    let cardImage;
+    cardImage = await CardService.getCardImageByName(props.name);
+    return cardImage;
+}
+
+async function getImage() {
+    let response = await getCardImage();
+    let image = await response.data;
+    imageStore.addCardImage(props.name, image);
+};
+
+const imgSrc = computed(() => {
+    if(imageStore.cardImages[props.name] == undefined) {
+        getImage();
+    }
     return imageStore.cardImages[props.name];
-});
+})
 
 </script>
 
@@ -58,7 +65,7 @@ const image = computed(() => {
 
             <div v-if="!cardClicked" id="card_image" class="m-auto w-[65%] h-[70%]">
             
-                <img :src="image" container-width="50%" class="hover:scale-150 cursor-pointer m-auto" @click="clickOnCard"/>
+                <img :src="imgSrc" container-width="50%" class="hover:scale-150 cursor-pointer m-auto" @click="clickOnCard"/>
 
             </div>
 

@@ -10,9 +10,13 @@ const limitedStore = useLimitedStore();
 const props = defineProps({
     player: String,
     state: Object,
-    send: Object,
+    send: Function,
     service: Object
 });
+
+const emits = defineEmits(['slideToTable']);
+
+function slideToTable() { emits('slideToTable'); }
 
 </script>
 
@@ -36,22 +40,21 @@ const props = defineProps({
             
             <div v-else class="h-[100%]" >
                 <CardHandBlock :name="card.name" :index="index" :mana="card.mana" :service = "service" :player = "player"
-                    @send-to-mana="matchStore.sendCardFromHandToMana(index, player, service)"
-                    @send-to-battle-zone="matchStore.sendCardFromHandToBattleZone(index, player, service)"
+                    @send-to-mana="matchStore.sendCardFromHandToMana(index, player, service); slideToTable();"
+                    @send-to-battle-zone="matchStore.sendCardFromHandToBattleZone(index, player, service); slideToTable();"
                 />
             </div>
         </div>
 
     </div>
-
+<!-- 
     <button v-if="player === 'player1'" class="absolute bg-myBeige text-myBlack font-bold rounded w-min px-4 bottom-8 right-24" @click="send('HIDE_HAND');">
         HAND
     </button>
 
     <button v-else-if="player === 'player2'" class="absolute bg-myBeige text-myBlack font-bold rounded w-min px-4 top-28 right-24" @click="send('HIDE_HAND');">
         HAND
-    </button>
-
+    </button> -->
 </template>
 
 

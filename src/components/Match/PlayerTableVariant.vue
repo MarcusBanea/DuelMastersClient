@@ -12,7 +12,7 @@ import { useMatchStore } from '../../stores/matchStore';
 const props = defineProps({
     player: String,
     state: Object,
-    send: Object,
+    send: Function,
     service: Object,
 
     limited: Boolean
@@ -23,18 +23,8 @@ const limitedStore = useLimitedStore();
 const middleZone_container_style = "grid grid-cols-[15%_70%_15%]";
 const manaZone_container_style = "w-[55%] h-[100%] flex flex-row flex-nowrap m-auto";
 
-const hand_button_style = computed(() => {
-    let style = "absolute bg-myBeige text-myBlack font-bold rounded w-min px-4";
-    if(props.player === 'player1') {
-        style += " bottom-8 right-24";
-    }
-    else {
-        style += " top-28 right-24";
-    }
-    return style;
-});
 const end_turn_button_style = computed(() => {
-    let style = "absolute bg-myBeige text-myBlack font-bold rounded px-4";
+    let style = "absolute bg-myGold3 text-myBlack font-bold rounded px-4";
     if(props.player === 'player1') {
         style += " bottom-8 left-24";
     }
@@ -44,7 +34,7 @@ const end_turn_button_style = computed(() => {
     return style;
 });
 const limited_turn_button_style = computed(() => {
-    let style = "absolute bg-myBeige text-myBlack font-bold rounded px-4";
+    let style = "absolute bg-myGold3 text-myBlack font-bold rounded px-4";
     if(props.player === 'player1') {
         style += " bottom-16 left-24";
     }
@@ -53,14 +43,6 @@ const limited_turn_button_style = computed(() => {
     }
     return style;
 });
-
-function endTurn() {
-    let matchStore = useMatchStore();
-    if(matchStore.usingAI == true) {
-        matchStore.newAITurn(props.service);
-    }
-    props.service.send('END_TURN');
-}
 
 </script>
 
@@ -77,7 +59,8 @@ function endTurn() {
 
     <div id="middleZone_container" :class = middleZone_container_style>
 
-        <Graveyard :player = player @click="(service.state.matches(player + 'Turn') || service.state.matches(player + 'TurnLimited')) && service.send('SHOW_GRAVEYARD')"/>
+        <div></div>
+        <!-- <Graveyard :player = player @click="(service.state.matches(player + 'Turn') || service.state.matches(player + 'TurnLimited')) && service.send('SHOW_GRAVEYARD')"/> -->
 
         <Shields :player = player :limited = limited :service = service />
 
@@ -90,14 +73,6 @@ function endTurn() {
     <div v-else :class = manaZone_container_style>
         <Mana :player = player :limited = limited />
     </div>
-
-    <button v-if="service.state.matches(player + 'Turn') || state.matches(player + 'TurnLimited')" :class = hand_button_style @click="send('SHOW_HAND');">
-        HAND
-    </button>
-
-    <button v-if="service.state.matches(player + 'Turn')" :class = end_turn_button_style @click="endTurn()">
-        END TURN
-    </button>
 
     <button v-if="service.state.matches(player + 'TurnLimited') && limitedStore.isExecuteEnabled && !limitedStore.blockerSelection" :class = end_turn_button_style 
         @click="limitedStore.executeLimitedAction(service, state); isExecuteActionButtonVisible = false;">

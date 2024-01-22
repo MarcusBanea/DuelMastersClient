@@ -9,7 +9,7 @@ const limitedStore = useLimitedStore();
 
 const props = defineProps({
     state: Object,
-    send: Object,
+    send: Function,
     service: Object,
     player: String,
 

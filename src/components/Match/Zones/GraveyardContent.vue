@@ -11,7 +11,7 @@ const limitedStore = useLimitedStore();
 const props = defineProps({
     player: String,
     state: Object,
-    send: Object,
+    send: Function,
     service: Object
 });
 
@@ -35,15 +35,12 @@ const props = defineProps({
 
 
     </div>
-
+<!-- 
     <button v-if="player === 'player1'" class="absolute bg-myBeige text-myBlack font-bold rounded w-min px-4 bottom-8 right-24" @click="send('HIDE_GRAVEYARD');">
         HIDE GRAVEYARD
     </button>
 
     <button v-else-if="player === 'player2'" class="absolute bg-myBeige text-myBlack font-bold rounded w-min px-4 top-28 right-24" @click="send('HIDE_GRAVEYARD');">
         HIDE GRAVEYARD
-    </button>
-
-
-
+    </button> -->
 </template>

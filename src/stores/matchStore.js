@@ -3,6 +3,8 @@ import utils from "@/Utils";
 import { useImageStore } from "./imageStore";
 import decoder from "../Decoder";
 import { useLimitedStore } from "./limitedStore";
+import MatchService from "../services/MatchService";
+import CardService from "../services/CardService";
 
 export const useMatchStore = defineStore({
     id: 'match',
@@ -19,6 +21,8 @@ export const useMatchStore = defineStore({
         cardForAttack: null,
         cardToAttack: null,
         cardToAttackZone: null,
+
+        ct: 0,
 
         gamelog: [],
 
@@ -37,8 +41,10 @@ export const useMatchStore = defineStore({
                 players = await responsePlayers.json();
             }
             else {
-                const responsePlayers = await fetch("/api/game/initialize/" + userId + "/" + userId);
-                players = await responsePlayers.json();
+                const responsePlayers = await MatchService.initializeMatch(userId, userId);
+                players = await responsePlayers.data;
+
+                console.log(players);
             }
             
             this.player1 = players[0];
@@ -50,7 +56,7 @@ export const useMatchStore = defineStore({
 
             this.initNewTurn();
 
-            this.isDataLoaded = true;
+            // this.isDataLoaded = true;
         },
 
         async newAITurn(service) {
@@ -80,15 +86,16 @@ export const useMatchStore = defineStore({
         },
 
         initCardStoreWithDisplayedCards() {
-            console.log("WOW");
             const imageStore = useImageStore();
-            let zones = ["battleZone", "manaZone", "hand", "graveyard", "shields"];
+            let zones = ["battleZone", "manaZone", "hand", "graveyard", "shields", "deck"];
             zones.forEach((zone) => {
-                this.player1[zone].forEach((card) => {
-                    imageStore.addCardImage(card.name, card.image);
+                this.player1[zone].forEach(async (card) => {
+                    let image = await CardService.getCardImageByName(card.name);
+                    imageStore.addCardImage(card.name, image);
                 })
-                this.player2[zone].forEach((card) => {
-                    imageStore.addCardImage(card.name, card.image);
+                this.player2[zone].forEach(async (card) => {
+                    let image = await CardService.getCardImageByName(card.name);
+                    imageStore.addCardImage(card.name, image);
                 })
             });
         },

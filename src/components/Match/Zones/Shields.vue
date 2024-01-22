@@ -19,7 +19,6 @@ function limitedSelection(index) {
 
 //when the opponent is attacking, notify the match interface which card was selected
 function opponentSelectCard(index) {
-    console.log("Service = " + props.service);
     matchStore.selectedCardToAttack(props.player === 'player1' ? 'player2' : 'player1', index, "shields", props.service, true, false); 
 }
 
@@ -27,26 +26,26 @@ function opponentSelectCard(index) {
 
 <template>
     
-    <div id="shields_container" class="w-[70%] h-[90%] border-2 border-myBeige m-auto flex flex-row justify-between">
+    <div id="shields_container" class="w-[50%] h-[90%] border-2 border-myGold3 m-auto flex flex-row justify-between bg-myGold3/25">
               
-        <div v-for="(card, index) in matchStore.getCardsInZoneForPlayer('shields', player)" :key="card">
+        <div id="shields" class="m-auto" v-for="(card, index) in matchStore.getCardsInZoneForPlayer('shields', player)" :key="card">
 
             <div v-if="!limited">
                 <div v-if="card.selected == true" class="pulse_animation">
                     <img src="../../../assets/Shield.jpg" class="h-28" @click="opponentSelectCard(index)"/>
                 </div>
                 <div v-else >
-                    <img src="../../../assets/Shield.jpg" class="h-28"/>
+                    <img src="../../../assets/Shield.jpg" class="h-[110px]"/>
                 </div>
             </div>
 
             <div v-else>
                 <div v-if="card.limitedSelected" class="pulse_animation">
-                    <img src="../../../assets/Shield.jpg" class="h-28"
+                    <img src="../../../assets/Shield.jpg" class="h-24"
                         @click="limitedSelection(index)"/>
                 </div>
                 <div v-else >
-                    <img src="../../../assets/Shield.jpg" class="h-28"
+                    <img src="../../../assets/Shield.jpg" class="h-24"
                         @click="limitedSelection(index)"/>
                 </div>
             </div>

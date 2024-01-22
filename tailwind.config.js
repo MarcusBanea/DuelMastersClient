@@ -16,7 +16,8 @@ module.exports = {
         'myLightBlue': '#333e4b',
         'myBeige': '#f0dbc4',
         'myGold': '#D4AF37',
-        'myGold2': "#e0bf6d",
+        'myGold2': "#C3A456",
+        'myGold3': "#e0bf6d",
 
         'myLimited': '#0f1d40',
         'myLimitedGreen' : '#0ac73c'
