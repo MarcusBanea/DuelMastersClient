@@ -1,8 +1,9 @@
 <script setup>
-import { computed, ref } from '@vue/runtime-core';
+import { onActivated, computed, ref } from '@vue/runtime-core';
 import { useImageStore } from '../stores/imageStore';
 import { useMatchStore } from '../stores/matchStore';
 import CardService from '../services/CardService';
+import { onBeforeRouteUpdate } from 'vue-router';
 
 const props = defineProps({
     name: String, 
@@ -21,10 +22,8 @@ const emits = defineEmits(['sendToBattleZone', 'sendToMana']);
 const cardClicked = ref(false);
 
 function clickOnCard() {
-    if (props.service.state.matches(props.player + "Hand")) {
-        if (props.mana <= matchStore.currentTurnManaAvailable || matchStore.currentTurnCanSendToMana == true) {
-            cardClicked.value = true;
-        }
+    if (props.mana <= matchStore.currentTurnManaAvailable || matchStore.currentTurnCanSendToMana == true) {
+        cardClicked.value = true;
     }
 }
 
@@ -53,24 +52,27 @@ const imgSrc = computed(() => {
     return imageStore.cardImages[props.name];
 })
 
+onActivated(() => {
+    cardClicked.value = false
+});
+
 </script>
 
 
 
 <template>
     
-    <div id="card_container" class="w-[300px] h-[100%] m-auto grid flex-none border-r-2  overflow-y-hidden">
+    <div id="card_container" class="w-[300px] h-[100%] m-auto grid flex-none overflow-y-hidden">
           
           <div id="card_image_container" class="m-auto w-[90%] h-[100%] grid">
 
-            <div v-if="!cardClicked" id="card_image" class="m-auto w-[65%] h-[70%]">
+            <div v-if="!cardClicked" id="card_image" class="m-auto w-[65%]">
             
                 <img :src="imgSrc" container-width="50%" class="hover:scale-150 cursor-pointer m-auto" @click="clickOnCard"/>
 
             </div>
 
-            <div v-else-if="(mana <= matchStore.currentTurnManaAvailable || matchStore.currentTurnCanSendToMana == true) && 
-                service.state.matches(player + 'Hand')" class="m-auto grid grid-rows-2 gap-4">
+            <div v-else-if="(mana <= matchStore.currentTurnManaAvailable || matchStore.currentTurnCanSendToMana == true)" class="m-auto grid grid-rows-2 gap-4">
 
                 <button v-if="mana <= matchStore.currentTurnManaAvailable" class="bg-myBeige text-myBlack font-bold rounded w-[100%] px-4" @click="sendToBattleZone()">
                     BATTLE ZONE

@@ -1,4 +1,5 @@
 <script setup>
+import { onMounted } from 'vue';
 import { useLimitedStore } from '../../../stores/limitedStore';
 import { useMatchStore } from '../../../stores/matchStore';
 
@@ -15,23 +16,18 @@ const props = defineProps({
 
 <template>
     
-    <div v-if="matchStore.currentTurnCanDrawCard === true && state.matches(player + 'Turn')" 
-        class="w-[40%] h-[90%] border-2 border-myBeige m-auto grid cursor-pointer pulse_animation"
-        @click="state.matches(player + 'Turn') ? matchStore.drawCard(player) : null">
+    <div v-if="matchStore.currentTurnCanDrawCard == true" 
+        class="w-[90%] h-full m-auto grid cursor-pointer pulse_animation" title="Draw card"
+        @click="matchStore.drawCard(player)">
 
-        <div class="grid">
-            <img src="../../../assets/Shield.jpg" class="h-28 relative m-auto opacity-30"/>
-            <p class="text-myBeige mt-8 mb-8 ml-4 absolute">
-                DECK
-                <br>
-                GET CARD
-            </p>
+        <div class="grid place-items-center">
+            <img src="../../../assets/Shield.jpg" class="h-[90%] relative opacity-100"/>
         </div>
 
     </div>
 
-    <div v-else-if="state.matches(player + 'TurnLimited') && limitedStore.admissibleDraw == true && limitedStore.limit > 0" 
-        class="w-[40%] h-[90%] border-2 border-myBeige m-auto grid cursor-pointer pulse_animation"
+    <!-- <div v-else-if="state.matches(player + 'TurnLimited') && limitedStore.admissibleDraw == true && limitedStore.limit > 0" 
+        class="w-[100%] h-[90%] border-2 border-myBeige m-auto grid cursor-pointer pulse_animation"
         @click="matchStore.drawCard(player) && limitedStore.limit--">
 
         <div class="grid">
@@ -43,17 +39,12 @@ const props = defineProps({
             </p>
         </div>
 
-    </div>
+    </div> -->
 
-    <div v-else class="w-[40%] h-[90%] border-2 border-myBeige m-auto grid" title="Cannot draw again this turn!">
+    <div v-else class="w-[90%] h-full m-auto grid" title="Cannot draw again this turn!">
 
-        <div class="grid">
-            <img src="../../../assets/Shield.jpg" class="h-28 relative m-auto opacity-30"/>
-            <p class="text-myBeige mt-8 mb-8 ml-4 absolute cursor-default">
-                DECK
-                <br>
-                GET CARD
-            </p>
+        <div class="grid place-items-center" @click="temp()">
+            <img src="../../../assets/Shield.jpg" class="h-[90%] relative opacity-100"/>
         </div>
 
     </div>

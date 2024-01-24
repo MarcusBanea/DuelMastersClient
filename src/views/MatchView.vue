@@ -34,7 +34,6 @@ watch(() => matchStore.ct, () => {
 })
 
 onBeforeRouteLeave(() => {
-    console.log("OUT!");
     matchStore.ct = 0;
     matchStore.isDataLoaded = false;
 

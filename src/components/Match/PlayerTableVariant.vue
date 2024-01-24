@@ -4,10 +4,6 @@ import { useLimitedStore } from '../../stores/limitedStore';
 import BattleZone from './Zones/BattleZone.vue';
 import Mana from './Zones/Mana.vue';
 import Shields from './Zones/Shields.vue';
-import Deck from './Zones/Deck.vue';
-import Graveyard from './Zones/Graveyard.vue';
-import { useMatchStore } from '../../stores/matchStore';
-
 
 const props = defineProps({
     player: String,
@@ -64,7 +60,7 @@ const limited_turn_button_style = computed(() => {
 
         <Shields :player = player :limited = limited :service = service />
 
-        <Deck :player = player :state = state />
+        <!-- <Deck :player = player :state = state /> -->
 
     </div>
 
